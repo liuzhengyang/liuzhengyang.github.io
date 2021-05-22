@@ -136,7 +136,7 @@ invokespecial - 其他的方法调用，private，constructor, super
 链接过程通过调用一个`boostrap method`，传入当前的调用相关信息，`bootstrap method`会返回一个`CallSite`，这个`CallSite`中包含了`MethodHandle`的引用，也就是`CallSite`的target。   
 `invokedynamic`指令便链接到这个`CallSite`上，并把所有的调用delegate到它当前的target`MethodHandle`上。根据target是否需要变换，`CallSite`可以分为`MutableCallSite`、`ConstantCallSite`和`VolatileCallSite`等，可以通过切换target `MethodHandle`实现动态修改要调用的方法。
 
-![invokedynamic](/images/invokedynamic.png)
+![invokedynamic](/assets/images/invokedynamic.png)
 
 ## lambda表达式真正是如何实现的
 

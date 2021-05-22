@@ -46,12 +46,12 @@ Java代码热更新工具正是为了解决这种痛点开发的，修改完代�
 wget https://maven.aliyun.com/repository/public/com/github/liuzhengyang/hotreload-boot/1.0.5/hotreload-boot-1.0.5-jar-with-dependencies.jar
 java -jar hotreload-boot-1.0.5-jar-with-dependencies.jar -localMode
 ```
-![agentinstall](/images/hotreloadinstall.png)
+![agentinstall](/assets/images/hotreloadinstall.png)
 
 #### 2. 安装IDEA插件
 
 点击IDEA页面左上角IntelliJ IDEA -> Preferences -> Plugins，搜索hotfix，安装即可。
-![hotreload-idea](/images/hotreload-idea.png)
+![hotreload-idea](/assets/images/hotreload-idea.png)
 
 #### 3. IDEA插件配置
 
@@ -63,13 +63,13 @@ keyword 填写自己Java进程的唯一标识，用于筛选自己的java进程�
 完成后，点击Apply OK保存。
 
 一个填写示例如下   
-![hotreloadideaconfig](/images/hotreloadideaconfig.png)
+![hotreloadideaconfig](/assets/images/hotreloadideaconfig.png)
 
 #### 4. 开始修改代码
 
 修改完代码后，在编辑器中右键 -> Hot Reload，或者使用快捷键`Cmd + Shift + L`，便可以立即热更新了。   
 下面用一个gif图演示一下
-![hotreloadprocess](/images/HotReloadRecord.gif)
+![hotreloadprocess](/assets/images/HotReloadRecord.gif)
 
 ### 热更新支持范围
 
@@ -92,7 +92,7 @@ java -jar hotreload-registry-1.0.5.jar
 ```
 然后启动hotreload-boot的时候，增加参数 --eurekaServer xxx:8761，xxx是启动eureka那个机器的ip或hostname
 
-![multihost](/images/hotreloadmultihost.png)
+![multihost](/assets/images/hotreloadmultihost.png)
 
 ### 端口冲突怎么办
 

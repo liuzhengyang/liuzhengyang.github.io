@@ -45,7 +45,7 @@ make all
 ```
 make成功   
 
-![openjdkmake](/images/openjdkmake.png)  
+![openjdkmake](/assets/images/openjdkmake.png)  
 
 验证下build出来的热乎的jdk
 
@@ -53,7 +53,7 @@ make成功
 ./build/macosx-x86_64-server-slowdebug/jdk/bin/java -version
 ```
 
-![openjdkimage](/images/openjdkversion.png)
+![openjdkimage](/assets/images/openjdkversion.png)
 
 ## 导入IDE
 
@@ -64,29 +64,29 @@ openjdk中的代码包含了Java(jdk各种jar包)和C++(hotspot虚拟机部分)�
 选择jdk14u下面的src/hotspot目录，然后点OK。
 CLion会帮助我们配置好CMake项目使用的CMakeLists.txt，并且构建代码索引、符号表等，等待加载完成。
 加载后完成点击Clion右上角部分的hotspot|Debug这里，添加一个新的Configuration。   
-![clionconfiguration](/images/addnewconfiguration.png)
+![clionconfiguration](/assets/images/addnewconfiguration.png)
 
 点击Configure Custom Build Targets，点击Add target。   
 
-![addbuildtarget](/images/addbuildtarget.png)   
+![addbuildtarget](/assets/images/addbuildtarget.png)   
 
 name设置成build openjdk，点击Build右边的...，创建External Tools, 点击左下角加号，创建一个Tool，name填make, Program填make，Working directory填下载的openjdk的代码的目录的路径位置，点击OK，保存。
 
-![addbuildtool](/images/addbuildtool.png)
+![addbuildtool](/assets/images/addbuildtool.png)
 
-![customtargetdone](/images/customtargetdone.png)
+![customtargetdone](/assets/images/customtargetdone.png)
 
 然后在Run/Debug Configurations页面中，Target选择刚才创建好的target。Executable选择build出来的jdk的java文件，即上两层目录下的jdk14u/build/macosx-x86_64-server-slowdebug/jdk/bin/java。Program arguments暂时填一个 -version。最后点击Apply OK保存。
 
-![application](/images/CustomBuildApplication.png)
+![application](/assets/images/CustomBuildApplication.png)
 
 然后点击debug
 
-![startdebug](/images/startdebug.png)
+![startdebug](/assets/images/startdebug.png)
 
 经过几个断点后，可以看到熟悉的java -version的结果
 
-![javaversion](/images/javaversiondebug.png)
+![javaversion](/assets/images/javaversiondebug.png)
 
 ## 解决IDE代码大量红色提示
 
@@ -100,14 +100,14 @@ include_directories(../../build/macosx-x86_64-server-slowdebug/jdk/include)
 include_directories(../../build/macosx-x86_64-server-slowdebug/hotspot/variant-server/gensrc)
 include_directories(../../build/macosx-x86_64-server-slowdebug/hotspot/variant-server/gensrc/jvmtifiles)
 ```
-![CMakeListsModify](/images/CMakeListsModify.png)
+![CMakeListsModify](/assets/images/CMakeListsModify.png)
 
 ## 修改hotspot代码
 
 这里我们对代码进行一些简单的修改，验证一下修改流程。
 找到执行java -version的相关代码, abstract_vm_version.cpp，用目前不太熟悉的C++语言打印出一个Hello World。然后重新点击debug按钮。
 
-![debugcodemodify](/images/vmversion.png)
+![debugcodemodify](/assets/images/vmversion.png)
 
 ## 其他问题
 

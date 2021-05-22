@@ -169,6 +169,6 @@ public class AgentAttacher {
 ```
 
 运行这个attach工具，可以在标准输出中看到Agent OnAttach和当前已经加载的类的结果
-![jvmti_attach_output](/images/jvmti_attach_output.png)
+![jvmti_attach_output](/assets/images/jvmti_attach_output.png)
 
 完整源码在: https://github.com/liuzhengyang/jvmti_examples
