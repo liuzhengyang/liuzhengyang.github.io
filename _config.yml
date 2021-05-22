@@ -7,13 +7,13 @@
 
 # Site settings
 title:  公众号「bytejava」
-subtitle: 沉淀、分享、成长，让自己和他人都能有所收获
+subtitle: 学习、分享、共同成长。博客网址bytejava.cn，公众号bytejava
 name: 小阳哥的知识乐园
 email: 140356824@qq.com
-location: My location # ex. Nice, France
-company: MyCompany
+location: 北京
+company: 快手
 company_url: my_company_website
-description: 沉淀、分享、成长，专注于原创专题案例，以最易学习编程的方式分享知识，让自己和他人都能有所收获。目前已完成的专题有；Netty4.x实战专题案例、用Java实现JVM、基于JavaAgent的全链路监控、手写RPC框架、DDD专题案例等。
+description: 学习、分享、共同成长。博客网址bytejava.cn，公众号bytejava，微信 liuzhengyang1234
 keywords: Java、ASM、 JVM
 encoding: "utf-8"
 favicon: favicon.ico
