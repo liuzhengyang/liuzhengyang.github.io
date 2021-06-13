@@ -5,7 +5,7 @@ categories:
     - Java
 ---
 
-![picture 1](../images/28f44647051ada9e6c2b5eb63028c0ace25b1d7c899394b417bdb5fbc2d13b22.png)  
+![picture 1](/assets/images/28f44647051ada9e6c2b5eb63028c0ace25b1d7c899394b417bdb5fbc2d13b22.png)  
 相信很多同学在开发过程中都遇到过类似的IDE提示，当我们在lambda表示中或匿名内部类中访问一个局部变量时，这个变量如果在方法内进行了重新赋值，则IDE/编译器会抛出一个`Variable used in lambda expression should be final or effectively final`这样的异常，那么为什么lambda表达式或匿名内部类中用到的变量需要是final或effectively final的呢？
 (effective final是指虽然变量没有声明final关键字但是在方法中指声明创建后没有修改，也就是事实上的final)
 
