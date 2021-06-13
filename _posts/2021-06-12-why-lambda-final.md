@@ -49,3 +49,5 @@ public static void main(String[] args) {
     System.out.println(counter.get());
 }
 ```
+
+额外拓展: [Java 有值类型吗？](http://www.yinwang.org/blog-cn/2016/06/08/java-value-type)
