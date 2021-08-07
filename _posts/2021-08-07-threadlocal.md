@@ -12,7 +12,7 @@ ThreadLocal的作用是什么？使用时有哪些注意事项？为什么Thread
 
 ## ThreadLocal介绍
 
-用ThreadLocal<T>修饰的变量，一般我们成为线程本地变量。那么一般什么情况下回使用ThreadLocal呢？
+用ThreadLocal<T>修饰的变量，一般我们称为线程本地变量。那么一般什么情况下会使用ThreadLocal呢？
 
 1. 解决线程安全问题。
 线程安全问题一般是多个线程对共享可变变量变量的修改问题，那么如果线程之间不共享变量，自然就解决了这个问题，通过线程本地变量就可以不共享，每个线程只能获取到自己的线程本地变量，线程间互不打扰。比如`java.text.SimpleDateFormat`不是线程安全的，如果多个线程都使用同一个SimpleDateFormat对象进行日期操作，则会出现线程安全问题。一种解决方案就是把SimpleDateFormat对象进行ThreadLocal封装，代码示例如下。
