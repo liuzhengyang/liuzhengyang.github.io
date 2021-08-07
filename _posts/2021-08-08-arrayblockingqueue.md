@@ -101,7 +101,7 @@ class ArrayBlockingQueue<E> {
 put方法的流程为
 
 1. 先加锁
-2. 在锁中while循环判断条件是否满足，不满足调用notFull.await()，await()方法会释放锁，被其他线程signal唤醒后会重新抢锁，再次获得锁后悔继续走到while循环判断条件的地方。
+2. 在锁中while循环判断条件是否满足，不满足调用notFull.await()，await()方法会释放锁，被其他线程signal唤醒后会重新抢锁，再次获得锁后会继续走到while循环判断条件的地方。
 3. 如果条件已经满足，则执行入队操作
 4. 入队完之后调用notEmpty.signal()唤醒一个等待notFull条件的线程
 5. finally中释放锁
@@ -130,7 +130,7 @@ public void put(E e) throws InterruptedException {
 
 2. 为什么while循环需要放在锁内呢？
 
-如果不放在锁内，则可能会出现多个线程同时看到满足条件，进而去加锁入队。虽然入队还是在临界区，但是会出现队列已满，仍然在执行入队操作的情况。这个问题和单利的double check locking中少些一个check的问题类似。
+如果不放在锁内，则可能会出现多个线程同时看到满足条件，进而去加锁入队。虽然入队还是在临界区，但是会出现队列已满，仍然在执行入队操作的情况。这个问题和单例的double check locking中少些一个check的问题类似。
 
 take方法是和put相对应的出队方法，和put流程基本一致
 ```java
