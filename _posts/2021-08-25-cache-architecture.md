@@ -5,8 +5,6 @@ categories:
     - Java
 ---
 
-# 缓存架构模
-
 缓存是一个非常通用的概念，维基百科中的定义是`a store of things that will be required in the future, and can be retrieved rapidly`，缓存在前端页面、服务端、甚至CPU中都有各自的缓存。
 本文主要介绍服务端中的缓存架构和应用，缓存是服务端开发中最常用的中间件之一。
 
