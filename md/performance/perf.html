@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>perf | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="perf">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/performance/perf.html">
+    <meta name="twitter:title" content="perf">
+    <meta name="twitter:url" content="/md/performance/perf.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-301.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <!----> </aside> <div><main class="withouttoc page"> <div class="theme-default-content content__default"><h1 id="perf"><a href="#perf" class="header-anchor">#</a> perf</h1> <h2 id="介绍"><a href="#介绍" class="header-anchor">#</a> 介绍</h2> <p>perf是linux系统中，用来性能分析、诊断、观测、profile的性能分析工具。</p> <ul><li>为什么kernel在on-CPU上消耗这么多CPU，什么代码导致的？</li> <li>导致CPU level 2 cache miss的代码是什么</li> <li>CPU在memory IO上很慢吗</li> <li>哪些代码在申请内存？</li> <li>谁在导致TCP重传？</li> <li>有哪些kernel function被调用、多频繁？</li></ul> <h2 id="安装"><a href="#安装" class="header-anchor">#</a> 安装</h2> <h4 id="centos系统"><a href="#centos系统" class="header-anchor">#</a> centos系统</h4> <div class="language-shell line-numbers-mode"><pre class="language-shell"><code><span class="token function">sudo</span> yum <span class="token function">install</span> -y perf
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><h4 id="在mac中启动一个centos容器进行测试"><a href="#在mac中启动一个centos容器进行测试" class="header-anchor">#</a> 在mac中启动一个centos容器进行测试</h4> <div class="language-shell line-numbers-mode"><pre class="language-shell"><code><span class="token function">docker</span> run --privileged centos <span class="token function">sleep</span> <span class="token number">1000000</span>
+
+<span class="token comment"># 进入容器81451f9c2ca8ebcfdae76c76745593461adb4f7b40449a691a5f5809be8a184b换成自己的容器id，通过docker ps可以看到</span>
+<span class="token function">docker</span> <span class="token builtin class-name">exec</span> -it 81451f9c2ca8ebcfdae76c76745593461adb4f7b40449a691a5f5809be8a184b /bin/sh
+
+<span class="token function">sed</span> -i <span class="token string">'s/mirrorlist/#mirrorlist/g'</span> /etc/yum.repos.d/CentOS-Linux-*
+<span class="token function">sed</span> -i <span class="token string">'s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g'</span> /etc/yum.repos.d/CentOS-Linux-*
+
+yum <span class="token function">install</span> -y perf
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br></div></div><h2 id="使用"><a href="#使用" class="header-anchor">#</a> 使用</h2> <p>perf命令执行时，默认需要root权限。如果使用时，提示权限不足，则需要修改系统配置</p> <div class="language-shell line-numbers-mode"><pre class="language-shell"><code><span class="token builtin class-name">echo</span> <span class="token number">0</span> <span class="token operator">&gt;</span> /proc/sys/kernel/perf_event_paranoid
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><p>使用命令格式</p> <h3 id="perf-list"><a href="#perf-list" class="header-anchor">#</a> perf list</h3> <p>perf list能够展示所有的event type</p> <p>常用指标说明</p> <ul><li>instructions:</li> <li>cycles</li> <li>cache-misses</li> <li>dTLB-loads</li> <li>dTLB-load-misses</li> <li>dTLB-stores</li> <li>dTLB-store-misses</li> <li>L1-dcache-load-misses:</li> <li>L1-dcache-loads</li> <li>L1-dcache-stores</li> <li>L1-icache-store-misses</li> <li>LLC-load-misses</li> <li>LLC-loads</li> <li>LLC-store-misses</li> <li>LLC-stores</li></ul> <h3 id="perf-stat"><a href="#perf-stat" class="header-anchor">#</a> perf stat</h3> <p>下面命令会每秒统计pid进程的cache-missed,cycles等指标，如果需要其他指标（通过perf list或搜索），可以通过逗号分隔加到后面。</p> <p>参数可以通过perf stat -h查看</p> <div class="language-shell line-numbers-mode"><pre class="language-shell"><code>$ perf <span class="token function">stat</span> -h
+
+ Usage: perf <span class="token function">stat</span> <span class="token punctuation">[</span><span class="token operator">&lt;</span>options<span class="token operator">&gt;</span><span class="token punctuation">]</span> <span class="token punctuation">[</span><span class="token operator">&lt;</span>command<span class="token operator">&gt;</span><span class="token punctuation">]</span>
+
+    -a, --all-cpus        system-wide collection from all CPUs
+    -A, --no-aggr         disable CPU count aggregation
+    -B, --big-num         print large numbers with thousands<span class="token string">' separators
+    -C, --cpu &lt;cpu&gt;       list of cpus to monitor in system-wide
+    -c, --scale           scale/normalize counters
+    -D, --delay &lt;n&gt;       ms to wait before starting measurement after program start
+    -d, --detailed        detailed run - start a lot of events
+    -e, --event &lt;event&gt;   event selector. use '</span>perf list' to list available events
+    -G, --cgroup <span class="token operator">&lt;</span>name<span class="token operator">&gt;</span>   monitor event <span class="token keyword">in</span> cgroup name only
+    -g, --group           put the counters into a counter group
+    -I, --interval-print <span class="token operator">&lt;</span>n<span class="token operator">&gt;</span>
+                          print counts at regular interval <span class="token keyword">in</span> ms <span class="token punctuation">(</span>overhead is possible <span class="token keyword">for</span> values <span class="token operator">&lt;=</span> 100ms<span class="token punctuation">)</span>
+    -i, --no-inherit      child tasks <span class="token keyword">do</span> not inherit counters
+    -M, --metrics <span class="token operator">&lt;</span>metric/metric group list<span class="token operator">&gt;</span>
+                          monitor specified metrics or metric <span class="token function">groups</span> <span class="token punctuation">(</span>separated by ,<span class="token punctuation">)</span>
+    -n, --null            null run - dont start any counters
+    -o, --output <span class="token operator">&lt;</span>file<span class="token operator">&gt;</span>   output <span class="token function">file</span> name
+    -p, --pid <span class="token operator">&lt;</span>pid<span class="token operator">&gt;</span>       <span class="token function">stat</span> events on existing process <span class="token function">id</span>
+    -r, --repeat <span class="token operator">&lt;</span>n<span class="token operator">&gt;</span>      repeat <span class="token builtin class-name">command</span> and print average + stddev <span class="token punctuation">(</span>max: <span class="token number">100</span>, forever: <span class="token number">0</span><span class="token punctuation">)</span>
+    -S, --sync            call sync<span class="token punctuation">(</span><span class="token punctuation">)</span> before starting a run
+    -t, --tid <span class="token operator">&lt;</span>tid<span class="token operator">&gt;</span>       <span class="token function">stat</span> events on existing thread <span class="token function">id</span>
+    -T, --transaction     hardware transaction statistics
+    -v, --verbose         be <span class="token function">more</span> verbose <span class="token punctuation">(</span>show counter <span class="token function">open</span> errors, etc<span class="token punctuation">)</span>
+    -x, --field-separator <span class="token operator">&lt;</span>separator<span class="token operator">&gt;</span>
+                          print counts with custom separator
+        --append          append to the output <span class="token function">file</span>
+        --filter <span class="token operator">&lt;</span>filter<span class="token operator">&gt;</span>
+                          event filter
+        --interval-clear  <span class="token function">clear</span> <span class="token function">screen</span> <span class="token keyword">in</span> between new interval
+        --interval-count <span class="token operator">&lt;</span>n<span class="token operator">&gt;</span>
+                          print counts <span class="token keyword">for</span> fixed number of <span class="token builtin class-name">times</span>
+        --log-fd <span class="token operator">&lt;</span>n<span class="token operator">&gt;</span>      log output to fd, instead of stderr
+        --metric-only     Only print computed metrics. No raw values
+        --no-merge        Do not merge identical named events
+        --per-core        aggregate counts per physical processor core
+        --per-socket      aggregate counts per processor socket
+        --per-thread      aggregate counts per thread
+        --post <span class="token operator">&lt;</span>command<span class="token operator">&gt;</span>  <span class="token builtin class-name">command</span> to run after to the measured <span class="token builtin class-name">command</span>
+        --pre <span class="token operator">&lt;</span>command<span class="token operator">&gt;</span>   <span class="token builtin class-name">command</span> to run prior to the measured <span class="token builtin class-name">command</span>
+        --smi-cost        measure SMI cost
+        --table           display details about each run <span class="token punctuation">(</span>only with -r option<span class="token punctuation">)</span>
+        --timeout <span class="token operator">&lt;</span>n<span class="token operator">&gt;</span>     stop workload and print counts after a <span class="token function">timeout</span> period <span class="token keyword">in</span> ms <span class="token punctuation">(</span><span class="token operator">&gt;=</span> 10ms<span class="token punctuation">)</span>
+        --topdown         measure topdown level <span class="token number">1</span> statistics
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br></div></div><div class="language-shell line-numbers-mode"><pre class="language-shell"><code><span class="token comment"># pid换成自己的进程id</span>
+perf <span class="token function">stat</span> -e instructions,cache-misses,cycles,dTLB-loads,dTLB-load-misses,L1-dcache-load-misses,L1-dcache-loads,LLC-load-misses,LLC-loads -a -p pid -I <span class="token number">1000</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><h3 id="perf-top"><a href="#perf-top" class="header-anchor">#</a> perf top</h3> <p>perf top -a</p> <p>perf和async-profiler</p> <h3 id="perf查看cpu栈"><a href="#perf查看cpu栈" class="header-anchor">#</a> perf查看cpu栈</h3> <h2 id="总结"><a href="#总结" class="header-anchor">#</a> 总结</h2></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/performance/perf.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <!----> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><!----> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">perf</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/performance/perf.html#介绍" class="toc-sidebar-link">介绍</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/performance/perf.html#安装" class="toc-sidebar-link">安装</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/performance/perf.html#使用" class="toc-sidebar-link">使用</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/performance/perf.html#perf-list" class="toc-sidebar-link">perf list</a></li><li class="toc-sidebar-sub-header"><a href="/md/performance/perf.html#perf-stat" class="toc-sidebar-link">perf stat</a></li><li class="toc-sidebar-sub-header"><a href="/md/performance/perf.html#perf-top" class="toc-sidebar-link">perf top</a></li><li class="toc-sidebar-sub-header"><a href="/md/performance/perf.html#perf查看cpu栈" class="toc-sidebar-link">perf查看cpu栈</a></li></ul></li><li><a href="/md/performance/perf.html#总结" class="toc-sidebar-link">总结</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/performance/perf.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <!----> <!----></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-301.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

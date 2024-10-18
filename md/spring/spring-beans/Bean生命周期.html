@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Bean生命周期 | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="Bean生命周期">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/spring/spring-beans/Bean%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.html">
+    <meta name="twitter:title" content="Bean生命周期">
+    <meta name="twitter:url" content="/md/spring/spring-beans/Bean%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-327.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>Spring</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/md/spring/springboot启动请求处理过程.html" class="sidebar-link">springboot启动、请求处理过程分析</a></li><li><a href="/md/spring/spring-boot/spring-boot.html" class="sidebar-link">spring boot</a></li><li><a href="/md/spring/spring-beans/spring-beans.html" class="sidebar-link">spring beans</a></li><li><a href="/md/spring/spring-beans/BeanFactoryPostProcessor.html" class="sidebar-link">BeanFactoryPostProcessor</a></li><li><a href="/md/spring/spring-beans/ConfigurationClassPostProcessor.html" class="sidebar-link">ConfigurationClassPostProcessor实现</a></li><li><a href="/md/spring/spring-beans/BeanFactory&amp;ApplicationContext生命周期.html" class="sidebar-link">BeanFactory&amp;ApplicationContext生命周期</a></li><li><a href="/md/spring/spring-beans/BeanPostProcessor.html" class="sidebar-link">BeanPostProcessor</a></li></ul></section></li></ul> </aside> <div><main class="withouttoc page"> <div class="theme-default-content content__default"><h1 id="bean生命周期"><a href="#bean生命周期" class="header-anchor">#</a> Bean生命周期</h1> <p>create bean</p> <p>postProcessBeforeInstantiation</p> <p>doCreateBean</p> <p>createBeanInstance
+applyMergedBeanDefinitionPostProcessors
+populateBean
+postProcessAfterInstantiation
+postProcessProperties
+postProcessPropertyValues</p> <p>initializeBean
+invokeAwareMethods
+postProcessBeforeInitialization
+invokeInitMethod(afterPropertiesSet)
+postProcessAfterInitialization</p></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/spring/spring-beans/Bean生命周期.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <!----> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><!----> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">Bean生命周期</div> <hr> <div class="toc-box"><!----></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/spring/spring-beans/Bean%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <!----> <!----></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-327.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

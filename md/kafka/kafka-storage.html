@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>kafka storage | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="kafka storage">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/kafka/kafka-storage.html">
+    <meta name="twitter:title" content="kafka storage">
+    <meta name="twitter:url" content="/md/kafka/kafka-storage.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-265.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>kafka源码分析</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/md/kafka/kafka.html" class="sidebar-link">kafka</a></li><li><a href="/md/kafka/kafka-setup.html" class="sidebar-link">kafka学习环境搭建</a></li><li><a href="/md/kafka/kafka-producer.html" class="sidebar-link">kafka producer</a></li><li><a href="/md/kafka/kafka-consumer.html" class="sidebar-link">kafka consumer</a></li><li><a href="/md/kafka/kafka-rebalance.html" class="sidebar-link">kafka rebalance</a></li><li><a href="/md/kafka/kafka-replication.html" class="sidebar-link">kafka replication</a></li><li><a href="/md/kafka/kafka-consumer-offset.html" class="sidebar-link">consumer offset</a></li><li><a href="/md/kafka/kafka-raft.html" class="sidebar-link">kafka raft</a></li></ul></section></li></ul> </aside> <div><main class="withouttoc page"> <div class="theme-default-content content__default"><h1 id="kafka-storage"><a href="#kafka-storage" class="header-anchor">#</a> kafka storage</h1> <p>今天我们主要讲解kafka如何接收producer发送消息、保存消息的。</p> <h2 id="kafka是如何存储消息的"><a href="#kafka是如何存储消息的" class="header-anchor">#</a> kafka是如何存储消息的</h2> <h3 id="文件目录"><a href="#文件目录" class="header-anchor">#</a> 文件目录</h3> <p>kafka broker将消息和相关的文件存储在server.properties配置文件中log.dirs的属性的文件夹中。</p> <p>比如我们现在有一个名为test的topic，一个partition。则在log.dirs目录下会有test-0的目录，其中保存test消息的partition为0的日志文件。
+其他还可以看到__consumer_offsets-9这样的文件夹，是kafka内部保存consumer offset的消息的文件夹。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>├── __consumer_offsets-9
+│   ├── 00000000000000000000.index
+│   ├── 00000000000000000000.log
+│   ├── 00000000000000000000.timeindex
+│   ├── leader-epoch-checkpoint
+│   └── partition.metadata
+├── cleaner-offset-checkpoint
+├── log-start-offset-checkpoint
+├── meta.properties
+├── recovery-point-offset-checkpoint
+├── replication-offset-checkpoint
+└── test-0
+    ├── 00000000000000000000.index
+    ├── 00000000000000000000.log
+    ├── 00000000000000000000.timeindex
+    ├── leader-epoch-checkpoint
+    └── partition.metadata
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br></div></div><p>根目录下包含各个TopicPartition文件夹和checkpoint等文件</p> <p>文件夹名称为 {topic}-{partition}，例如topic为test的消息的partition为0的文件夹是test-0</p> <p>TopicPartition文件夹内部的文件有</p> <ul><li>00000000000000000000.log文件，log文件是一系列的log消息的列表，每个列表由一个4byte的数据表示消息长度，然后是对应长度的消息byte。kafka会对log文件进行分段(segment)，每个分段文件的文件名是这个文件中的第一个消息的offset。分段策略是当文件大小超过1G（可以配置）时进行分段，可以避免大文件的查找写入性能下降问题。</li> <li>00000000000000000000.index文件</li> <li>00000000000000000000.timeindex文件</li> <li>leader-epoch-checkpoint</li> <li>partition.metadata文件，保存topic_id（是broker内部的id）和version</li></ul> <p>根目录下的几个文件分别为</p> <ul><li>cleaner-offset-checkpoint</li> <li>log-start-offset-checkpoint</li> <li>meta.properties: 保存cluster.id, broker.id, version</li> <li>recovery-point-offset-checkpoint</li> <li>replication-offset-checkpoint</li></ul> <p>上面我们还可以看到kafka内部使用的记录consumer offset的__consumer_offsets消息文件的文件夹。</p> <h2 id="读写策略"><a href="#读写策略" class="header-anchor">#</a> 读写策略</h2> <p>kafka不会直接写入磁盘，而是先写到操作系统buffer中，等待消息达到一定数量（log.flush.interval.messages配置）或buffer达到一定时间（log.flush.interval.ms/log.flush.scheduler.interval.ms配置）flush同步到磁盘（FileChannel.force())
+所以即使机器故障，最多只会丢失固定数量或固定时间的消息。</p> <p>consumer拉取消息时，broker会查找对应的消息存在的segment文件，因为segment文件的文件名是表示第一个消息的offset，
+TODO broker通过segment文件名内存的二分查找就可以额定位到消息所在的segment文件。
+文件内部的位置怎么定位？TODO</p> <h2 id="清理策略"><a href="#清理策略" class="header-anchor">#</a> 清理策略</h2> <p>旧消息需要清理来避免文件过大导致磁盘占满，清理有删除和压缩两种方式(默认删除），判断是否要清理有时间和消息大小两个策略。</p> <p>时间策略: 按照segment中消息的最大的时间戳计算，如果距离当前时间超过了指定时间(log.retention.hours默认168小时或log.retention.minutes或log.retention.ms)，则会删除这个segment文件。</p> <p>大小策略: 默认关闭，如果开启后，broker当检测到某个partition下所有的segment文件的总大小超过一定的值（可配置），则会删除最旧的segment文件。</p> <h3 id="压缩"><a href="#压缩" class="header-anchor">#</a> 压缩</h3> <p>对于一些比较重要的数据，删除不是一种合适的策略，因为可能出现数据丢失，所以kafka提供了一种压缩的策略。
+压缩策略把消息按照key维度进行保存，只保存一个key最后一条记录，对于状态变更类消息比较友好，比如kafka内部记录offset的__consumer_offsets消息，
+里面保存的就是一个group下某个topic partition的消费的offset，理论上只需要保存最后的offset，所以__consumer_offsets使用这种策略，如果使用删除策略会有可能导致最后的offset记录丢失。</p> <p><img alt="img.png" data-src="/assets/images/kafka/kafka-compact.png" loading="lazy" class="lazy"></p> <h2 id="kafka-broker-处理"><a href="#kafka-broker-处理" class="header-anchor">#</a> Kafka Broker 处理</h2> <ol><li>检查topicPartition是否有权限、是否存在</li> <li>调用replicaManager.appendRecords 保存消息
+<ul><li>appendToLocalLog 保存log到本地
+<ul><li>Partition.appendRecordsToLeader</li></ul></li></ul></li></ol> <p>对于acks=0,1,-1(all)，broker是如何处理的？</p> <p>delayed operation</p> <h2 id="fetch-message时的zero-copy"><a href="#fetch-message时的zero-copy" class="header-anchor">#</a> fetch message时的zero-copy</h2> <h2 id="todo"><a href="#todo" class="header-anchor">#</a> TODO</h2> <h2 id="log文件的磁盘写入时机"><a href="#log文件的磁盘写入时机" class="header-anchor">#</a> Log文件的磁盘写入时机</h2> <p>写入时调用FileChannel.write，写入到操作系统的pagecache内存中。然后定期调用flush，同步到磁盘。</p> <p>刷新策略如下</p> <p>时间策略: 如果一条消息在pagecache中停留时间超过<code>log.flush.interval.ms</code>（如果没有设置会使用<code>log.flush.scheduler.interval.ms</code>）</p> <p>checkpoint</p> <p>index
+timeindex</p></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/kafka/kafka-storage.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <!----> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><!----> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">kafka storage</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/kafka/kafka-storage.html#kafka是如何存储消息的" class="toc-sidebar-link">kafka是如何存储消息的</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/kafka/kafka-storage.html#文件目录" class="toc-sidebar-link">文件目录</a></li></ul></li><li><a href="/md/kafka/kafka-storage.html#读写策略" class="toc-sidebar-link">读写策略</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/kafka/kafka-storage.html#清理策略" class="toc-sidebar-link">清理策略</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/kafka/kafka-storage.html#压缩" class="toc-sidebar-link">压缩</a></li></ul></li><li><a href="/md/kafka/kafka-storage.html#kafka-broker-处理" class="toc-sidebar-link">Kafka Broker 处理</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/kafka/kafka-storage.html#fetch-message时的zero-copy" class="toc-sidebar-link">fetch message时的zero-copy</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/kafka/kafka-storage.html#todo" class="toc-sidebar-link">TODO</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/kafka/kafka-storage.html#log文件的磁盘写入时机" class="toc-sidebar-link">Log文件的磁盘写入时机</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/kafka/kafka-storage.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <!----> <!----></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-265.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

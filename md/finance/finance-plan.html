@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>finance plan | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="finance plan">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/finance/finance-plan.html">
+    <meta name="twitter:title" content="finance plan">
+    <meta name="twitter:url" content="/md/finance/finance-plan.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-100.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <!----> </aside> <div><main class="withouttoc page"> <div class="theme-default-content content__default"><h1 id="finance-plan"><a href="#finance-plan" class="header-anchor">#</a> finance plan</h1> <p>2022年底，7年8个月。2025年6月满10年。
+全国累计缴费15年，北京缴费10年，不能是临时账户。退休前不要回户籍地交社保。</p> <p>2023:
+2024:
+2025:
+2026:
+2027:
+2028:
+2029:
+2030:
+2031:</p> <h2 id="近五年"><a href="#近五年" class="header-anchor">#</a> 近五年</h2> <p>当前2023.5</p> <p>2021.12出生,2024.12满3周岁</p> <p>家庭积分，2023上半年16分。每年加4分。</p> <p>2020年356个人。
+21年15家庭 40，50分 ; 50.5w，270
+22年，22，42, 56分 ；60, 270。
+23年，27.6，47.6，60分； 62分，61.9, 250</p> <h2 id="现金"><a href="#现金" class="header-anchor">#</a> 现金</h2> <p>2024年上半年商业结束</p> <p>7 + 4.5</p> <p>8, 6
+9, 6
+10, 6
+11, 6
+12, 6</p> <p>40</p> <p>2024 25，一月份10（nj) 10。</p> <h2 id="股票"><a href="#股票" class="header-anchor">#</a> 股票</h2> <p>Part1:
+44507: 21617可行权（37447已归属），6590待归属（每月470）
+16074：1543已归属（14531待归属）</p> <p>已行权：55w RMB ,4200 28w HKD，大约80w
+可行权：税前 144w HKD, 8200+21617=3w股</p> <p>22.5.1, 30000<em>65</em>0.93=1813500</p> <p>905000<em>0.65+7160</em>12=674170
+674170*2=1348340</p> <p>22.5.1：133w</p> <p>Part2:
+9088: 3785可行权(7311已归属)，1777待归属（每月118）
+2265: 已归属641，待归属1624（每年10.21 541)</p> <p>1603<em>65</em>0.93=9.7
+3785+1603=5388
+5388<em>65</em>0.93=325704.6</p> <p>162850<em>0.8+1410</em>12=147200</p> <p>147200*2=294400</p> <p>可交易（已归属已行权）3586（21.6w税后）</p> <p>294400+216000=510400</p> <p>24年5月：51w</p> <p>总共：100+134+51+80=365</p> <h2 id="其他"><a href="#其他" class="header-anchor">#</a> 其他</h2> <p>裁员补偿,预计每年增加3000-4000</p> <p>2023 44619
+2025 50000</p> <h1 id="积分落户"><a href="#积分落户" class="header-anchor">#</a> 积分落户</h1> <ul><li>合法稳定就业：社保满一年积3分。2023 8年。</li> <li>合法稳定住所：自有产权满一年1分，租赁满1年0.5分。2014-2022，8年，4分。2023。</li> <li>教育背景：研究生26分</li> <li>职住区域：本市城六区，自有住所居住，满1年2分。最高12分。</li> <li>纳税：纳税满10万，加2分，最多6分。</li> <li>年龄：不超过45，加20分。</li></ul> <p>20 + 24 + 26 + 4 + 1 = 75</p> <p>每年加 3 + 1 = 4分。</p> <h2 id="买房"><a href="#买房" class="header-anchor">#</a> 买房</h2> <h3 id="北京人家"><a href="#北京人家" class="header-anchor">#</a> 北京人家</h3> <p>2023.8。5.1万，2居室70平，400w</p> <p>靠近13号线AB线新龙泽站，附近积水潭医院、离西二旗较近。</p> <p>交通：13号线AB线新龙泽站
+商业：
+学校：
+医院：
+环境：
+物业：</p> <h2 id="汽车"><a href="#汽车" class="header-anchor">#</a> 汽车</h2> <h3 id="_10座黄牌车"><a href="#_10座黄牌车" class="header-anchor">#</a> 10座黄牌车</h3> <ul><li>福田G7，8w，改装</li> <li>上汽大通G10，16年老车，13w</li></ul> <h3 id="专项作业车"><a href="#专项作业车" class="header-anchor">#</a> 专项作业车</h3> <h3 id="河北车牌"><a href="#河北车牌" class="header-anchor">#</a> 河北车牌</h3> <h2 id="行权"><a href="#行权" class="header-anchor">#</a> 行权</h2> <p>2023 (2500+ 1443)<em>56</em>0.93=20.53w
+130200 130200*0.1-2520
+(660000-205300)/0.93/56=8730.79877112</p> <p>660000/0.93/56=12672.81105991</p></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/finance/finance-plan.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <!----> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><!----> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">finance plan</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/finance/finance-plan.html#近五年" class="toc-sidebar-link">近五年</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/finance/finance-plan.html#现金" class="toc-sidebar-link">现金</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/finance/finance-plan.html#股票" class="toc-sidebar-link">股票</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/finance/finance-plan.html#其他" class="toc-sidebar-link">其他</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/finance/finance-plan.html#买房" class="toc-sidebar-link">买房</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/finance/finance-plan.html#北京人家" class="toc-sidebar-link">北京人家</a></li></ul></li><li><a href="/md/finance/finance-plan.html#汽车" class="toc-sidebar-link">汽车</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/finance/finance-plan.html#_10座黄牌车" class="toc-sidebar-link">10座黄牌车</a></li><li class="toc-sidebar-sub-header"><a href="/md/finance/finance-plan.html#专项作业车" class="toc-sidebar-link">专项作业车</a></li><li class="toc-sidebar-sub-header"><a href="/md/finance/finance-plan.html#河北车牌" class="toc-sidebar-link">河北车牌</a></li></ul></li><li><a href="/md/finance/finance-plan.html#行权" class="toc-sidebar-link">行权</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/finance/finance-plan.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <!----> <!----></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-100.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

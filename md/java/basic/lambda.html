@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>lambda表达式实现原理分析 | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="lambda表达式实现原理分析">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/java/basic/lambda.html">
+    <meta name="twitter:title" content="lambda表达式实现原理分析">
+    <meta name="twitter:url" content="/md/java/basic/lambda.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-129.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>Java并发</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/md/java/basic/java线程池.html" class="sidebar-link">ThreadPoolExecutor</a></li><li><a href="/md/java/basic/HashMap.html" class="sidebar-link">HashMap源码分析</a></li><li><a href="/md/java/basic/ConcurrentHashMap.html" class="sidebar-link">ConcurrentHashMap</a></li><li><a href="/md/java/basic/ThreadLocal.html" class="sidebar-link">ThreadLocal源码分析</a></li><li><a href="/md/java/basic/ArrayBlockingQueue阻塞队列.html" class="sidebar-link">ArrayBlockingQueue</a></li><li><a href="/md/java/basic/AbstractQueuedSynchronizer.html" class="sidebar-link">AQS详解</a></li><li><a href="/md/java/basic/ReentrantLock.html" class="sidebar-link">ReentrantLock</a></li><li><a href="/md/java/basic/ReentrantReadWriteLock.html" class="sidebar-link">ReentrantReadWriteLock</a></li><li><a href="/md/java/basic/CountDownLatch.html" class="sidebar-link">CountDownLatch</a></li><li><a href="/md/java/basic/LongAdder.html" class="sidebar-link">高并发计数类LongAdder</a></li><li><a href="/md/java/basic/AtomicInteger.html" class="sidebar-link">AtomicInteger</a></li><li><a href="/md/java/basic/动态代理.html" class="sidebar-link">Java动态代理</a></li><li><a href="/md/java/basic/lambda.html" aria-current="page" class="active sidebar-link">lambda表达式实现原理分析</a></li><li><a href="/md/java/basic/why-lambda-final.html" class="sidebar-link">lambda中的final修饰符</a></li><li><a href="/md/java/basic/ThreadLocalRandom.html" class="sidebar-link">ThreadLocalRandom</a></li><li><a href="/md/java/basic/rate-limit.html" class="sidebar-link">rate limiter关于限速器所需要了解的知识</a></li></ul></section></li></ul> </aside> <div><main class="page"> <div class="theme-default-content content__default"><h1 id="lambda表达式实现原理分析"><a href="#lambda表达式实现原理分析" class="header-anchor">#</a> lambda表达式实现原理分析</h1> <h2 id="java为什么需要lambda表达式"><a href="#java为什么需要lambda表达式" class="header-anchor">#</a> Java为什么需要lambda表达式？</h2> <p>能够提升代码简洁性、提高代码可读性。</p> <p>例如，在平时的开发过程中，把一个列表转换成另一个列表或map等等这样的转换操作是一种常见需求。<br>
+在没有lambda之前通常都是这样实现的。</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Long</span><span class="token punctuation">&gt;</span></span> idList <span class="token operator">=</span> <span class="token class-name">Arrays</span><span class="token punctuation">.</span><span class="token function">asList</span><span class="token punctuation">(</span><span class="token number">1L</span><span class="token punctuation">,</span> <span class="token number">2L</span><span class="token punctuation">,</span> <span class="token number">3L</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Person</span><span class="token punctuation">&gt;</span></span> personList <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">long</span> id <span class="token operator">:</span> idList<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    personList<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token function">getById</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><p>代码重复多了之后，大家就会对这种常见代码进行抽象，形成一些类库便于复用。<br>
+上面的需求可以抽象成：对一个列表中的每个元素调用一个转换函数转换并输出结果列表。</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token keyword">interface</span> <span class="token class-name">Function</span> <span class="token punctuation">{</span>
+    <span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">T</span><span class="token punctuation">,</span> <span class="token class-name">R</span><span class="token punctuation">&gt;</span></span> <span class="token class-name">R</span> <span class="token function">fun</span><span class="token punctuation">(</span><span class="token class-name">T</span> input<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">T</span><span class="token punctuation">,</span> <span class="token class-name">R</span><span class="token punctuation">&gt;</span></span> <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">R</span><span class="token punctuation">&gt;</span></span> <span class="token function">map</span><span class="token punctuation">(</span><span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">T</span><span class="token punctuation">&gt;</span></span> inputList<span class="token punctuation">,</span> <span class="token class-name">Function</span> function<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">R</span><span class="token punctuation">&gt;</span></span> mappedList <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">T</span> t <span class="token operator">:</span> inputList<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        mappedList<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>function<span class="token punctuation">.</span><span class="token function">fun</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> mappedList<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br></div></div><p>有了这个抽象，最开始的代码便可以&quot;简化&quot;成</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Long</span><span class="token punctuation">&gt;</span></span> idList <span class="token operator">=</span> <span class="token class-name">Arrays</span><span class="token punctuation">.</span><span class="token function">asList</span><span class="token punctuation">(</span><span class="token number">1L</span><span class="token punctuation">,</span> <span class="token number">2L</span><span class="token punctuation">,</span> <span class="token number">3L</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Person</span><span class="token punctuation">&gt;</span></span> personList <span class="token operator">=</span> <span class="token function">map</span><span class="token punctuation">(</span>idList<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Function</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Long</span><span class="token punctuation">,</span> <span class="token class-name">Person</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token class-name">Person</span> <span class="token function">fun</span><span class="token punctuation">(</span><span class="token class-name">Long</span> input<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token function">getById</span><span class="token punctuation">(</span>input<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br></div></div><p>虽然实现逻辑少了一些，但是同样也遗憾地发现，代码行数还变多了。<br> <strong>因为Java语言中函数并不能作为参数传递到方法中</strong>，函数只能寄存在一个类中表示。为了能够把函数作为参数传递到方法中，我们被迫使用了匿名内部类实现，需要加相当多的冗余代码。<br>
+在一些支持函数式编程的语言(Functional Programming Language)中（例如Python, Scala, Kotlin等)，函数是一等公民，函数可以成为参数传递以及作为返回值返回。<br>
+例如在Kotlin中，上述的代码可以缩减到很短，代码只包含关键内容，没有冗余信息。</p> <div class="language-kotlin line-numbers-mode"><pre class="language-kotlin"><code><span class="token keyword">val</span> personList <span class="token operator">=</span> idList<span class="token punctuation">.</span><span class="token function">map</span> <span class="token punctuation">{</span> id <span class="token operator">-&gt;</span> <span class="token function">getById</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span> <span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><p>这样的编写效率差距也导致了一部分Java用户流失到其他语言，不过最终终于在JDK8也提供了Lambda表达式能力，来支持这种函数传递。</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Person</span><span class="token punctuation">&gt;</span></span> personList <span class="token operator">=</span> <span class="token function">map</span><span class="token punctuation">(</span>idList<span class="token punctuation">,</span> input <span class="token operator">-&gt;</span> <span class="token function">getById</span><span class="token punctuation">(</span>input<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><h2 id="lambda表达式只是匿名内部类的语法糖吗"><a href="#lambda表达式只是匿名内部类的语法糖吗" class="header-anchor">#</a> Lambda表达式只是匿名内部类的语法糖吗？</h2> <p>如果要在Java语言中实现lambda表达式，初步观察，通过javac把这种箭头语法还原成匿名内部类，就可以轻松实现，因为它们功能基本是等价的（IDEA中经常有提示)。</p> <p>但是匿名内部类有一些缺点。</p> <ol><li>每个匿名内部类都会在编译时创建一个对应的class，并且是有文件的，因此在运行时不可避免的会有加载、验证、准备、解析、初始化的类加载过程。</li> <li>每次调用都会创建一个这个匿名内部类class的实例对象，无论是有状态的(capturing，从上下文中捕获一些变量）还是无状态（non-capturing)的内部类。</li></ol> <h2 id="invokedynamic介绍"><a href="#invokedynamic介绍" class="header-anchor">#</a> invokedynamic介绍</h2> <p>如果有一种函数引用、指针就好了，但JVM中并没有函数类型表示。<br>
+Java中有表示函数引用的对象吗，反射中有个Method对象，但它的问题是性能问题，每次执行都会进行安全检查，且参数都是Object类型，需要boxing等等。</p> <p>还有其他表示函数引用的方法吗？<code>MethodHandle</code>，它是在JDK7中与<code>invokedynamic</code>指令等一起提供的新特性。</p> <p>但直接使用<code>MethodHandle</code>来实现，由于没有签名信息，会遇不能重载的问题。并且<code>MethodHandle</code>的invoke方法性能不一定能保证比字节码调用好。</p> <h3 id="invokedynamic出现的背景"><a href="#invokedynamic出现的背景" class="header-anchor">#</a> invokedynamic出现的背景</h3> <p>JVM上的动态语言（JRuby, Scala等)，要实现dynamic typing动态类型，是比较麻烦的。<br>
+这里简单解释一下什么是dynamic typing，与其相对的是static typing静态类型。<br>
+static typing: 所有变量的类型在编译时都是确定的，并且会进行类型检查。<br>
+dynamic typing: 变量的类型在编译时不能确定，只能在运行时才能确定、检查。</p> <p>例如如下动态语言的例子，a和b的类型都是未知的，因此a.append(b)这个方法是什么也是未知的。</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>def add(val a, val b)
+    a.append(b)
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><p>而在Java中a和b的类型在编译时就能确定。</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>SimpleString add(SimpleString a, SimpleString b) {
+    return a.append(b);
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><p>编译后的字节码如下，通过<code>invokevirtual</code>明确调用变量a的函数签名为<code>(LSimpleString;)LSimpleString;</code>的方法。</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>0: aload_1
+1: aload_2
+2: invokevirtual #2 // Method SimpleString.append:(LSimpleString;)LSimpleString;
+5: areturn
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br></div></div><p>关于方法调用的字节码指令，JVM中提供了四种。<br>
+invokestatic - 调用静态方法<br>
+invokeinterface - 调用接口方法<br>
+invokevirtual - 调用实例非接口方法的public方法<br>
+invokespecial - 其他的方法调用，private，constructor, super<br>
+这几种方法调用指令，在编译的时候就已经明确指定了要调用什么样的方法，且均需要接收一个明确的常量池中的方法的符号引用，并进行类型检查，是不能随便传一个不满足类型要求的对象来调用的，即使传过来的类型中也恰好有一样的方法签名也不行。</p> <h3 id="invokedynamic功能"><a href="#invokedynamic功能" class="header-anchor">#</a> invokedynamic功能</h3> <p>这个限制让JVM上的动态语言实现者感到很艰难，只能暂时通过性能较差的反射等方式实现动态类型。<br>
+这说明在字节码层面无法支持动态分派，该怎么办呢，又用到了大家熟悉的&quot;All problems in computer science can be solved by another level of indirection&quot;了。<br>
+要实现动态分派，既然不能在编译时决定，那么我们把这个决策推迟到运行时再决定，由用户的自定义代码告诉给JVM要执行什么方法。</p> <p>在jdk7，Java提供了<code>invokedynamic</code>指令来解决这个问题，同时搭配的还有<code>java.lang.invoke</code>包。<br>
+这个指令大部分用户不太熟悉，因为不像invokestatic等指令，它在Java语言中并没有和它相关的直接概念。</p> <p>关键的概念有如下几个</p> <ol><li>invokedynamic指令: 运行时JVM第一次到这里的时候会进行linkage，会调用用户指定的bootstrap method来决定要执行什么方法，之后便不需要这个解析步骤。这个<code>invokedynamic</code>指令出现的地方也叫做<code>dynamic call site</code></li> <li>Bootstrap Method: 用户可以自己编写的方法，实现自己的逻辑最终返回一个CallSite对象。</li> <li>CallSite: 负责通过getTarget()方法返回MethodHandle</li> <li>MethodHandle: MethodHandle表示的是要执行的方法的指针</li></ol> <p>再串联起来梳理下</p> <p><code>invokedynamic</code>在最开始时处于未链接(unlinked)状态，这时这个指令并不知道要调用的目标方法是什么。<br>
+当JVM要第一次执行某个地方的<code>invokedynamic</code>指令的时候，<code>invokedynamic</code>必须先进行链接(linkage)。<br>
+链接过程通过调用一个<code>boostrap method</code>，传入当前的调用相关信息，<code>bootstrap method</code>会返回一个<code>CallSite</code>，这个<code>CallSite</code>中包含了<code>MethodHandle</code>的引用，也就是<code>CallSite</code>的target。<br> <code>invokedynamic</code>指令便链接到这个<code>CallSite</code>上，并把所有的调用delegate到它当前的target<code>MethodHandle</code>上。根据target是否需要变换，<code>CallSite</code>可以分为<code>MutableCallSite</code>、<code>ConstantCallSite</code>和<code>VolatileCallSite</code>等，可以通过切换target <code>MethodHandle</code>实现动态修改要调用的方法。</p> <p><img alt="invokedynamic" data-src="/assets/images/lambda/invokedynamic.png" loading="lazy" class="lazy"></p> <h2 id="lambda表达式真正是如何实现的"><a href="#lambda表达式真正是如何实现的" class="header-anchor">#</a> lambda表达式真正是如何实现的</h2> <p>下面直接看一下目前java实现lambda的方式</p> <p>以下面的代码为例</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">RunnableTest</span> <span class="token punctuation">{</span>
+    <span class="token keyword">void</span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">Function</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Integer</span><span class="token punctuation">,</span> <span class="token class-name">Integer</span><span class="token punctuation">&gt;</span></span> function <span class="token operator">=</span> input <span class="token operator">-&gt;</span> input <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        function<span class="token punctuation">.</span><span class="token function">apply</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br></div></div><p>编译后通过javap查看生成的字节码</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>void run();
+    descriptor: ()V
+    flags:
+    Code:
+      stack=2, locals=2, args_size=1
+         0: invokedynamic #2,  0              // InvokeDynamic #0:apply:()Ljava/util/function/Function;
+         5: astore_1
+         6: aload_1
+         7: iconst_1
+         8: invokestatic  #3                  // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+        11: invokeinterface #4,  2            // InterfaceMethod java/util/function/Function.apply:(Ljava/lang/Object;)Ljava/lang/Object;
+        16: pop
+        17: return
+      LineNumberTable:
+        line 12: 0
+        line 13: 6
+        line 14: 17
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0      18     0  this   Lcom/github/liuzhengyang/invokedyanmic/RunnableTest;
+            6      12     1 function   Ljava/util/function/Function;
+      LocalVariableTypeTable:
+        Start  Length  Slot  Name   Signature
+            6      12     1 function   Ljava/util/function/Function&lt;Ljava/lang/Integer;Ljava/lang/Integer;&gt;;
+
+private static java.lang.Integer lambda$run$0(java.lang.Integer);
+    descriptor: (Ljava/lang/Integer;)Ljava/lang/Integer;
+    flags: ACC_PRIVATE, ACC_STATIC, ACC_SYNTHETIC
+    Code:
+      stack=2, locals=1, args_size=1
+         0: aload_0
+         1: invokevirtual #5                  // Method java/lang/Integer.intValue:()I
+         4: iconst_1
+         5: iadd
+         6: invokestatic  #3                  // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+         9: areturn
+      LineNumberTable:
+        line 12: 0
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0      10     0 input   Ljava/lang/Integer;
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br></div></div><p>对应<code>Function&lt;Integer, Integer&gt; function = input -&gt; input + 1;</code>这一行的字节码为</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>0: invokedynamic #2,  0              // InvokeDynamic #0:apply:()Ljava/util/function/Function;
+5: astore_1
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><p>这里再复习一下<code>invokedynamic</code>的步骤。</p> <ol><li>JVM第一次解析时，调用用户定义的<code>bootstrap method</code></li> <li><code>bootstrap method</code>会返回一个<code>CallSite</code></li> <li><code>CallSite</code>中能够得到<code>MethodHandle</code>，表示方法指针</li> <li>JVM之后调用这里就不再需要重新解析，直接绑定到这个<code>CallSite</code>上，调用对应的target <code>MethodHandle</code>，并能够进行inline等调用优化</li></ol> <p>第一行<code>invokedynamic</code>后面有两个参数，第二个0没有意义固定为0
+第一个参数是#2，指向的是常量池中类型为<a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.10" target="_blank" rel="noopener noreferrer">CONSTANT_InvokeDynamic_info<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a>的常量。</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>#2 = InvokeDynamic      #0:#32         // #0:apply:()Ljava/util/function/Function;
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><p>这个常量对应的#0:#32中第二个#32表示的是这个<code>invokedynamic</code>指令对应的动态方法的名字和方法签名（方法类型）</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>#32 = NameAndType        #43:#44        // apply:()Ljava/util/function/Function;
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><p>第一个#0表示的是<code>bootstrap method</code>在BootstrapMethods表中的索引。在javap结果的最后看到是</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>BootstrapMethods:
+  0: #28 invokestatic java/lang/invoke/LambdaMetafactory.metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #29 (Ljava/lang/Object;)Ljava/lang/Object;
+      #30 invokestatic com/github/liuzhengyang/invokedyanmic/RunnableTest.lambda$run$0:(Ljava/lang/Integer;)Ljava/lang/Integer;
+      #31 (Ljava/lang/Integer;)Ljava/lang/Integer;
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br></div></div><p>再看下<code>BootstrapMethods</code>属性对应<a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.23" target="_blank" rel="noopener noreferrer">JVM虚拟机规范<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a>里的说明。</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>BootstrapMethods_attribute {
+    u2 attribute_name_index;
+    u4 attribute_length;
+    u2 num_bootstrap_methods;
+    {   u2 bootstrap_method_ref;
+        u2 num_bootstrap_arguments;
+        u2 bootstrap_arguments[num_bootstrap_arguments];
+    } bootstrap_methods[num_bootstrap_methods];
+}
+
+bootstrap_method_ref
+The value of the bootstrap_method_ref item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_MethodHandle_info structure
+
+bootstrap_arguments[]
+Each entry in the bootstrap_arguments array must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_String_info, CONSTANT_Class_info, CONSTANT_Integer_info, CONSTANT_Long_info, CONSTANT_Float_info, CONSTANT_Double_info, CONSTANT_MethodHandle_info, or CONSTANT_MethodType_info structure
+
+CONSTANT_MethodHandle_info The CONSTANT_MethodHandle_info structure is used to represent a method handle
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br></div></div><p>这个BootstrapMethod属性可以告诉<code>invokedynamic</code>指令需要的<code>boostrap method</code>的引用以及参数的数量和类型。
+#28对应的是bootstrap_method_ref，为</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>#28 = MethodHandle       #6:#40         // invokestatic java/lang/invoke/LambdaMetafactory.metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><p>按照JVM规范，BootstrapMethod接收3个标准参数和一些自定义参数，标准参数如下</p> <ol><li><code>MethodHandles.$Lookup</code>类型的caller参数，这个对象能够通过类似反射的方式拿到在执行<code>invokedynamic</code>指令这个环境下能够调动到的方法，比如其他类的private方法是调用不到的。这个参数由JVM来入栈</li> <li>String类型的invokedName参数，表示<code>invokedynamic</code>要实现的方法的名字，在这里是<code>apply</code>，是lambda表达式实现的方法名，这个参数由JVM来入栈</li> <li>MethodType类型的invokedType参数，表示<code>invokedynamic</code>要实现的方法的类型，在这里是<code>()Function</code>，这个参数由JVM来入栈</li></ol> <p>#29,#30,#31是可选的自定义参数类型</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>#29 = MethodType         #41            //  (Ljava/lang/Object;)Ljava/lang/Object;
+#30 = MethodHandle       #6:#42         // invokestatic com/github/liuzhengyang/invokedyanmic/RunnableTest.lambda$run$0:(Ljava/lang/Integer;)Ljava/lang/Integer;
+#31 = MethodType         #21            //  (Ljava/lang/Integer;)Ljava/lang/Integer;
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><p>通过<code>java.lang.invoke.LambdaMetafactory#metafactory</code>的代码说明下</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>public static CallSite metafactory(MethodHandles.Lookup caller,
+        String invokedName,
+        MethodType invokedType,
+        MethodType samMethodType,
+        MethodHandle implMethod,
+        MethodType instantiatedMethodType)
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br></div></div><p>前面三个介绍过了，剩下几个为<br>
+MethodType samMethodType: sam(SingleAbstractMethod)就是<code>#29 = MethodType #41 // (Ljava/lang/Object;)Ljava/lang/Object;</code>，表示要实现的方法对象的类型，不过它没有泛型信息，(Ljava/lang/Object;)Ljava/lang/Object;<br>
+MethodHandle implMethod: 真正要执行的方法的位置，这里是<code>com.github.liuzhengyang.invokedyanmic.Runnable.lambda$run$0(Integer)Integer/invokeStatic</code>，这里是javac生成的一个对lambda解语法糖之后的方法，后面进行介绍<br>
+MethodType instantiatedMethodType: 和samMethod基本一样，不过会包含泛型信息，(Ljava/lang/Integer;)Ljava/lang/Integer;</p> <p><code>private static java.lang.Integer lambda$run$0(java.lang.Integer);</code>这个方法是有javac把lambda表达式desugar解语法糖生成的方法，如果lambda表达式用到了上下文变量，则为有状态的，这个表达式也叫做capturing-lambda，会把变量作为这个生成方法的参数传进来，没有状态则为non-capturing。<br>
+另外如果使用的是java8的MethodReference，例如Main::run这种语法则说明有可以直接调用的方法，就不需要再生成一个中间方法。</p> <p>继续看<code>5: astore_1</code>这条指令，表示把当前操作数栈的对象引用保存到index为1的局部变量表中，即赋值给了function变量。<br>
+说明前面执行完<code>invokedynamic #2, 0</code>后，在操作数栈中插入了一个类型为Function的对象。<br>
+这里的过程需要继续看一下<code>LambdaMetafactory#metafactory</code>的实现。</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>mf = new InnerClassLambdaMetafactory(caller, invokedType,
+                                        invokedName, samMethodType,
+                                        implMethod, instantiatedMethodType,
+                                        false, EMPTY_CLASS_ARRAY, EMPTY_MT_ARRAY);
+mf.validateMetafactoryArgs();
+return mf.buildCallSite();
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br></div></div><p>创建了一个<code>InnerClassLambdaMetafactory</code>，然后调用<code>buildCallSite</code>返回CallSite</p> <p>看一下<code>InnerClassLambdaMetafactory</code>是做什么的: <code>Lambda metafactory implementation which dynamically creates an inner-class-like class per lambda callsite.</code></p> <p>怎么回事！饶了一大圈还是创建了一个inner class！先不要慌，先看完，最后分析下和普通inner class的区别。</p> <p>创建<code>InnerClassLambdaMetafactory</code>的过程大概是参数的一些赋值和初始化等<br>
+再看<code>buildCallSite</code>，这个复杂一些，方法描述说明为<code>Build the CallSite. Generate a class file which implements the functional interface, define the class, if there are no parameters create an instance of the class which the CallSite will return, otherwise, generate handles which will call the class' constructor.</code></p> <p>创建一个实现functional interface的的class文件，define这个class，如果是没有参数non-capturing类型的创建一个类实例，CallSite可以固定返回这个实例，否则有状态，CallSite每次都要通过构造函数来生成新对象。<br>
+这里相比普通的InnerClass，有一个内存优化，无状态就使用一个对象。</p> <p>方法实现的第一步是调用spinInnerClass()，通过ASM生成一个function interface的实现类字节码并且进行类加载返回。</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>只保留关键代码
+cw.visit(CLASSFILE_VERSION, ACC_SUPER + ACC_FINAL + ACC_SYNTHETIC, lambdaClassName, null, JAVA_LANG_OBJECT, interfaces);
+for (int i = 0; i &lt; argDescs.length; i++) {
+    FieldVisitor fv = cw.visitField(ACC_PRIVATE + ACC_FINAL, argNames[i], argDescs[i], null, null);
+    fv.visitEnd();
+}
+generateConstructor();
+if (invokedType.parameterCount() != 0) {
+    generateFactory();
+}
+// Forward the SAM method
+MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, samMethodName, samMethodType.toMethodDescriptorString(), null, null);
+mv.visitAnnotation(&quot;Ljava/lang/invoke/LambdaForm$Hidden;&quot;, true);
+new ForwardingMethodGenerator(mv).generate(samMethodType);
+
+byte[] classBytes = cw.toByteArray();
+
+return UNSAFE.defineAnonymousClass(targetClass, classBytes, null);
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br></div></div><p>生成方法为</p> <ol><li>声明要实现的接口</li> <li>创建保存参数用的各个字段</li> <li>生成构造函数，如果有参数，则生成一个static Factory方法</li> <li>实现function interface里的要实现的方法，forward到implMethodName上，也就是javac生成的方法或者MethodReference指向的方法</li> <li>生成完毕，通过ClassWrite.toByteArray拿到class字节码数组</li> <li>通过UNSAFE.defineAnonymousClass(targetClass, classBytes, null) define这个内部类class。这里的defineAnonymousClass比较特殊，它创建出来的匿名类会挂载到targetClass这个宿主类上，然后可以用宿主类的类加载器加载这个类。但是不会但是并不会放到SystemDirectory里，SystemDirectory是类加载器对象+类名字到kclass地址的映射，没有放到这个Directory里，就可以重复加载了，来方便实现一些动态语言的功能，并且能够防止一些内存泄露情况。</li></ol> <p>这些比较抽象，直观的看一下生成的结果</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>// $FF: synthetic class
+final class RunnableTest$$Lambda$1 implements Function {
+    private RunnableTest$$Lambda$1() {
+    }
+
+    @Hidden
+    public Object apply(Object var1) {
+        return RunnableTest.lambda$run$0((Integer)var1);
+    }
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br></div></div><p>如果有参数的情况呢，例如从外部类中使用了一个非静态字段，并使用了一个外部局部变量</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>private int a;
+void run() {
+    int b = 0;
+    Function&lt;Integer, Integer&gt; function = input -&gt; input + 1 + a + b;
+    function.apply(1);
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br></div></div><p>对应的结果为</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>final class RunnableTest$$Lambda$1 implements Function {
+    private final RunnableTest arg$1;
+    private final int arg$2;
+
+    private RunnableTest$$Lambda$1(RunnableTest var1, int var2) {
+        this.arg$1 = var1;
+        this.arg$2 = var2;
+    }
+
+    private static Function get$Lambda(RunnableTest var0, int var1) {
+        return new RunnableTest$$Lambda$1(var0, var1);
+    }
+
+    @Hidden
+    public Object apply(Object var1) {
+        return this.arg$1.lambda$run$0(this.arg$2, (Integer)var1);
+    }
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br></div></div><p>创建完inner class之后，就是生成需要的CallSite了。
+如果没有参数，则生成这个inner class的一个function interface对象示例，创建一个固定返回这个对象的MethodHandle，再包装成ConstantCallSite返回。<br>
+如果有参数，则返回一个需要每次调用Factory方法产生function interface的对象实例的MethodHandle，包装成ConstantCallSite返回。</p> <p>这样就完成了bootstrap的过程。invokedynamic链接完之后，后面的调用就直接调用到对应的MethodHandle了，具体是实现就是返回固定的内部类对象，或每次创建新内部类对象。</p> <h2 id="再次对比通过invokedynamic相对于直接匿名内部类语法糖的优势"><a href="#再次对比通过invokedynamic相对于直接匿名内部类语法糖的优势" class="header-anchor">#</a> 再次对比通过invokedynamic相对于直接匿名内部类语法糖的优势</h2> <p>我们再想一下，Java8实现这一套骚操作的原因是什么。
+既然lambda表达式又不需要什么动态分派(调动哪个方法是明确的), 为什么要用invokedynamic呢？<br>
+JVM虚拟机的一个基本保证就是低版本的class文件也是能够在高版本的JVM上运行的，并且JVM虚拟机通过版本升级，是在不断优化和提升性能的。</p> <p>直接转换成内部类实现，固然简单，但编译后的二进制字节码（包括第三方jar包等）内容就固定了，实现固定为创建内部类对象+invoke{virtual, static, special, interface}调用。<br>
+未来提升性能只能靠提升创建类对象、invoke指令调用这几个地方的优化。换个熟悉点的说法就是这里写死了。<br>
+如果通过invokedynamic呢，javac编译后把足够的信息保留了下来，在JVM执行时能够动态决定如何实现lambda，也就能不断优化lambda表达式的实现，并保持兼容性，给未来留下了更多可能。</p> <h2 id="总结"><a href="#总结" class="header-anchor">#</a> 总结</h2> <p>本文是我学习lambda的一些总结，介绍了lambda表达式出现的原因、实现方法以及不同实现思路上的对比。
+对lambda知识也只是略看了一些代码、资料，如有错误或不明确的地方还请大家无情指出。</p> <h2 id="扩展"><a href="#扩展" class="header-anchor">#</a> 扩展</h2> <p>注意MethodReference和lambda表达式的处理方式略有不同</p> <p>例如</p> <p>// 实例字段field
+String s = null;</p> <p>() -&gt; s.toString() 和 s::toString，前者在赋值时不会出现异常，而后者会抛出NPE。</p> <p>前者编译出来的代码，依赖的是s的外部context作为构造函数参数。而后者会把String作为lambda生成的匿名内部类的构造函数参数</p></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/java/basic/lambda.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+        ←
+        <a href="/md/java/basic/动态代理.html" class="prev">
+          Java动态代理
+        </a></span> <span class="next"><a href="/md/java/basic/why-lambda-final.html">
+          lambda中的final修饰符
+        </a>
+        →
+      </span></p></div> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><div class="option-box-toc-fixed"><div class="toc-container-sidebar"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:650px"><div style="font-weight:bold;text-align:center;">lambda表达式实现原理分析</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/java/basic/lambda.html#java为什么需要lambda表达式" class="toc-sidebar-link">Java为什么需要lambda表达式？</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/lambda.html#lambda表达式只是匿名内部类的语法糖吗" class="toc-sidebar-link">Lambda表达式只是匿名内部类的语法糖吗？</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/lambda.html#invokedynamic介绍" class="toc-sidebar-link">invokedynamic介绍</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/java/basic/lambda.html#invokedynamic出现的背景" class="toc-sidebar-link">invokedynamic出现的背景</a></li><li class="toc-sidebar-sub-header"><a href="/md/java/basic/lambda.html#invokedynamic功能" class="toc-sidebar-link">invokedynamic功能</a></li></ul></li><li><a href="/md/java/basic/lambda.html#lambda表达式真正是如何实现的" class="toc-sidebar-link">lambda表达式真正是如何实现的</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/lambda.html#再次对比通过invokedynamic相对于直接匿名内部类语法糖的优势" class="toc-sidebar-link">再次对比通过invokedynamic相对于直接匿名内部类语法糖的优势</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/lambda.html#总结" class="toc-sidebar-link">总结</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/lambda.html#扩展" class="toc-sidebar-link">扩展</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">lambda表达式实现原理分析</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/java/basic/lambda.html#java为什么需要lambda表达式" class="toc-sidebar-link">Java为什么需要lambda表达式？</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/lambda.html#lambda表达式只是匿名内部类的语法糖吗" class="toc-sidebar-link">Lambda表达式只是匿名内部类的语法糖吗？</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/lambda.html#invokedynamic介绍" class="toc-sidebar-link">invokedynamic介绍</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/java/basic/lambda.html#invokedynamic出现的背景" class="toc-sidebar-link">invokedynamic出现的背景</a></li><li class="toc-sidebar-sub-header"><a href="/md/java/basic/lambda.html#invokedynamic功能" class="toc-sidebar-link">invokedynamic功能</a></li></ul></li><li><a href="/md/java/basic/lambda.html#lambda表达式真正是如何实现的" class="toc-sidebar-link">lambda表达式真正是如何实现的</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/lambda.html#再次对比通过invokedynamic相对于直接匿名内部类语法糖的优势" class="toc-sidebar-link">再次对比通过invokedynamic相对于直接匿名内部类语法糖的优势</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/lambda.html#总结" class="toc-sidebar-link">总结</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/lambda.html#扩展" class="toc-sidebar-link">扩展</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/java/basic/lambda.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <div title="Java动态代理" class="option-box" style="padding-left:2px;text-align:center;"><a href="/md/java/basic/动态代理.html"><img src="/images/system/pre2.png" width="30px" class="nozoom"> <span class="show-txt">上一篇</span></a></div> <div title="lambda中的final修饰符" class="option-box" style="padding-left:2px;text-align:center;"><a href="/md/java/basic/why-lambda-final.html"><img src="/images/system/next2.png" width="30px" class="nozoom"> <span class="show-txt">下一篇</span></a></div></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-129.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

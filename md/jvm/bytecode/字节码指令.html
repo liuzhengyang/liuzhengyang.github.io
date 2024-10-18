@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>字节码指令 | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="字节码指令">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html">
+    <meta name="twitter:title" content="字节码指令">
+    <meta name="twitter:url" content="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-157.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>JVM字节码</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/md/jvm/bytecode/class字节码文件格式.html" class="sidebar-link">class字节码文件格式</a></li><li><a href="/md/jvm/bytecode/字节码指令.html" class="active sidebar-link">字节码指令</a></li><li><a href="/md/jvm/bytecode/lambda.html" class="sidebar-link">lambda表达式实现原理分析</a></li></ul></section></li></ul> </aside> <div><main class="page"> <div class="theme-default-content content__default"><h1 id="字节码指令"><a href="#字节码指令" class="header-anchor">#</a> 字节码指令</h1> <p>在class字节码文件格式中，方法的字节码内容保存在方法的&quot;Code&quot;属性当中。</p> <p>字节码文件就像protocol buffer等协议一样，定义的是二进制的传输协议，jvm可以解析这个数据形成更加立体的结构（比如类、字段、方法）</p> <p>jvm在执行Java代码时，上通过线程进行调度、执行的，每个线程有各自的线程栈、程序计数器（program counter)</p> <p>线程栈上一个栈结构，每个栈的元素即栈帧(Stack Frame)表示一个方法的调用，我们在debug时或者看到异常时，经常会看到这样的栈结构。
+栈帧中具有局部变量表、操作数栈、返回地址、当前方法的引用等信息。</p> <p>局部变量表(Local Variable)中包含了方法代码执行时的局部变量信息，包含了方法参数和方法中声明使用到的局部变量，局部变量表可以想象成一个数组，
+数组的元素上slot，可以存放4字节的数据，所以long和double需要占用两个slot，而其他的primitive类型和引用类型都占用4字节。</p> <p>操作数栈上方法执行过程中使用的栈结构，不要和线程栈混淆，操作数栈中可以中间结果，比如一个创建对象并赋值到一个局部变量引用的过程，会分为几步。</p> <p>先是通过newinstance指令创建对象，这时栈顶会有创建出来的对象引用，还没有调用构造函数，然后通过dup对象复制引用，此时
+栈顶的两个元素都是这个对象的引用，然后通过invokespecial指令调用构造函数，调用构造函数会弹出这个对象引用。
+此时栈顶还剩一个该对象的引用，然后就可以通过局部变量操作将这个引用保存到局部变量表当中。</p> <p>jvm指令提供了丰富的操作局部变量表和操作数栈的指令。</p> <h3 id="jvm字节码执行概念模型"><a href="#jvm字节码执行概念模型" class="header-anchor">#</a> jvm字节码执行概念模型</h3> <p>jvm规范定义了一套概念模型，虚拟机需要按照指定的规则来执行jvm字节码，各个虚拟机实现
+可以在满足规范的条件下进行性能优化，比如一个比较著名的优化是JIT(Just in time compile)优化，即会将符合条件的热点代码编译成本地机器码执行，加快执行速度。</p> <p>jvm通过线程维度调度执行代码，线程执行的代码对应于java.lang.Thread对象，线程启动后，
+jvm会调用线程的run方法，run方法中又可以继续调用其他方法，形成方法栈。</p> <p>因为cpu需要各个线程之间执行代码，保证每个线程都能执行，也就是多线程并发，所以cpu会通过时间片的方式在各个线程间
+调度，所以一个线程的任务会可能在执行一半就切换到其他线程上了，需要保存之前执行时的状态，以便下次cpu切换回来还能继续执行。</p> <p>这个状态在jvm规范中包含了pc(program counter程序计数器)和Java虚拟机栈。</p> <p>每个线程都有属于自己的pc和Java虚拟机栈。
+程序计数器保存的是当前线程执行的方法的字节码位置，如果方法是native方法，则规范中没有定义。</p> <p>Java虚拟机栈中保存方法栈帧，当线程中在执行的代码中调用了其他方法，就会在当前线程的栈帧中增加一个新的线程栈来执行调用的方法的代码。
+方法执行完成（正常完成或异常退出）后会退出栈顶的方法继续执行上一个方法。</p> <p>每个栈帧中的核心数据是操作数栈和局部变量表。
+操作数栈是单个方法执行过程中需要的栈，因为在方法执行过程中会对数据进行操作（比如数字操作、引用操作等等）。
+局部变量表用于保存方法执行过程中使用到的局部变量，方法的参数也会初始化到局部变量表中使用，实例方法（也就是非静态方法）的局部变量表的第一个是this对象引用。</p> <p>每个方法执行时需要的方法栈的大小在编译后就固定下来（在方法的字节码属性中有max_local, max_stack属性）。</p> <p>而线程栈的大小，则是不固定的，因为线程执行的方法可能会随着输入参数等情况发生变化，线程栈大小通过-Xss启动参数指定，比如-Xss1M表示每个线程的线程栈大小为1MB。
+设置时不能太小也不能太大，太小容易抛出StackOverflowException，太大则会导致线程占用比较多的内存空间尤其是线程比较多的情况下。</p> <p>jvm在执行方法字节码时，逻辑可以理解如下</p> <p>读取方法的Code属性，读取max_stack, max_local创建对应的操作数栈和局部变量表。
+从code数组读取字节码指令，解析指令并执行。
+字节码指令是一个byte长度表示的指令，最多255个(0没使用)。有的指令不需要参数（比如dup, swap, iconst_0)，有的指令还跟着参数(invokevirtual、istore)。
+jvm就按照指令和参数，来操作操作数栈和局部变量表，如果遇到调用方法，则会创建新的方法栈然后取执行新的方法，方法执行完成后弹出当前方法栈，
+继续执行之前的方法。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>while(1) {
+    fetch opcode and operand
+    execute
+    update_pc
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><div class="language-text line-numbers-mode"><pre class="language-text"><code>Code_attribute {
+       u2 attribute_name_index;
+       u4 attribute_length;
+       u2 max_stack;
+       u2 max_locals;
+       u4 code_length;
+       u1 code[code_length];
+       u2 exception_table_length;
+       {   u2 start_pc;
+           u2 end_pc;
+           u2 handler_pc;
+           u2 catch_type;
+       } exception_table[exception_table_length];
+       u2 attributes_count;
+       attribute_info attributes[attributes_count];
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br></div></div><h2 id="指令类型"><a href="#指令类型" class="header-anchor">#</a> 指令类型</h2> <h3 id="操作局部变量表"><a href="#操作局部变量表" class="header-anchor">#</a> 操作局部变量表</h3> <p>istore
+astore
+iinc</p> <h3 id="操作操作数栈"><a href="#操作操作数栈" class="header-anchor">#</a> 操作操作数栈</h3> <p>iload
+iconst
+ldc
+sipush
+putfield
+getfield
+putstatic
+getstatic
+swap
+pop
+dup</p> <h3 id="方法调用"><a href="#方法调用" class="header-anchor">#</a> 方法调用</h3> <p>invokevirtual
+invokespecial
+invokestatic
+invokeinterface
+invokedynamic</p> <h3 id="计算"><a href="#计算" class="header-anchor">#</a> 计算</h3> <p>iadd
+imul
+idiv
+ineg</p> <h3 id="逻辑控制"><a href="#逻辑控制" class="header-anchor">#</a> 逻辑控制</h3> <p>if_comp
+ifgt
+iflt
+ifnull
+ifnonnull
+athrow</p> <h3 id="其他"><a href="#其他" class="header-anchor">#</a> 其他</h3> <p>monitorenter
+monitorexit
+instanceof
+new
+newarray
+anewarray
+return
+ireturn
+areturn</p> <p>Java代码执行过程、线程、操作数栈、本地变量表。</p> <p>while和for循环会编译成什么字节码</p> <p>jdk代码中的一些优化(复制成局部变量)</p></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/jvm/bytecode/字节码指令.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+        ←
+        <a href="/md/jvm/bytecode/class字节码文件格式.html" class="prev">
+          class字节码文件格式
+        </a></span> <span class="next"><a href="/md/jvm/bytecode/lambda.html">
+          lambda表达式实现原理分析
+        </a>
+        →
+      </span></p></div> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><div class="option-box-toc-fixed"><div class="toc-container-sidebar"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:650px"><div style="font-weight:bold;text-align:center;">字节码指令</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html#指令类型" class="toc-sidebar-link">指令类型</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html#操作局部变量表" class="toc-sidebar-link">操作局部变量表</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html#操作操作数栈" class="toc-sidebar-link">操作操作数栈</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html#方法调用" class="toc-sidebar-link">方法调用</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html#计算" class="toc-sidebar-link">计算</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html#逻辑控制" class="toc-sidebar-link">逻辑控制</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html#其他" class="toc-sidebar-link">其他</a></li></ul></li></ul></div></div></div></div></div> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">字节码指令</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html#指令类型" class="toc-sidebar-link">指令类型</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html#操作局部变量表" class="toc-sidebar-link">操作局部变量表</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html#操作操作数栈" class="toc-sidebar-link">操作操作数栈</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html#方法调用" class="toc-sidebar-link">方法调用</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html#计算" class="toc-sidebar-link">计算</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html#逻辑控制" class="toc-sidebar-link">逻辑控制</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html#其他" class="toc-sidebar-link">其他</a></li></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/jvm/bytecode/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <div title="class字节码文件格式" class="option-box" style="padding-left:2px;text-align:center;"><a href="/md/jvm/bytecode/class字节码文件格式.html"><img src="/images/system/pre2.png" width="30px" class="nozoom"> <span class="show-txt">上一篇</span></a></div> <div title="lambda表达式实现原理分析" class="option-box" style="padding-left:2px;text-align:center;"><a href="/md/jvm/bytecode/lambda.html"><img src="/images/system/next2.png" width="30px" class="nozoom"> <span class="show-txt">下一篇</span></a></div></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-157.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

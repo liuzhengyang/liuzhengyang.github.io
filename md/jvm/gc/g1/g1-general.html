@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>G1 GC是如何运行的 | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="G1 GC是如何运行的">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/jvm/gc/g1/g1-general.html">
+    <meta name="twitter:title" content="G1 GC是如何运行的">
+    <meta name="twitter:url" content="/md/jvm/gc/g1/g1-general.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-167.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>G1 GC</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/md/jvm/gc/g1/g1-all-intro.html" class="sidebar-link">G1 GC核心原理介绍</a></li></ul></section></li></ul> </aside> <div><main class="withouttoc page"> <div class="theme-default-content content__default"><h1 id="g1-gc是如何运行的"><a href="#g1-gc是如何运行的" class="header-anchor">#</a> G1 GC是如何运行的</h1> <p>本文目的：了解G1 GC的运行机制、了解G1 GC的常用配置和最佳实践、了解G1 GC场景问题的排查解决方法。</p> <p>个人介绍：8年丰富的Java服务端开发使用经验，高并发业务、活动架构设计。
+课程介绍：深入了解G1 GC的执行流程、运行机制、设计思想；了解G1的常用配置；了解常见GC问题的排查定位优化方法。</p> <h2 id="gc简介"><a href="#gc简介" class="header-anchor">#</a> GC简介</h2> <p>GC，自动内存管理，内存申请、内存回收。
+内存申请: TLAB
+内存回收:
+什么对象可以回收、什么对象不可以回收（图遍历）。存活对象移动
+存活，有用，能在程序中使用到。如果一个对象是存活对象，则这个对象引用的对象也是存活对象。使用到的起始位置（线程 栈 本地变量表、操作数栈，ClassLoader，Heap部分回收时其他区域的引用）。
+GC Roots，遍历，标记。清除、复制、整理。
+标记复制：移动对象到新区域（survivor或old），修改引用来源的指针值。</p> <h2 id="g1-gc简介"><a href="#g1-gc简介" class="header-anchor">#</a> G1 GC简介</h2> <p>G1 GC又称为Garbage First GC，具备低延迟（停顿时间）、高吞吐的特性，是当前JDK(JDK9以上)默认的垃圾回收器。</p> <p>G1 GC是分代的、按照region划分堆内存，在回收内存时，选择回收效率最高的若干个region进行回收，从而实现可控低延迟和高吞吐。
+同时，G1 GC在回收老年代时会通过并发标记来降低对应用(mutator)的停顿影响。</p> <h3 id="为什么创造出g1-gc-之前的gc遇到了什么问题"><a href="#为什么创造出g1-gc-之前的gc遇到了什么问题" class="header-anchor">#</a> 为什么创造出G1 GC，之前的GC遇到了什么问题？</h3> <p>在对外提供实时服务的服务端领域，G1 GC出现之前，普遍使用的GC是CMS，
+CMS通过并发标记清除解决了普通的标记清除算法在回收老年代时的长时间停顿。
+为什么普通标记清除会出现长时间停顿？
+因为在服务端开始使用更大的内存（8G、16G、32G甚至更多），使用大内存的原因有随着业务逻辑复杂常驻内存对象越来越多、大内存提供更强的性能（相比多个小内存进程能够复用一些内存空间）。
+但是对于普通的标记清除或标记整理算法，暂停耗时基本和内存大小以及回收区域内的存活对象总大小成正比，因为标记清除需要对存活对象图进行图遍历。</p> <p>所以对于内存较大、存活对象较多的老年代，普通标记清除算法需要的暂停时间就比较长。
+CMS通过并发标记，能够降低老年代一定的停顿时间。</p> <p>但是CMS会存在内存碎片问题，需要搭配Compaction压缩来进行内存整理，压缩时对象的移动，也会导致较长时间的停顿。</p> <p>另外对于年轻代，CMS需要搭配ParNew进行并行收集，ParNew（多线程标记复制算法）的回收暂停时间也会随着年轻代大小的变大而变长。</p> <p>所以G1 GC以前的GC，在堆内存比较大时，可能会遇到长达几秒的停顿时间。</p> <p>长时间的停顿可能带来什么样问题呢？</p> <p>如果是一个http服务，可能导致客户端请求超时或让用户体验变差。
+如果Java服务调用其他资源（比如rpc、缓存、数据库等），长时间的停顿可能导致调用超时，导致调用方自身因素出现的资源访问失败。</p> <h3 id="g1-gc是如何解决上述问题的"><a href="#g1-gc是如何解决上述问题的" class="header-anchor">#</a> G1 GC是如何解决上述问题的？</h3> <p>G1 GC通过将堆内存划分为若干个相同大小的逻辑区域即region，每个region的大小为2的指数幂个byte大小（最小1MB，最大32MB）。
+用户可以通过-XX:MaxGCPauseMillis参数配置希望的最大暂停时间，然后G1 GC通过这个参数来控制每次回收时回收的region数量，
+通过控制region数量，就能够控制暂停时间。</p> <p>G1 GC也实现了分代收集，在逻辑上将region划分为了young和old即年轻代和老年代。
+在平时主要采用young-only的回收模式，即回收全部的young region，通过控制young region的数量，能够控制young-only gc的暂停时间。
+当老年代空间大小超过一定阈值后（默认堆内存大小的45%），G1 GC会开始进行并发标记，
+并发标记阶段不会暂停mutator，并发标记完成后会进行短暂的重新标记和清理，这两个阶段会暂停但是时间很短。
+并发标记周期结束后，G1 GC会开始进行多次mixed gc，mixed GC会回收全部的young region和一部分回收效率最高的old region。
+回收效率最高的old region是通过并发标记周期中的标记信息获得的。</p> <h2 id="g1实现"><a href="#g1实现" class="header-anchor">#</a> G1实现</h2> <h3 id="内存分配"><a href="#内存分配" class="header-anchor">#</a> 内存分配</h3> <p>内存管理包含分配和回收两个方面。</p> <p>分配阶段默认采用TLAB的策略，即Thread Local Allocation Buffer。
+每个线程在申请对象内存时，会优先使用本地的TLAB，即线程缓存的一段内存空间，
+第一次申请时，会到g1当前分配内存的region中去申请一段内存。
+然后在TLAB这段内存内部给这个对象分配内存空间，只需要记录并修改TLAB的top即可实现。
+在TLAB剩余空间不够当前对象使用时，TLAB会判断当前剩余的空间是否大于等于waste limit值，
+如果小于，TLAB会回退到region中去分配，然后调大waste limit值，否则呢会重新申请一个TLAB
+来给这个对象分配内存。</p> <h3 id="young-only"><a href="#young-only" class="header-anchor">#</a> Young Only</h3> <p>图遍历</p> <p>创建一个queue队列；
+队列中放入若干个初始Node节点；</p> <p>while (队列不为空) {</p> <p>}</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>Queue queue;
+queue.enqueue(roots);
+BFS(G) {
+   while (!queue.empty()) {
+        Node node = queue.poll();
+        visit(node);
+        node.setVisited();
+        for(Node child : node.children()) {
+            if (!child.visited()) {
+                queue.enqueue(child);
+            }
+        }
+   }
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br></div></div><p>回收时机
+回收范围
+Safepoint: http://psy-lob-saw.blogspot.com/2015/12/safepoints.html</p> <ul><li>Pre Evacuation Collection Set
+<ul><li>Prepare TLABs</li> <li>Choose Collection Set</li> <li>Humongous Register</li></ul></li> <li>Evacuate Collection Set
+<ul><li>Ext Root Scanning</li> <li>Update RS
+<ul><li>Processed Buffers</li> <li>Scanned Cards</li> <li>Skipped Cars</li></ul></li> <li>Scan RS
+<ul><li>Scanned Cards</li> <li>Claimed Cards</li> <li>Skipped Cards</li></ul></li> <li>Code Root Scanning</li> <li>Object Copy</li> <li>Termination</li> <li>GC Worker Other</li></ul></li> <li>Post Evacuation Collection Set
+<ul><li>Code Roots Fixup</li> <li>Clear Card Table</li> <li>Reference Processing</li></ul></li> <li>Code Roots Purge</li> <li>Redirty Cards</li> <li>Free Collection Set</li> <li>Humongous Reclaim</li> <li>Resize TLABs</li></ul> <p>young only 触发时机。</p> <p>在内存分配器分配，发现没有可用的region后（当前的young region的数量达到了年轻代上限，G1会根据G1ReservePercent配置预留出一定数量region以便在gc时用于survirvor区域和promotion到老年代)</p> <p>年轻代大小计算控制</p> <p>Safepoint中执行。(Stop The World)</p> <p>Why, 为什么需要在Safepoint中执行？</p> <ol><li>safepoint中mutator是暂停之中的。和mutator并发执行回收，实现复杂、效率不高，因为需要进行大量的同步协调，比如tracing过程中如果mutator修改了引用关系，则需要用write barrier等机制来通知gc</li> <li>Safepoint中，gc能够确定地枚举根节点，比如线程栈的栈帧中的局部变量表、本地操作栈中哪些位置持有的是引用，这些引用是gc roots也是gc 图遍历的起始节点，这个信息成为stack map。为了提升效率，jvm不会在所有的位置生成stack map，而是在特定情况下（比如方法调用、return等时机生成），进入safepoint需要等待mutator暂停，mutator暂停又是在这些特殊位置（能获取到stack map)才会暂停，因为在safepoint中就可以获取gc需要的stack map从而进行gc root遍历处理了。</li></ol> <p>Young only执行步骤</p> <p>remembered set</p> <ol><li>触发时机，young region list用完</li> <li>safepoint</li> <li>scan roots
+<ol><li>Threads root processor</li> <li>ClassLoader root processor</li> <li>rem set scan heap roots
+<ol><li>遍历Heap Region的Remembered Set（以及未扫描完成的card table？）</li></ol></li> <li>rem set scan collection set regions</li></ol></li> <li>evacuate live objects</li></ol> <h4 id="remembered-set"><a href="#remembered-set" class="header-anchor">#</a> Remembered Set</h4> <p>region:
+全局维护一个rem set state，其中包含_card_table_scan_state数组，元素值表示对应的region scan的card索引，索引增加到CardsPerRegion表示扫描完成。
+card table: value值 clean, dirty, scanned。
+chunk：连续的card表示的范围。worker分配任务时，是按照更大的chunk粒度进行划分的，chunk表示连续的若干个card。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>uint _scan_chunks_per_region
+bool* _region_scan_chunks
+size_t _num_total_scan_chunks
+uint8_t _scan_chunks_shift
+
+_all_dirty_regions
+_next_dirty_regions
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br></div></div><div class="language-text line-numbers-mode"><pre class="language-text"><code>OtherRegionsTable
+
+CHeapBitMap _coarse_map;
+PerRegionTable** _fine_grain_regions; // 每个from region，都有自己的PerRegionTable数组，PerRegionTable内部维护bitmap。
+SparsePRT _sparse_table; // sparse 保存稀疏映射，包含引用来源所在region的index到引用来源的card index的映射。
+
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br></div></div><p>Young Only阶段只回收年轻代的region，那么该如何判断这些region中哪些对象可以回收（等价于反过来判断，哪些对象是活跃对象？）
+如果要进行全局的tracing图遍历，则会导致一个问题，遍历的耗时和堆大小正相关。</p> <p>为了控制暂停耗时，对于这种部分回收的gc，普遍采用引用记录的方式，在G1中，定义了一个Remembered Set，每个region都有自己的Remembered Set。</p> <p>表示当前region中的对象，被哪些位置(范围)的对象引用了。Remembered Set只保留来自其他的old region的引用，以为所有的young region都会在gc时进行回收，
+都会进行引用遍历，不需要再保存Remembered Set。</p> <p>在引用修改时（比如astore等指令的引用修改），jvm会在修改引用后，插入一点write barrier代码。
+g1的write barrier会保存一个card table(card table是一个数组，数组元素是byte)，每512byte的内存范围对应card table中的一个位置(数组的index)。
+然后每个对象就能对应到card table中的一个值。
+g1 write barrier会把当前引用来源的对象对应的card值标记为dirty，并将card index放入到线程本地的dirty card queue set即dirty card队列中。
+当然在card table中已经标记为dirty的card不会重复处理。
+dirty表示堆内存中这个范围的对象需要单独处理维护remembered set。</p> <p>在放入线程本地的dirty card queue set时，队列会有一个上限，如果超过上限，则把本地的队列的数据全部放到global queue全局queue中。</p> <p>然后激活ConcurrentRefine线程，ConcurrentRefine线程负责扫描对应的card所对应的内存范围内的对象，
+查找对象的引用字段指向的对象，给这些对象所在的region的remembered set增加记录。</p> <p>在应用实际处理过程中，还可能出现一些非常热门的card，比如有一个全局变量，会不断引用其他region的对象，则这个全局变量对象的card会不断加入到dirty card queue中，
+为了解决这类热点问题，</p> <p>hot card</p> <p>另外还有一种情况，当前region中，来自某个region的引用过多，为了降低remembered set的大小，则会把对应的来源region变成粗粒度的记录，即
+记录这个region有引用。称为coarse_map，即稀疏的map。</p> <p>coarse</p> <p>ConcurrentRefinementThread: 处理remembered set log</p> <h3 id="mixed-gc"><a href="#mixed-gc" class="header-anchor">#</a> Mixed GC</h3> <h3 id="concurrentmarking"><a href="#concurrentmarking" class="header-anchor">#</a> ConcurrentMarking</h3> <p>TODO: 如果concurrent marking阶段没完成，young区满了，需要进行young gc，如何处理？</p> <h4 id="g1-root-region"><a href="#g1-root-region" class="header-anchor">#</a> g1 root region</h4> <p>从g1 gc root能够直接引用到的对象（若干个内存区域范围），区域信息是通过上一次的young only gc中的根扫描获取的。
+concurrent marking时不再需要重新扫描。</p> <p>root region就是图遍历的起始节点(集合）（就像经典算法题中的01湖水遍历）</p> <p>initial mark: 初始标记</p> <p>如果上一次young only gc或其他触发原因判断出来需要进行concurrent marking阶段了，则在接下来，还会进行一次young only gc，
+这次gc的root processing的时候即对gc root进行处理的时候，会标记concurrent marking bitmap。</p> <p>G1ConcurrentStartMarkClosures</p> <p>只会标记引用目标不在collection set中的对象。为什么？collection set中的gc root直接引用如何处理？</p> <p>因为young region区域内的对象在以后的mixed gc中，也会进行图遍历标记，不会出现漏标。
+所以只需要扫描gc root图遍历中对old region的引用，标记mark bitmap。</p> <p>G1RootRegionScanClosure:</p> <h4 id="mark-from-roots"><a href="#mark-from-roots" class="header-anchor">#</a> mark from roots</h4> <p>G1CMConcurrentMarkingTask:do_marking_step</p> <h4 id="concurrent-marking-remark"><a href="#concurrent-marking-remark" class="header-anchor">#</a> concurrent marking &amp; remark</h4> <p>G1CMTask</p> <ul><li>_task queue: task queue of this task，每个gc线程维护自己的task queue可以减少并发冲突，没有任务的线程还可以steal其他线程的task。</li> <li>_next_mark_bitmap: 全局的next mark bitmap, next表示当前正在处理中的bitmap，prev是已经处理完的bitmap。mark bitmap</li> <li>_curr_region: 当前task正在扫描的region</li> <li>_finger: local finger of this task，表示当前task在当前处理的region内已经处理到哪里了。</li> <li>global finger: global finger表示g1 allocator内存分配到哪里了。</li> <li>global mark stack: 当task的local queue满了之后，会把queue里的task放到global mark stack中。</li> <li>SATB Buffer Queue: 记录并发标记阶段 mutator做的引用修改，以便Remark的时候进行修正。</li></ul> <p>G1CMTask::do_mark_step</p> <p>G1CMBitMapClosure:</p> <ul><li>do_addr:
+<ul><li>move_finger_to</li> <li>scan_task_entry</li> <li>drain_local_queue partially</li> <li>drain_global_stack partially</li></ul></li></ul> <p>G1CMOopClosure:</p> <ul><li>do_oop_word
+<ul><li>load reference oop, obj</li> <li>return if obj null</li> <li>mark_reference_grey
+<ul><li>mark_in_next_bitmap</li> <li>if obj below global_finger
+<ul><li>create G1TaskQueueEntry
+<ul><li>if obj is array
+<ul><li>process_grey_task_entry</li></ul></li> <li>obj is not array
+<ul><li>push(entry), push to local task queue, if full, move queue to global stack.</li></ul></li></ul></li></ul></li></ul></li></ul></li></ul> <p>cm.claim_region，获取一块heap region分配给一个worker。</p> <p>然后扫描这块region中的next markBitMap，对标记的对象的字段引用进行扫描处理（标记并加入到task queue中），还会drain local queue/global stack partially。</p> <p>drain_satb_buffer
+drain_local_queue partially
+drain_global_stack partially</p> <p>abort: 一些情况下marking step可以abort中断，比如1. 出现Full GC。2. global stack overflow，然后会重启。3. 有足够的SATB buffer可以处理，do_marking_step只会从头处理SATB buffer，会重启。4. yield。</p> <p>Marking Bitmap</p> <p>并发标记中的三色标记，白: 未标记的对象；灰：对象已经标记，但是字段引用还没处理；黑：对象已经标记且字段引用都已经处理；
+对应于图遍历算法，白就是没有遍历到的对象；灰：就是已经访问到，但是还没把字段放入到遍历队列中，即在task queue中？；黑：已经访问到，且字段引用已经放绕到遍历队列中。</p> <h4 id="remark"><a href="#remark" class="header-anchor">#</a> Remark</h4> <p>并发标记时，mutator还一直在运行，需要暂停，把并发标记期间mutator做的一些修改，进行处理、修正。
+如果不暂停，可能永远无法获得一个准确的最终标记信息（哪些对象区域是存活对象，其他区域可以回收）。</p> <p>Remark通过VM_Operation执行。</p> <p>G1ConcurrentMark::finalize_marking</p> <p>G1CMRemarkTask:work 多个worker并行执行
+task-&gt;do_marking_step(target_ms: 1000000000.0, do_termination: true, is_serial: false)</p> <p>和并发标记过程中的marking_step的区别是，在safepoint中执行，mutator不会创建新的SATB buffer。
+会steal其他线程的task，target_ms无限大。</p> <p>交换mark bitmap。</p> <p>计算mark bytes，保存到region中，用于后面的mixed gc中选择collection set。</p> <p>reclaim empty region。没有活跃对象的region，提前回收。</p> <h4 id="cleanup清理"><a href="#cleanup清理" class="header-anchor">#</a> Cleanup清理</h4> <p>phase_cleanup: G1UpdateRemSetTrackingAfterRebuild
+清理rem set清理工作。</p> <h4 id="stab"><a href="#stab" class="header-anchor">#</a> STAB</h4> <p>由于在并发标记时，mutator还在进行对象的创建、引用的修改。所以需要对concurrent marking过程中的修改进行记录。</p> <ol><li>当前young only gc结束后计算发现IHOP已经超过需要进行concurrent marking cycle了。</li> <li>标记_in_concurrent_start_gc为true</li> <li>下一次young only gc时会标记old region中的引用。这一次young only gc最后结束前，调用start_concurrent_cycle。通过satb_mq_set.set_active_all_threads，这样这些线程之后的引用修改操作就会写入到satb buffer中。新加入的线程也会判断。</li> <li>satb_mark_queue_set active之后，会通过Write Barrier机制在引用修改是，将修改的引用写入到satb buffer中</li> <li>在concurrent marking阶段中，会不断处理satb buffer，对这些引用引用的对象标记到mark bitmap中。</li></ol> <div class="language-shell line-numbers-mode"><pre class="language-shell"><code>inline void G1BarrierSet::write_ref_field_pre<span class="token punctuation">(</span>T* field<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>HasDecorator<span class="token operator">&lt;</span>decorators, IS_DEST_UNINITIALIZED<span class="token operator">&gt;</span>::value <span class="token operator">||</span>
+      HasDecorator<span class="token operator">&lt;</span>decorators, AS_NO_KEEPALIVE<span class="token operator">&gt;</span>::value<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token builtin class-name">return</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  T heap_oop <span class="token operator">=</span> RawAccess<span class="token operator">&lt;</span>MO_RELAXED<span class="token operator">&gt;</span>::oop_load<span class="token punctuation">(</span>field<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>CompressedOops::is_null<span class="token punctuation">(</span>heap_oop<span class="token punctuation">))</span> <span class="token punctuation">{</span>
+    enqueue<span class="token punctuation">(</span>CompressedOops::decode_not_null<span class="token punctuation">(</span>heap_oop<span class="token punctuation">))</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br></div></div><p>post_concurrent_mark_start</p> <h4 id="tams"><a href="#tams" class="header-anchor">#</a> TAMS</h4> <p>TAMS是top at mark start，是开始并发标记时，各个region中的内存top位置（即能表示region内哪些位置是有数据的），
+对于TAMS之上的对象，则会认为是存活对象（虽然可能并不存活，不过不影响gc正确性）。</p> <h3 id="mixed-gc-2"><a href="#mixed-gc-2" class="header-anchor">#</a> Mixed GC</h3> <p>collection set chosen: 如何选择要回收的olg region？</p> <p>G1BuildCandidateRegionsTask get_sorted_candidates</p> <p>G1BuildCandidateRegionsClosure: 对每个region计算gc回收效率、决定要不要加入到candidates中。</p> <h3 id="full-gc"><a href="#full-gc" class="header-anchor">#</a> Full GC</h3> <p>Evacuation Failure</p> <ol><li>Young only GC过程中，如果要转移到old区，但是没有可用空间了，触发Full GC?</li> <li>Concurrent Marking过程中，young区空间不足了，触发Full GC?</li></ol> <p>G1ReservePercent</p> <p>Concurrent</p> <p>Phases:</p> <ol><li>phase1: mark live objects</li> <li>phase2: prepare compaction</li> <li>adjust pointers</li> <li>do_compaction</li></ol> <h3 id="停顿预测、调度控制"><a href="#停顿预测、调度控制" class="header-anchor">#</a> 停顿预测、调度控制</h3> <p>标准差、方差</p> <p>decay，衰退均值
+可信度，衰退标准差。</p> <h3 id="其他实现"><a href="#其他实现" class="header-anchor">#</a> 其他实现</h3> <h4 id="humongous-region"><a href="#humongous-region" class="header-anchor">#</a> Humongous Region</h4> <p>如果一个对象的大小超过了region大小的一半，则认为这个对象为Humongous Object巨型对象，会单独放到一个或多个连续的region中。
+为什么要单独处理Humongous Object？因为移动Humongous Object的成本比较高，所以单独放到Humongous Region，减少移动次数。</p> <p>Humongous Object一般是数组对象，因为数组对象大小包含数组长度*元素长度（比如引用4byte）</p> <h4 id="reference-process"><a href="#reference-process" class="header-anchor">#</a> Reference Process</h4> <h4 id="metaspace-classloader回收"><a href="#metaspace-classloader回收" class="header-anchor">#</a> Metaspace, ClassLoader回收</h4> <h4 id="usecompressedoops"><a href="#usecompressedoops" class="header-anchor">#</a> UseCompressedOops</h4> <h2 id="g1参数配置"><a href="#g1参数配置" class="header-anchor">#</a> G1参数配置</h2> <h3 id="为什么xms和xmx配置成一样的"><a href="#为什么xms和xmx配置成一样的" class="header-anchor">#</a> 为什么Xms和Xmx配置成一样的？</h3> <p>堆扩展的副作用</p> <h2 id="扩展"><a href="#扩展" class="header-anchor">#</a> 扩展</h2> <p><a href="https://blog.jetbrains.com/clion/2020/03/openjdk-with-clion/" target="_blank" rel="noopener noreferrer">如何在本地编译debug openjdk代码<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></p> <h2 id="questions"><a href="#questions" class="header-anchor">#</a> Questions</h2> <ul><li>标记压缩，如何修改引用来源指针的？</li> <li>为什么satb的write barrier在pre中，修改字段引用之前？避免并发问题？</li> <li>prevBitMap和nextBitMap的作用?</li></ul></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/jvm/gc/g1/g1-general.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <!----> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><!----> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">G1 GC是如何运行的</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/jvm/gc/g1/g1-general.html#gc简介" class="toc-sidebar-link">GC简介</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/jvm/gc/g1/g1-general.html#g1-gc简介" class="toc-sidebar-link">G1 GC简介</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/jvm/gc/g1/g1-general.html#为什么创造出g1-gc-之前的gc遇到了什么问题" class="toc-sidebar-link">为什么创造出G1 GC，之前的GC遇到了什么问题？</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/gc/g1/g1-general.html#g1-gc是如何解决上述问题的" class="toc-sidebar-link">G1 GC是如何解决上述问题的？</a></li></ul></li><li><a href="/md/jvm/gc/g1/g1-general.html#g1实现" class="toc-sidebar-link">G1实现</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/jvm/gc/g1/g1-general.html#内存分配" class="toc-sidebar-link">内存分配</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/gc/g1/g1-general.html#young-only" class="toc-sidebar-link">Young Only</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/gc/g1/g1-general.html#mixed-gc" class="toc-sidebar-link">Mixed GC</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/gc/g1/g1-general.html#concurrentmarking" class="toc-sidebar-link">ConcurrentMarking</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/gc/g1/g1-general.html#mixed-gc-2" class="toc-sidebar-link">Mixed GC</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/gc/g1/g1-general.html#full-gc" class="toc-sidebar-link">Full GC</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/gc/g1/g1-general.html#停顿预测、调度控制" class="toc-sidebar-link">停顿预测、调度控制</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/gc/g1/g1-general.html#其他实现" class="toc-sidebar-link">其他实现</a></li></ul></li><li><a href="/md/jvm/gc/g1/g1-general.html#g1参数配置" class="toc-sidebar-link">G1参数配置</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/jvm/gc/g1/g1-general.html#为什么xms和xmx配置成一样的" class="toc-sidebar-link">为什么Xms和Xmx配置成一样的？</a></li></ul></li><li><a href="/md/jvm/gc/g1/g1-general.html#扩展" class="toc-sidebar-link">扩展</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/jvm/gc/g1/g1-general.html#questions" class="toc-sidebar-link">Questions</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/jvm/gc/g1/g1-general.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <!----> <!----></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-167.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

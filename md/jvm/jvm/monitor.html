@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>synchronized、monitor lock加锁流程 | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="synchronized、monitor lock加锁流程">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/jvm/jvm/monitor.html">
+    <meta name="twitter:title" content="synchronized、monitor lock加锁流程">
+    <meta name="twitter:url" content="/md/jvm/jvm/monitor.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-209.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>JVM</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/md/jvm/jvm/build-jdk.html" class="sidebar-link">在2024年使用Clion编译、debug、开发Java虚拟机(Mac版本)</a></li><li><a href="/md/jvm/jvm/javaagent.html" class="sidebar-link">javaagent</a></li><li><a href="/md/jvm/jvm/jstack.html" class="sidebar-link">jstack实现原理分析</a></li><li><a href="/md/jvm/jvm/string-deduplication.html" class="sidebar-link">String Deduplication</a></li><li><a href="/md/jvm/jvm/tlab.html" class="sidebar-link">TLAB</a></li><li><a href="/md/jvm/jvm/synchronizer.html" class="sidebar-link">synchronzier</a></li><li><a href="/md/jvm/jvm/monitor.html" aria-current="page" class="active sidebar-link">synchronized、monitor lock加锁流程</a></li><li><a href="/md/jvm/jvm/virtualthread/virtual-thread.html" class="sidebar-link">JDK Virtual Thread的实现</a></li></ul></section></li></ul> </aside> <div><main class="page"> <div class="theme-default-content content__default"><h1 id="synchronized、monitor-lock加锁流程"><a href="#synchronized、monitor-lock加锁流程" class="header-anchor">#</a> synchronized、monitor lock加锁流程</h1> <p>synchronized关键字是Java提供的内置的锁，也可以成为monitor lock。
+通过synchronzied加锁，实现可见性、原子性、防止重排序等并发场景下的线程间同步协调机制。</p> <p>在Java语言层面，通过对一个对象加synchronized形成加锁代码块或给一个方法增加synchronized标识，都能使得对应的代码块
+或方法在执行前后进行加锁、释放锁的操作。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>synchronized(lock) {
+    // 
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><div class="language-text line-numbers-mode"><pre class="language-text"><code>public synchronized void doSomething() {
+    //
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><h2 id="实现"><a href="#实现" class="header-anchor">#</a> 实现</h2> <p>从字节码层面来看，<code>synchornized(lock)</code>这样的代码块，在前后会有一个<code>monitorenter</code>和<code>monitorexit</code>指令</p> <p>比如如下Java代码</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>private Object lock = new Object();
+public void test() {
+    synchronized (lock) {
+        System.out.println(&quot;test&quot;);
+    }
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br></div></div><p>编译后字节码中包含两个monitorexit，一个是代码块正常执行完，另一个用于exception table实现异常情况也能执行monitorexit保证锁释放。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code> 0 aload_0
+ 1 getfield #3 &amp;lt;com/lzy/SynchronizedTest.lock : Ljava/lang/Object;&gt;
+ 4 dup
+ 5 astore_1
+ 6 monitorenter
+ 7 getstatic #4 &amp;lt;java/lang/System.out : Ljava/io/PrintStream;&gt;
+10 ldc #5 &amp;lt;test&gt;
+12 invokevirtual #6 &amp;lt;java/io/PrintStream.println : (Ljava/lang/String;)V&gt;
+15 aload_1
+16 monitorexit
+17 goto 25 (+8)
+20 astore_2
+21 aload_1
+22 monitorexit
+23 aload_2
+24 athrow
+25 return
+
+Exception table:
+from    to  target type
+ 7    17    20   any
+20    23    20   any
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br></div></div><p>而synchronized方法，该方法的access flag中的ACC_SYNCHRONIZED标记位会被设置为1。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>public synchronized void testSync();
+    descriptor: ()V
+    flags: (0x0021) ACC_PUBLIC, ACC_SYNCHRONIZED
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><h3 id="monitorenter的实现"><a href="#monitorenter的实现" class="header-anchor">#</a> monitorenter的实现</h3> <p>从模版解释器开始看monitor的处理。在遇到monitorenter指令时，jvm会在当前的线程栈上创建一个monitor block的内存区域，这块
+内存用于存放BasicObjectLock对象，该对象会用于后续的轻量级锁加锁。</p> <p>下面以templateInterpreter字节码解释执行时的实现进行分析。</p> <ul><li>rax寄存器是加锁的对象（即synchronized(obj)中的obj）</li> <li><code>__ movptr(Address(rmon, BasicObjectLock::obj_offset_in_bytes()), rax);</code>将被锁对象地址设置到BasicObjectLock中的obj字段。</li> <li><code>__ lock_object(rmon);</code>：具体的加锁过程。</li></ul> <div class="language-text line-numbers-mode"><pre class="language-text"><code>//-----------------------------------------------------------------------------
+// Synchronization
+//
+// Note: monitorenter &amp;amp; exit are symmetric routines; which is reflected
+//       in the assembly code structure as well
+//
+// Stack layout:
+//
+// [expressions  ] &amp;lt;--- rsp               = expression stack top
+// ..
+// [expressions  ]
+// [monitor entry] &amp;lt;--- monitor block top = expression stack bot
+// ..
+// [monitor entry]
+// [frame data   ] &amp;lt;--- monitor block bot
+// ...
+// [saved rbp    ] &amp;lt;--- rbp
+void TemplateTable::monitorenter() {
+  transition(atos, vtos);
+
+  // check for NULL object
+  __ null_check(rax);
+
+  const Address monitor_block_top(
+        rbp, frame::interpreter_frame_monitor_block_top_offset * wordSize);
+  const Address monitor_block_bot(
+        rbp, frame::interpreter_frame_initial_sp_offset * wordSize);
+  const int entry_size = frame::interpreter_frame_monitor_size() * wordSize;
+
+  Label allocated;
+
+  Register rtop = LP64_ONLY(c_rarg3) NOT_LP64(rcx);
+  Register rbot = LP64_ONLY(c_rarg2) NOT_LP64(rbx);
+  Register rmon = LP64_ONLY(c_rarg1) NOT_LP64(rdx);
+
+  // initialize entry pointer
+  __ xorl(rmon, rmon); // points to free slot or NULL
+
+  // find a free slot in the monitor block (result in rmon)
+  {
+    Label entry, loop, exit;
+    __ movptr(rtop, monitor_block_top); // points to current entry,
+                                        // starting with top-most entry
+    __ lea(rbot, monitor_block_bot);    // points to word before bottom
+                                        // of monitor block
+    __ jmpb(entry);
+
+    __ bind(loop);
+    // check if current entry is used
+    __ cmpptr(Address(rtop, BasicObjectLock::obj_offset_in_bytes()), (int32_t) NULL_WORD);
+    // if not used then remember entry in rmon
+    __ cmovptr(Assembler::equal, rmon, rtop);   // cmov =&gt; cmovptr
+    // check if current entry is for same object
+    __ cmpptr(rax, Address(rtop, BasicObjectLock::obj_offset_in_bytes()));
+    // if same object then stop searching
+    __ jccb(Assembler::equal, exit);
+    // otherwise advance to next entry
+    __ addptr(rtop, entry_size);
+    __ bind(entry);
+    // check if bottom reached
+    __ cmpptr(rtop, rbot);
+    // if not at bottom then check this entry
+    __ jcc(Assembler::notEqual, loop);
+    __ bind(exit);
+  }
+
+  __ testptr(rmon, rmon); // check if a slot has been found
+  __ jcc(Assembler::notZero, allocated); // if found, continue with that one
+
+  // allocate one if there's no free slot
+  {
+    Label entry, loop;
+    // 1. compute new pointers          // rsp: old expression stack top
+    __ movptr(rmon, monitor_block_bot); // rmon: old expression stack bottom
+    __ subptr(rsp, entry_size);         // move expression stack top
+    __ subptr(rmon, entry_size);        // move expression stack bottom
+    __ mov(rtop, rsp);                  // set start value for copy loop
+    __ movptr(monitor_block_bot, rmon); // set new monitor block bottom
+    __ jmp(entry);
+    // 2. move expression stack contents
+    __ bind(loop);
+    __ movptr(rbot, Address(rtop, entry_size)); // load expression stack
+                                                // word from old location
+    __ movptr(Address(rtop, 0), rbot);          // and store it at new location
+    __ addptr(rtop, wordSize);                  // advance to next word
+    __ bind(entry);
+    __ cmpptr(rtop, rmon);                      // check if bottom reached
+    __ jcc(Assembler::notEqual, loop);          // if not at bottom then
+                                                // copy next word
+  }
+
+  // call run-time routine
+  // rmon: points to monitor entry
+  __ bind(allocated);
+
+  // Increment bcp to point to the next bytecode, so exception
+  // handling for async. exceptions work correctly.
+  // The object has already been poped from the stack, so the
+  // expression stack looks correct.
+  __ increment(rbcp);
+
+  // store object
+  __ movptr(Address(rmon, BasicObjectLock::obj_offset_in_bytes()), rax);
+  __ lock_object(rmon);
+
+  // check to make sure this monitor doesn't cause stack overflow after locking
+  __ save_bcp();  // in case of exception
+  __ generate_stack_overflow_check(0);
+
+  // The bcp has already been incremented. Just need to dispatch to
+  // next instruction.
+  __ dispatch_next(vtos);
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br><span class="line-number">89</span><br><span class="line-number">90</span><br><span class="line-number">91</span><br><span class="line-number">92</span><br><span class="line-number">93</span><br><span class="line-number">94</span><br><span class="line-number">95</span><br><span class="line-number">96</span><br><span class="line-number">97</span><br><span class="line-number">98</span><br><span class="line-number">99</span><br><span class="line-number">100</span><br><span class="line-number">101</span><br><span class="line-number">102</span><br><span class="line-number">103</span><br><span class="line-number">104</span><br><span class="line-number">105</span><br><span class="line-number">106</span><br><span class="line-number">107</span><br><span class="line-number">108</span><br><span class="line-number">109</span><br><span class="line-number">110</span><br><span class="line-number">111</span><br><span class="line-number">112</span><br><span class="line-number">113</span><br></div></div><h3 id="lock-object"><a href="#lock-object" class="header-anchor">#</a> lock_object</h3> <p>BasicObjectLock包含两个字段，一个<code>BasicLock _lock</code>，一个<code>oop _obj</code>。
+_lock对象是内嵌到BasicObjectLock对象内存中的，BasicLock中目前只有一个markWord类型的_displaced_header字段。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>class BasicObjectLock {
+  friend class VMStructs;
+ private:
+  BasicLock _lock;                                    // the lock, must be double word aligned
+  oop       _obj;                                     // object holds the lock;
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><p>BasicLock类中有一个volatile生命的markWork类型的_displaced_header用于保存<code>_obj</code>之前的对象头（因为加锁会涉及到cas替换被加锁对象的对象头，加锁完成后需要恢复）</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>class BasicLock {
+  friend class VMStructs;
+  friend class JVMCIVMStructs;
+ private:
+  volatile markWord _displaced_header;
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><ul><li>参数传过来的是BasicObjectLock的地址（在线程栈中）</li> <li>UseHeavyMonitors是全局配置，默认false，会使用轻量级锁。</li> <li><code>orptr(swap_reg, Address(obj_reg, oopDesc::mark_offset_in_bytes()));</code>: Load (object-&gt;mark() | 1) into swap_reg %rax，设置要cas的目标值，markWord的标记为设置为01，即</li> <li><code>movptr(Address(lock_reg, mark_offset), swap_reg);</code>：将锁对象的markWord保存到BasicLock的displaced header。</li> <li><code>cmpxchgptr(lock_reg, Address(obj_reg, oopDesc::mark_offset_in_bytes()))</code>: cas替换锁对象的对象头为BasicLock地址。如果cas成功，则markWord的标记为会替换为00，表示轻量级加锁状态，因为BasicObjectLock的地址是以一个byte为单位的，后三位是000。</li> <li><code>jcc(Assembler::zero, done)</code>：如果cmpxchgptr成功，会设置结果为0，则直接走到done label完成了加锁。</li> <li><code>call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::monitorenter), lock_reg);</code>：否则调用<code>InterpreterRuntime::monitorenter</code></li></ul> <div class="language-text line-numbers-mode"><pre class="language-text"><code>// Lock object
+//
+// Args:
+//      rdx, c_rarg1: BasicObjectLock to be used for locking
+//
+// Kills:
+//      rax, rbx
+void InterpreterMacroAssembler::lock_object(Register lock_reg) {
+  assert(lock_reg == LP64_ONLY(c_rarg1) NOT_LP64(rdx),
+         &quot;The argument is only for looks. It must be c_rarg1&quot;);
+
+  if (UseHeavyMonitors) {
+    call_VM(noreg,
+            CAST_FROM_FN_PTR(address, InterpreterRuntime::monitorenter),
+            lock_reg);
+  } else {
+    Label done;
+
+    const Register swap_reg = rax; // Must use rax for cmpxchg instruction
+    const Register tmp_reg = rbx; // Will be passed to biased_locking_enter to avoid a
+                                  // problematic case where tmp_reg = no_reg.
+    const Register obj_reg = LP64_ONLY(c_rarg3) NOT_LP64(rcx); // Will contain the oop
+    const Register rklass_decode_tmp = LP64_ONLY(rscratch1) NOT_LP64(noreg);
+
+    const int obj_offset = BasicObjectLock::obj_offset_in_bytes();
+    const int lock_offset = BasicObjectLock::lock_offset_in_bytes ();
+    const int mark_offset = lock_offset +
+                            BasicLock::displaced_header_offset_in_bytes();
+
+    Label slow_case;
+
+    // Load object pointer into obj_reg
+    movptr(obj_reg, Address(lock_reg, obj_offset));
+
+    if (DiagnoseSyncOnValueBasedClasses != 0) {
+      load_klass(tmp_reg, obj_reg, rklass_decode_tmp);
+      movl(tmp_reg, Address(tmp_reg, Klass::access_flags_offset()));
+      testl(tmp_reg, JVM_ACC_IS_VALUE_BASED_CLASS);
+      jcc(Assembler::notZero, slow_case);
+    }
+
+    if (UseBiasedLocking) {
+      biased_locking_enter(lock_reg, obj_reg, swap_reg, tmp_reg, rklass_decode_tmp, false, done, &amp;amp;slow_case);
+    }
+
+    // Load immediate 1 into swap_reg %rax
+    movl(swap_reg, (int32_t)1);
+
+    // Load (object-&gt;mark() | 1) into swap_reg %rax
+    orptr(swap_reg, Address(obj_reg, oopDesc::mark_offset_in_bytes()));
+
+    // Save (object-&gt;mark() | 1) into BasicLock's displaced header
+    movptr(Address(lock_reg, mark_offset), swap_reg);
+
+    assert(lock_offset == 0,
+           &quot;displaced header must be first word in BasicObjectLock&quot;);
+
+    lock();
+    cmpxchgptr(lock_reg, Address(obj_reg, oopDesc::mark_offset_in_bytes()));
+    if (PrintBiasedLockingStatistics) {
+      cond_inc32(Assembler::zero,
+                 ExternalAddress((address) BiasedLocking::fast_path_entry_count_addr()));
+    }
+    jcc(Assembler::zero, done);
+
+    const int zero_bits = LP64_ONLY(7) NOT_LP64(3);
+
+    subptr(swap_reg, rsp);
+    andptr(swap_reg, zero_bits - os::vm_page_size());
+
+    // Save the test result, for recursive case, the result is zero
+    movptr(Address(lock_reg, mark_offset), swap_reg);
+
+    if (PrintBiasedLockingStatistics) {
+      cond_inc32(Assembler::zero,
+                 ExternalAddress((address) BiasedLocking::fast_path_entry_count_addr()));
+    }
+    jcc(Assembler::zero, done);
+
+    bind(slow_case);
+
+    // Call the runtime routine for slow case
+    call_VM(noreg,
+            CAST_FROM_FN_PTR(address, InterpreterRuntime::monitorenter),
+            lock_reg);
+
+    bind(done);
+  }
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br><span class="line-number">89</span><br></div></div><h3 id="interpreter-runtime中的monitor-enter"><a href="#interpreter-runtime中的monitor-enter" class="header-anchor">#</a> interpreter runtime中的monitor enter</h3> <p>前面模版解释器中通过cas加轻量级锁失败后，说明加锁存在冲突，会回退到slow path。</p> <p>主要是调用
+<code>ObjectSynchronizer::enter(h_obj, elem-&gt;lock(), current);</code></p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>//------------------------------------------------------------------------------------------------------------------------
+// Synchronization
+//
+// The interpreter's synchronization code is factored out so that it can
+// be shared by method invocation and synchronized blocks.
+//%note synchronization_3
+
+//%note monitor_1
+JRT_ENTRY_NO_ASYNC(void, InterpreterRuntime::monitorenter(JavaThread* current, BasicObjectLock* elem))
+#ifdef ASSERT
+  current-&gt;last_frame().interpreter_frame_verify_monitor(elem);
+#endif
+  if (PrintBiasedLockingStatistics) {
+    Atomic::inc(BiasedLocking::slow_path_entry_count_addr());
+  }
+  Handle h_obj(current, elem-&gt;obj());
+  assert(Universe::heap()-&gt;is_in_or_null(h_obj()),
+         &quot;must be NULL or an object&quot;);
+  ObjectSynchronizer::enter(h_obj, elem-&gt;lock(), current);
+  assert(Universe::heap()-&gt;is_in_or_null(elem-&gt;obj()),
+         &quot;must be NULL or an object&quot;);
+#ifdef ASSERT
+  current-&gt;last_frame().interpreter_frame_verify_monitor(elem);
+#endif
+JRT_END
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br></div></div><p>enter方法</p> <ul><li>先通过<code>markWord mark = obj-&gt;mark()</code>拿到markWord</li> <li>先判断<code>mark.is_neutral()</code>：is_neutral判断markWord标记为是否是01即未加锁状态，则再通过cas尝试轻量级加锁，如果成功返回。不成功则走到后面的锁膨胀流程。</li> <li>如果不是is_neutral，则判断<code>mark.has_locker()&amp;&amp; current-&gt;is_lock_owned((address)mark.locker())</code>：说明当前线程在前面已经加了这个对象的锁，直接返回。</li> <li>进入锁膨胀再重量级加锁流程，在<code>while(true)</code>循环中不断尝试inflate进行锁膨胀，然后用膨胀后的重量级锁ObjectMonitor调用enter方法进行加锁。</li></ul> <div class="language-text line-numbers-mode"><pre class="language-text"><code>// -----------------------------------------------------------------------------
+// Monitor Enter/Exit
+// The interpreter and compiler assembly code tries to lock using the fast path
+// of this algorithm. Make sure to update that code if the following function is
+// changed. The implementation is extremely sensitive to race condition. Be careful.
+
+void ObjectSynchronizer::enter(Handle obj, BasicLock* lock, JavaThread* current) {
+  if (obj-&gt;klass()-&gt;is_value_based()) {
+    handle_sync_on_value_based_class(obj, current);
+  }
+
+  if (UseBiasedLocking) {
+    BiasedLocking::revoke(current, obj);
+  }
+
+  markWord mark = obj-&gt;mark();
+  assert(!mark.has_bias_pattern(), &quot;should not see bias pattern here&quot;);
+
+  if (mark.is_neutral()) {
+    // Anticipate successful CAS -- the ST of the displaced mark must
+    // be visible &amp;lt;= the ST performed by the CAS.
+    lock-&gt;set_displaced_header(mark);
+    if (mark == obj()-&gt;cas_set_mark(markWord::from_pointer(lock), mark)) {
+      return;
+    }
+    // Fall through to inflate() ...
+  } else if (mark.has_locker() &amp;amp;&amp;amp;
+             current-&gt;is_lock_owned((address)mark.locker())) {
+    assert(lock != mark.locker(), &quot;must not re-lock the same lock&quot;);
+    assert(lock != (BasicLock*)obj-&gt;mark().value(), &quot;don't relock with same BasicLock&quot;);
+    lock-&gt;set_displaced_header(markWord::from_pointer(NULL));
+    return;
+  }
+
+  // The object header will never be displaced to this lock,
+  // so it does not matter what the value is, except that it
+  // must be non-zero to avoid looking like a re-entrant lock,
+  // and must not look locked either.
+  lock-&gt;set_displaced_header(markWord::unused_mark());
+  // An async deflation can race after the inflate() call and before
+  // enter() can make the ObjectMonitor busy. enter() returns false if
+  // we have lost the race to async deflation and we simply try again.
+  while (true) {
+    ObjectMonitor* monitor = inflate(current, obj(), inflate_cause_monitor_enter);
+    if (monitor-&gt;enter(current)) {
+      return;
+    }
+  }
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br></div></div><h3 id="锁膨胀inflation"><a href="#锁膨胀inflation" class="header-anchor">#</a> 锁膨胀inflation</h3> <ul><li>判断mark如果已经是has_monitor说明有其他线程完成了所膨胀，直接从mark中获取monitor指针返回。</li> <li>如果mark状态是INFLATING膨胀中（全是0），说明有其他线程在进行锁膨胀，则continue继续下一轮循环判断</li> <li>如果mark状态是has_locker，说明有其他线程加了轻量级锁，则通过<code>object-&gt;cas_set_mark(markWord::INFLATING(), mark)</code>cas修改锁对象头设置状态为膨胀中
+<ul><li>如果cas失败则continue继续循环</li> <li>通过displaced_mark_helper方法获取锁对象原本的markWord，设置到ObjectMonitor中（ObjectMonitor对象在膨胀锁之前创建）。</li> <li>设置ObjectMonitor的_owner、mark，然后返回</li></ul></li> <li>如果mark处于neutral状态，说明没有其他线程在加轻量级锁，则创建ObjectMonitor对象，然后cas修改锁对象头，成功返回。</li></ul> <div class="language-text line-numbers-mode"><pre class="language-text"><code>ObjectMonitor* ObjectSynchronizer::inflate(Thread* current, oop object,
+                                           const InflateCause cause) {
+  EventJavaMonitorInflate event;
+
+  for (;;) {
+    const markWord mark = object-&gt;mark();
+    assert(!mark.has_bias_pattern(), &quot;invariant&quot;);
+
+    // The mark can be in one of the following states:
+    // *  Inflated     - just return
+    // *  Stack-locked - coerce it to inflated
+    // *  INFLATING    - busy wait for conversion to complete
+    // *  Neutral      - aggressively inflate the object.
+    // *  BIASED       - Illegal.  We should never see this
+
+    // CASE: inflated
+    if (mark.has_monitor()) {
+      ObjectMonitor* inf = mark.monitor();
+      markWord dmw = inf-&gt;header();
+      assert(dmw.is_neutral(), &quot;invariant: header=&quot; INTPTR_FORMAT, dmw.value());
+      return inf;
+    }
+
+    // CASE: inflation in progress - inflating over a stack-lock.
+    // Some other thread is converting from stack-locked to inflated.
+    // Only that thread can complete inflation -- other threads must wait.
+    // The INFLATING value is transient.
+    // Currently, we spin/yield/park and poll the markword, waiting for inflation to finish.
+    // We could always eliminate polling by parking the thread on some auxiliary list.
+    if (mark == markWord::INFLATING()) {
+      read_stable_mark(object);
+      continue;
+    }
+
+    // CASE: stack-locked
+    // Could be stack-locked either by this thread or by some other thread.
+    //
+    // Note that we allocate the ObjectMonitor speculatively, _before_ attempting
+    // to install INFLATING into the mark word.  We originally installed INFLATING,
+    // allocated the ObjectMonitor, and then finally STed the address of the
+    // ObjectMonitor into the mark.  This was correct, but artificially lengthened
+    // the interval in which INFLATING appeared in the mark, thus increasing
+    // the odds of inflation contention.
+
+    LogStreamHandle(Trace, monitorinflation) lsh;
+
+    if (mark.has_locker()) {
+      ObjectMonitor* m = new ObjectMonitor(object);
+      // Optimistically prepare the ObjectMonitor - anticipate successful CAS
+      // We do this before the CAS in order to minimize the length of time
+      // in which INFLATING appears in the mark.
+
+      markWord cmp = object-&gt;cas_set_mark(markWord::INFLATING(), mark);
+      if (cmp != mark) {
+        delete m;
+        continue;       // Interference -- just retry
+      }
+
+      // We've successfully installed INFLATING (0) into the mark-word.
+      // This is the only case where 0 will appear in a mark-word.
+      // Only the singular thread that successfully swings the mark-word
+      // to 0 can perform (or more precisely, complete) inflation.
+      //
+      // Why do we CAS a 0 into the mark-word instead of just CASing the
+      // mark-word from the stack-locked value directly to the new inflated state?
+      // Consider what happens when a thread unlocks a stack-locked object.
+      // It attempts to use CAS to swing the displaced header value from the
+      // on-stack BasicLock back into the object header.  Recall also that the
+      // header value (hash code, etc) can reside in (a) the object header, or
+      // (b) a displaced header associated with the stack-lock, or (c) a displaced
+      // header in an ObjectMonitor.  The inflate() routine must copy the header
+      // value from the BasicLock on the owner's stack to the ObjectMonitor, all
+      // the while preserving the hashCode stability invariants.  If the owner
+      // decides to release the lock while the value is 0, the unlock will fail
+      // and control will eventually pass from slow_exit() to inflate.  The owner
+      // will then spin, waiting for the 0 value to disappear.   Put another way,
+      // the 0 causes the owner to stall if the owner happens to try to
+      // drop the lock (restoring the header from the BasicLock to the object)
+      // while inflation is in-progress.  This protocol avoids races that might
+      // would otherwise permit hashCode values to change or &quot;flicker&quot; for an object.
+      // Critically, while object-&gt;mark is 0 mark.displaced_mark_helper() is stable.
+      // 0 serves as a &quot;BUSY&quot; inflate-in-progress indicator.
+
+
+      // fetch the displaced mark from the owner's stack.
+      // The owner can't die or unwind past the lock while our INFLATING
+      // object is in the mark.  Furthermore the owner can't complete
+      // an unlock on the object, either.
+      markWord dmw = mark.displaced_mark_helper();
+      // Catch if the object's header is not neutral (not locked and
+      // not marked is what we care about here).
+      assert(dmw.is_neutral(), &quot;invariant: header=&quot; INTPTR_FORMAT, dmw.value());
+
+      // Setup monitor fields to proper values -- prepare the monitor
+      m-&gt;set_header(dmw);
+
+      // Optimization: if the mark.locker stack address is associated
+      // with this thread we could simply set m-&gt;_owner = current.
+      // Note that a thread can inflate an object
+      // that it has stack-locked -- as might happen in wait() -- directly
+      // with CAS.  That is, we can avoid the xchg-NULL .... ST idiom.
+      m-&gt;set_owner_from(NULL, mark.locker());
+      // TODO-FIXME: assert BasicLock-&gt;dhw != 0.
+
+      // Must preserve store ordering. The monitor state must
+      // be stable at the time of publishing the monitor address.
+      guarantee(object-&gt;mark() == markWord::INFLATING(), &quot;invariant&quot;);
+      // Release semantics so that above set_object() is seen first.
+      object-&gt;release_set_mark(markWord::encode(m));
+
+      // Once ObjectMonitor is configured and the object is associated
+      // with the ObjectMonitor, it is safe to allow async deflation:
+      _in_use_list.add(m);
+
+      // Hopefully the performance counters are allocated on distinct cache lines
+      // to avoid false sharing on MP systems ...
+      OM_PERFDATA_OP(Inflations, inc());
+      if (log_is_enabled(Trace, monitorinflation)) {
+        ResourceMark rm(current);
+        lsh.print_cr(&quot;inflate(has_locker): object=&quot; INTPTR_FORMAT &quot;, mark=&quot;
+                     INTPTR_FORMAT &quot;, type='%s'&quot;, p2i(object),
+                     object-&gt;mark().value(), object-&gt;klass()-&gt;external_name());
+      }
+      if (event.should_commit()) {
+        post_monitor_inflate_event(&amp;amp;event, object, cause);
+      }
+      return m;
+    }
+
+    // CASE: neutral
+    // TODO-FIXME: for entry we currently inflate and then try to CAS _owner.
+    // If we know we're inflating for entry it's better to inflate by swinging a
+    // pre-locked ObjectMonitor pointer into the object header.   A successful
+    // CAS inflates the object *and* confers ownership to the inflating thread.
+    // In the current implementation we use a 2-step mechanism where we CAS()
+    // to inflate and then CAS() again to try to swing _owner from NULL to current.
+    // An inflateTry() method that we could call from enter() would be useful.
+
+    // Catch if the object's header is not neutral (not locked and
+    // not marked is what we care about here).
+    assert(mark.is_neutral(), &quot;invariant: header=&quot; INTPTR_FORMAT, mark.value());
+    ObjectMonitor* m = new ObjectMonitor(object);
+    // prepare m for installation - set monitor to initial state
+    m-&gt;set_header(mark);
+
+    if (object-&gt;cas_set_mark(markWord::encode(m), mark) != mark) {
+      delete m;
+      m = NULL;
+      continue;
+      // interference - the markword changed - just retry.
+      // The state-transitions are one-way, so there's no chance of
+      // live-lock -- &quot;Inflated&quot; is an absorbing state.
+    }
+
+    // Once the ObjectMonitor is configured and object is associated
+    // with the ObjectMonitor, it is safe to allow async deflation:
+    _in_use_list.add(m);
+
+    // Hopefully the performance counters are allocated on distinct
+    // cache lines to avoid false sharing on MP systems ...
+    OM_PERFDATA_OP(Inflations, inc());
+    if (log_is_enabled(Trace, monitorinflation)) {
+      ResourceMark rm(current);
+      lsh.print_cr(&quot;inflate(neutral): object=&quot; INTPTR_FORMAT &quot;, mark=&quot;
+                   INTPTR_FORMAT &quot;, type='%s'&quot;, p2i(object),
+                   object-&gt;mark().value(), object-&gt;klass()-&gt;external_name());
+    }
+    if (event.should_commit()) {
+      post_monitor_inflate_event(&amp;amp;event, object, cause);
+    }
+    return m;
+  }
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br><span class="line-number">89</span><br><span class="line-number">90</span><br><span class="line-number">91</span><br><span class="line-number">92</span><br><span class="line-number">93</span><br><span class="line-number">94</span><br><span class="line-number">95</span><br><span class="line-number">96</span><br><span class="line-number">97</span><br><span class="line-number">98</span><br><span class="line-number">99</span><br><span class="line-number">100</span><br><span class="line-number">101</span><br><span class="line-number">102</span><br><span class="line-number">103</span><br><span class="line-number">104</span><br><span class="line-number">105</span><br><span class="line-number">106</span><br><span class="line-number">107</span><br><span class="line-number">108</span><br><span class="line-number">109</span><br><span class="line-number">110</span><br><span class="line-number">111</span><br><span class="line-number">112</span><br><span class="line-number">113</span><br><span class="line-number">114</span><br><span class="line-number">115</span><br><span class="line-number">116</span><br><span class="line-number">117</span><br><span class="line-number">118</span><br><span class="line-number">119</span><br><span class="line-number">120</span><br><span class="line-number">121</span><br><span class="line-number">122</span><br><span class="line-number">123</span><br><span class="line-number">124</span><br><span class="line-number">125</span><br><span class="line-number">126</span><br><span class="line-number">127</span><br><span class="line-number">128</span><br><span class="line-number">129</span><br><span class="line-number">130</span><br><span class="line-number">131</span><br><span class="line-number">132</span><br><span class="line-number">133</span><br><span class="line-number">134</span><br><span class="line-number">135</span><br><span class="line-number">136</span><br><span class="line-number">137</span><br><span class="line-number">138</span><br><span class="line-number">139</span><br><span class="line-number">140</span><br><span class="line-number">141</span><br><span class="line-number">142</span><br><span class="line-number">143</span><br><span class="line-number">144</span><br><span class="line-number">145</span><br><span class="line-number">146</span><br><span class="line-number">147</span><br><span class="line-number">148</span><br><span class="line-number">149</span><br><span class="line-number">150</span><br><span class="line-number">151</span><br><span class="line-number">152</span><br><span class="line-number">153</span><br><span class="line-number">154</span><br><span class="line-number">155</span><br><span class="line-number">156</span><br><span class="line-number">157</span><br><span class="line-number">158</span><br><span class="line-number">159</span><br><span class="line-number">160</span><br><span class="line-number">161</span><br><span class="line-number">162</span><br><span class="line-number">163</span><br><span class="line-number">164</span><br><span class="line-number">165</span><br><span class="line-number">166</span><br><span class="line-number">167</span><br><span class="line-number">168</span><br><span class="line-number">169</span><br><span class="line-number">170</span><br><span class="line-number">171</span><br><span class="line-number">172</span><br><span class="line-number">173</span><br></div></div><h3 id="重量级锁的enter加锁"><a href="#重量级锁的enter加锁" class="header-anchor">#</a> 重量级锁的enter加锁</h3> <ul><li>通过cas修改ObjectMonitor的_owner，从null cas到当前线程，如果cas成功说明重量级锁加锁成功，返回。</li> <li>判断锁重入情况，如果重入（锁的owner和当前线程想通）则增加_recursions并返回成功</li> <li>如果当前线程已经轻量级加锁，说明当前线程在轻量级锁加锁完成后再对相同锁对象加锁，此时被其他线程完成了锁膨胀，所以会将owner从BasicLock设置为当前线程，并设置recursion为1表示第一次重入，并返回</li> <li>TrySpin，TrySpin是cas设置owner，会经过多次自适应自旋，如果TrySpin成功说明加锁成功也会返回</li> <li><code>for(;;)</code>中不断尝试加锁
+<ul><li><code>ThreadBlockInVMPreprocess&lt;ExitOnSuspend&gt; tbivs(current, eos)</code>: 创建一个ThreadBlockInVMPreprocess对象，在方法块结束前析构方法会检查是否处于safepoint过程中，如果是则会等待safepoint完成再返回。</li> <li><code>EnterI</code>：是重量级锁的入队、park阻塞实现</li></ul></li></ul> <div class="language-text line-numbers-mode"><pre class="language-text"><code>// -----------------------------------------------------------------------------
+// Enter support
+
+bool ObjectMonitor::enter(JavaThread* current) {
+  // The following code is ordered to check the most common cases first
+  // and to reduce RTS-&gt;RTO cache line upgrades on SPARC and IA32 processors.
+
+  void* cur = try_set_owner_from(NULL, current);
+  if (cur == NULL) {
+    assert(_recursions == 0, &quot;invariant&quot;);
+    return true;
+  }
+
+  if (cur == current) {
+    // TODO-FIXME: check for integer overflow!  BUGID 6557169.
+    _recursions++;
+    return true;
+  }
+
+  if (current-&gt;is_lock_owned((address)cur)) {
+    assert(_recursions == 0, &quot;internal state error&quot;);
+    _recursions = 1;
+    set_owner_from_BasicLock(cur, current);  // Convert from BasicLock* to Thread*.
+    return true;
+  }
+
+  // We've encountered genuine contention.
+  assert(current-&gt;_Stalled == 0, &quot;invariant&quot;);
+  current-&gt;_Stalled = intptr_t(this);
+
+  // Try one round of spinning *before* enqueueing current
+  // and before going through the awkward and expensive state
+  // transitions.  The following spin is strictly optional ...
+  // Note that if we acquire the monitor from an initial spin
+  // we forgo posting JVMTI events and firing DTRACE probes.
+  if (TrySpin(current) &gt; 0) {
+    assert(owner_raw() == current, &quot;must be current: owner=&quot; INTPTR_FORMAT, p2i(owner_raw()));
+    assert(_recursions == 0, &quot;must be 0: recursions=&quot; INTX_FORMAT, _recursions);
+    assert(object()-&gt;mark() == markWord::encode(this),
+           &quot;object mark must match encoded this: mark=&quot; INTPTR_FORMAT
+           &quot;, encoded this=&quot; INTPTR_FORMAT, object()-&gt;mark().value(),
+           markWord::encode(this).value());
+    current-&gt;_Stalled = 0;
+    return true;
+  }
+
+  assert(owner_raw() != current, &quot;invariant&quot;);
+  assert(_succ != current, &quot;invariant&quot;);
+  assert(!SafepointSynchronize::is_at_safepoint(), &quot;invariant&quot;);
+  assert(current-&gt;thread_state() != _thread_blocked, &quot;invariant&quot;);
+
+  // Keep track of contention for JVM/TI and M&amp;amp;M queries.
+  add_to_contentions(1);
+  if (is_being_async_deflated()) {
+    // Async deflation is in progress and our contentions increment
+    // above lost the race to async deflation. Undo the work and
+    // force the caller to retry.
+    const oop l_object = object();
+    if (l_object != NULL) {
+      // Attempt to restore the header/dmw to the object's header so that
+      // we only retry once if the deflater thread happens to be slow.
+      install_displaced_markword_in_object(l_object);
+    }
+    current-&gt;_Stalled = 0;
+    add_to_contentions(-1);
+    return false;
+  }
+
+  { // Change java thread status to indicate blocked on monitor enter.
+    JavaThreadBlockedOnMonitorEnterState jtbmes(current, this);
+
+    assert(current-&gt;current_pending_monitor() == NULL, &quot;invariant&quot;);
+    current-&gt;set_current_pending_monitor(this);
+
+    DTRACE_MONITOR_PROBE(contended__enter, this, object(), current);
+    if (JvmtiExport::should_post_monitor_contended_enter()) {
+      JvmtiExport::post_monitor_contended_enter(current, this);
+
+      // The current thread does not yet own the monitor and does not
+      // yet appear on any queues that would get it made the successor.
+      // This means that the JVMTI_EVENT_MONITOR_CONTENDED_ENTER event
+      // handler cannot accidentally consume an unpark() meant for the
+      // ParkEvent associated with this ObjectMonitor.
+    }
+
+    OSThreadContendState osts(current-&gt;osthread());
+
+    assert(current-&gt;thread_state() == _thread_in_vm, &quot;invariant&quot;);
+
+    for (;;) {
+      ExitOnSuspend eos(this);
+      {
+        ThreadBlockInVMPreprocess&amp;lt;ExitOnSuspend&gt; tbivs(current, eos);
+        EnterI(current);
+        current-&gt;set_current_pending_monitor(NULL);
+        // We can go to a safepoint at the end of this block. If we
+        // do a thread dump during that safepoint, then this thread will show
+        // as having &quot;-locked&quot; the monitor, but the OS and java.lang.Thread
+        // states will still report that the thread is blocked trying to
+        // acquire it.
+        // If there is a suspend request, ExitOnSuspend will exit the OM
+        // and set the OM as pending.
+      }
+      if (!eos.exited()) {
+        // ExitOnSuspend did not exit the OM
+        assert(owner_raw() == current, &quot;invariant&quot;);
+        break;
+      }
+    }
+
+    // We've just gotten past the enter-check-for-suspend dance and we now own
+    // the monitor free and clear.
+  }
+
+  add_to_contentions(-1);
+  assert(contentions() &gt;= 0, &quot;must not be negative: contentions=%d&quot;, contentions());
+  current-&gt;_Stalled = 0;
+
+  // Must either set _recursions = 0 or ASSERT _recursions == 0.
+  assert(_recursions == 0, &quot;invariant&quot;);
+  assert(owner_raw() == current, &quot;invariant&quot;);
+  assert(_succ != current, &quot;invariant&quot;);
+  assert(object()-&gt;mark() == markWord::encode(this), &quot;invariant&quot;);
+
+  return true;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br><span class="line-number">89</span><br><span class="line-number">90</span><br><span class="line-number">91</span><br><span class="line-number">92</span><br><span class="line-number">93</span><br><span class="line-number">94</span><br><span class="line-number">95</span><br><span class="line-number">96</span><br><span class="line-number">97</span><br><span class="line-number">98</span><br><span class="line-number">99</span><br><span class="line-number">100</span><br><span class="line-number">101</span><br><span class="line-number">102</span><br><span class="line-number">103</span><br><span class="line-number">104</span><br><span class="line-number">105</span><br><span class="line-number">106</span><br><span class="line-number">107</span><br><span class="line-number">108</span><br><span class="line-number">109</span><br><span class="line-number">110</span><br><span class="line-number">111</span><br><span class="line-number">112</span><br><span class="line-number">113</span><br><span class="line-number">114</span><br><span class="line-number">115</span><br><span class="line-number">116</span><br><span class="line-number">117</span><br><span class="line-number">118</span><br><span class="line-number">119</span><br><span class="line-number">120</span><br><span class="line-number">121</span><br><span class="line-number">122</span><br><span class="line-number">123</span><br><span class="line-number">124</span><br><span class="line-number">125</span><br><span class="line-number">126</span><br></div></div><h4 id="enteri"><a href="#enteri" class="header-anchor">#</a> EnterI</h4> <ul><li>再尝试TryLock，包含在后面的步骤中还会穿插尝试TryLock</li> <li>创建ObjectWaiter等待节点，然后通过cas设置为新的_cxq头节点，cas成功完成入队。</li> <li>如果ObjectWaiter的next为NULL并且_EntryList也是NULL，需要将自己设置成_Responsible，当前这种情况，已经持有锁的线程在释放锁时可能走快速锁释放流程导致等待锁的线程不能被唤醒，所以_Responsible会定期检查锁状态，即park阻塞会设置超时时间不断检查。</li> <li>入队完成后，for循环内不断
+<ul><li>TryLock尝试加锁</li> <li>加锁不成功<code>current-&gt;_ParkEvent-&gt;park()</code>，阻塞即挂起当前线程，内核可以调度运行其他线程。park恢复后（可能是锁释放了），会继续尝试加锁。</li></ul></li></ul> <div class="language-text line-numbers-mode"><pre class="language-text"><code>void ObjectMonitor::EnterI(JavaThread* current) {
+  assert(current-&gt;thread_state() == _thread_blocked, &quot;invariant&quot;);
+
+  // Try the lock - TATAS
+  if (TryLock (current) &gt; 0) {
+    assert(_succ != current, &quot;invariant&quot;);
+    assert(owner_raw() == current, &quot;invariant&quot;);
+    assert(_Responsible != current, &quot;invariant&quot;);
+    return;
+  }
+
+  if (try_set_owner_from(DEFLATER_MARKER, current) == DEFLATER_MARKER) {
+    // Cancelled the in-progress async deflation by changing owner from
+    // DEFLATER_MARKER to current. As part of the contended enter protocol,
+    // contentions was incremented to a positive value before EnterI()
+    // was called and that prevents the deflater thread from winning the
+    // last part of the 2-part async deflation protocol. After EnterI()
+    // returns to enter(), contentions is decremented because the caller
+    // now owns the monitor. We bump contentions an extra time here to
+    // prevent the deflater thread from winning the last part of the
+    // 2-part async deflation protocol after the regular decrement
+    // occurs in enter(). The deflater thread will decrement contentions
+    // after it recognizes that the async deflation was cancelled.
+    add_to_contentions(1);
+    assert(_succ != current, &quot;invariant&quot;);
+    assert(_Responsible != current, &quot;invariant&quot;);
+    return;
+  }
+
+  assert(InitDone, &quot;Unexpectedly not initialized&quot;);
+
+  // We try one round of spinning *before* enqueueing current.
+  //
+  // If the _owner is ready but OFFPROC we could use a YieldTo()
+  // operation to donate the remainder of this thread's quantum
+  // to the owner.  This has subtle but beneficial affinity
+  // effects.
+
+  if (TrySpin(current) &gt; 0) {
+    assert(owner_raw() == current, &quot;invariant&quot;);
+    assert(_succ != current, &quot;invariant&quot;);
+    assert(_Responsible != current, &quot;invariant&quot;);
+    return;
+  }
+
+  // The Spin failed -- Enqueue and park the thread ...
+  assert(_succ != current, &quot;invariant&quot;);
+  assert(owner_raw() != current, &quot;invariant&quot;);
+  assert(_Responsible != current, &quot;invariant&quot;);
+
+  // Enqueue &quot;current&quot; on ObjectMonitor's _cxq.
+  //
+  // Node acts as a proxy for current.
+  // As an aside, if were to ever rewrite the synchronization code mostly
+  // in Java, WaitNodes, ObjectMonitors, and Events would become 1st-class
+  // Java objects.  This would avoid awkward lifecycle and liveness issues,
+  // as well as eliminate a subset of ABA issues.
+  // TODO: eliminate ObjectWaiter and enqueue either Threads or Events.
+
+  ObjectWaiter node(current);
+  current-&gt;_ParkEvent-&gt;reset();
+  node._prev   = (ObjectWaiter*) 0xBAD;
+  node.TState  = ObjectWaiter::TS_CXQ;
+
+  // Push &quot;current&quot; onto the front of the _cxq.
+  // Once on cxq/EntryList, current stays on-queue until it acquires the lock.
+  // Note that spinning tends to reduce the rate at which threads
+  // enqueue and dequeue on EntryList|cxq.
+  ObjectWaiter* nxt;
+  for (;;) {
+    node._next = nxt = _cxq;
+    if (Atomic::cmpxchg(&amp;amp;_cxq, nxt, &amp;amp;node) == nxt) break;
+
+    // Interference - the CAS failed because _cxq changed.  Just retry.
+    // As an optional optimization we retry the lock.
+    if (TryLock (current) &gt; 0) {
+      assert(_succ != current, &quot;invariant&quot;);
+      assert(owner_raw() == current, &quot;invariant&quot;);
+      assert(_Responsible != current, &quot;invariant&quot;);
+      return;
+    }
+  }
+
+  // Check for cxq|EntryList edge transition to non-null.  This indicates
+  // the onset of contention.  While contention persists exiting threads
+  // will use a ST:MEMBAR:LD 1-1 exit protocol.  When contention abates exit
+  // operations revert to the faster 1-0 mode.  This enter operation may interleave
+  // (race) a concurrent 1-0 exit operation, resulting in stranding, so we
+  // arrange for one of the contending thread to use a timed park() operations
+  // to detect and recover from the race.  (Stranding is form of progress failure
+  // where the monitor is unlocked but all the contending threads remain parked).
+  // That is, at least one of the contended threads will periodically poll _owner.
+  // One of the contending threads will become the designated &quot;Responsible&quot; thread.
+  // The Responsible thread uses a timed park instead of a normal indefinite park
+  // operation -- it periodically wakes and checks for and recovers from potential
+  // strandings admitted by 1-0 exit operations.   We need at most one Responsible
+  // thread per-monitor at any given moment.  Only threads on cxq|EntryList may
+  // be responsible for a monitor.
+  //
+  // Currently, one of the contended threads takes on the added role of &quot;Responsible&quot;.
+  // A viable alternative would be to use a dedicated &quot;stranding checker&quot; thread
+  // that periodically iterated over all the threads (or active monitors) and unparked
+  // successors where there was risk of stranding.  This would help eliminate the
+  // timer scalability issues we see on some platforms as we'd only have one thread
+  // -- the checker -- parked on a timer.
+
+  if (nxt == NULL &amp;amp;&amp;amp; _EntryList == NULL) {
+    // Try to assume the role of responsible thread for the monitor.
+    // CONSIDER:  ST vs CAS vs { if (Responsible==null) Responsible=current }
+    Atomic::replace_if_null(&amp;amp;_Responsible, current);
+  }
+
+  // The lock might have been released while this thread was occupied queueing
+  // itself onto _cxq.  To close the race and avoid &quot;stranding&quot; and
+  // progress-liveness failure we must resample-retry _owner before parking.
+  // Note the Dekker/Lamport duality: ST cxq; MEMBAR; LD Owner.
+  // In this case the ST-MEMBAR is accomplished with CAS().
+  //
+  // TODO: Defer all thread state transitions until park-time.
+  // Since state transitions are heavy and inefficient we'd like
+  // to defer the state transitions until absolutely necessary,
+  // and in doing so avoid some transitions ...
+
+  int nWakeups = 0;
+  int recheckInterval = 1;
+
+  for (;;) {
+
+    if (TryLock(current) &gt; 0) break;
+    assert(owner_raw() != current, &quot;invariant&quot;);
+
+    // park self
+    if (_Responsible == current) {
+      current-&gt;_ParkEvent-&gt;park((jlong) recheckInterval);
+      // Increase the recheckInterval, but clamp the value.
+      recheckInterval *= 8;
+      if (recheckInterval &gt; MAX_RECHECK_INTERVAL) {
+        recheckInterval = MAX_RECHECK_INTERVAL;
+      }
+    } else {
+      current-&gt;_ParkEvent-&gt;park();
+    }
+
+    if (TryLock(current) &gt; 0) break;
+
+    if (try_set_owner_from(DEFLATER_MARKER, current) == DEFLATER_MARKER) {
+      // Cancelled the in-progress async deflation by changing owner from
+      // DEFLATER_MARKER to current. As part of the contended enter protocol,
+      // contentions was incremented to a positive value before EnterI()
+      // was called and that prevents the deflater thread from winning the
+      // last part of the 2-part async deflation protocol. After EnterI()
+      // returns to enter(), contentions is decremented because the caller
+      // now owns the monitor. We bump contentions an extra time here to
+      // prevent the deflater thread from winning the last part of the
+      // 2-part async deflation protocol after the regular decrement
+      // occurs in enter(). The deflater thread will decrement contentions
+      // after it recognizes that the async deflation was cancelled.
+      add_to_contentions(1);
+      break;
+    }
+
+    // The lock is still contested.
+    // Keep a tally of the # of futile wakeups.
+    // Note that the counter is not protected by a lock or updated by atomics.
+    // That is by design - we trade &quot;lossy&quot; counters which are exposed to
+    // races during updates for a lower probe effect.
+
+    // This PerfData object can be used in parallel with a safepoint.
+    // See the work around in PerfDataManager::destroy().
+    OM_PERFDATA_OP(FutileWakeups, inc());
+    ++nWakeups;
+
+    // Assuming this is not a spurious wakeup we'll normally find _succ == current.
+    // We can defer clearing _succ until after the spin completes
+    // TrySpin() must tolerate being called with _succ == current.
+    // Try yet another round of adaptive spinning.
+    if (TrySpin(current) &gt; 0) break;
+
+    // We can find that we were unpark()ed and redesignated _succ while
+    // we were spinning.  That's harmless.  If we iterate and call park(),
+    // park() will consume the event and return immediately and we'll
+    // just spin again.  This pattern can repeat, leaving _succ to simply
+    // spin on a CPU.
+
+    if (_succ == current) _succ = NULL;
+
+    // Invariant: after clearing _succ a thread *must* retry _owner before parking.
+    OrderAccess::fence();
+  }
+
+  // Egress :
+  // current has acquired the lock -- Unlink current from the cxq or EntryList.
+  // Normally we'll find current on the EntryList .
+  // From the perspective of the lock owner (this thread), the
+  // EntryList is stable and cxq is prepend-only.
+  // The head of cxq is volatile but the interior is stable.
+  // In addition, current.TState is stable.
+
+  assert(owner_raw() == current, &quot;invariant&quot;);
+
+  UnlinkAfterAcquire(current, &amp;amp;node);
+  if (_succ == current) _succ = NULL;
+
+  assert(_succ != current, &quot;invariant&quot;);
+  if (_Responsible == current) {
+    _Responsible = NULL;
+    OrderAccess::fence(); // Dekker pivot-point
+
+    // We may leave threads on cxq|EntryList without a designated
+    // &quot;Responsible&quot; thread.  This is benign.  When this thread subsequently
+    // exits the monitor it can &quot;see&quot; such preexisting &quot;old&quot; threads --
+    // threads that arrived on the cxq|EntryList before the fence, above --
+    // by LDing cxq|EntryList.  Newly arrived threads -- that is, threads
+    // that arrive on cxq after the ST:MEMBAR, above -- will set Responsible
+    // non-null and elect a new &quot;Responsible&quot; timer thread.
+    //
+    // This thread executes:
+    //    ST Responsible=null; MEMBAR    (in enter epilogue - here)
+    //    LD cxq|EntryList               (in subsequent exit)
+    //
+    // Entering threads in the slow/contended path execute:
+    //    ST cxq=nonnull; MEMBAR; LD Responsible (in enter prolog)
+    //    The (ST cxq; MEMBAR) is accomplished with CAS().
+    //
+    // The MEMBAR, above, prevents the LD of cxq|EntryList in the subsequent
+    // exit operation from floating above the ST Responsible=null.
+  }
+
+  // We've acquired ownership with CAS().
+  // CAS is serializing -- it has MEMBAR/FENCE-equivalent semantics.
+  // But since the CAS() this thread may have also stored into _succ,
+  // EntryList, cxq or Responsible.  These meta-data updates must be
+  // visible __before this thread subsequently drops the lock.
+  // Consider what could occur if we didn't enforce this constraint --
+  // STs to monitor meta-data and user-data could reorder with (become
+  // visible after) the ST in exit that drops ownership of the lock.
+  // Some other thread could then acquire the lock, but observe inconsistent
+  // or old monitor meta-data and heap data.  That violates the JMM.
+  // To that end, the 1-0 exit() operation must have at least STST|LDST
+  // &quot;release&quot; barrier semantics.  Specifically, there must be at least a
+  // STST|LDST barrier in exit() before the ST of null into _owner that drops
+  // the lock.   The barrier ensures that changes to monitor meta-data and data
+  // protected by the lock will be visible before we release the lock, and
+  // therefore before some other thread (CPU) has a chance to acquire the lock.
+  // See also: http://gee.cs.oswego.edu/dl/jmm/cookbook.html.
+  //
+  // Critically, any prior STs to _succ or EntryList must be visible before
+  // the ST of null into _owner in the *subsequent* (following) corresponding
+  // monitorexit.  Recall too, that in 1-0 mode monitorexit does not necessarily
+  // execute a serializing instruction.
+
+  return;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br><span class="line-number">89</span><br><span class="line-number">90</span><br><span class="line-number">91</span><br><span class="line-number">92</span><br><span class="line-number">93</span><br><span class="line-number">94</span><br><span class="line-number">95</span><br><span class="line-number">96</span><br><span class="line-number">97</span><br><span class="line-number">98</span><br><span class="line-number">99</span><br><span class="line-number">100</span><br><span class="line-number">101</span><br><span class="line-number">102</span><br><span class="line-number">103</span><br><span class="line-number">104</span><br><span class="line-number">105</span><br><span class="line-number">106</span><br><span class="line-number">107</span><br><span class="line-number">108</span><br><span class="line-number">109</span><br><span class="line-number">110</span><br><span class="line-number">111</span><br><span class="line-number">112</span><br><span class="line-number">113</span><br><span class="line-number">114</span><br><span class="line-number">115</span><br><span class="line-number">116</span><br><span class="line-number">117</span><br><span class="line-number">118</span><br><span class="line-number">119</span><br><span class="line-number">120</span><br><span class="line-number">121</span><br><span class="line-number">122</span><br><span class="line-number">123</span><br><span class="line-number">124</span><br><span class="line-number">125</span><br><span class="line-number">126</span><br><span class="line-number">127</span><br><span class="line-number">128</span><br><span class="line-number">129</span><br><span class="line-number">130</span><br><span class="line-number">131</span><br><span class="line-number">132</span><br><span class="line-number">133</span><br><span class="line-number">134</span><br><span class="line-number">135</span><br><span class="line-number">136</span><br><span class="line-number">137</span><br><span class="line-number">138</span><br><span class="line-number">139</span><br><span class="line-number">140</span><br><span class="line-number">141</span><br><span class="line-number">142</span><br><span class="line-number">143</span><br><span class="line-number">144</span><br><span class="line-number">145</span><br><span class="line-number">146</span><br><span class="line-number">147</span><br><span class="line-number">148</span><br><span class="line-number">149</span><br><span class="line-number">150</span><br><span class="line-number">151</span><br><span class="line-number">152</span><br><span class="line-number">153</span><br><span class="line-number">154</span><br><span class="line-number">155</span><br><span class="line-number">156</span><br><span class="line-number">157</span><br><span class="line-number">158</span><br><span class="line-number">159</span><br><span class="line-number">160</span><br><span class="line-number">161</span><br><span class="line-number">162</span><br><span class="line-number">163</span><br><span class="line-number">164</span><br><span class="line-number">165</span><br><span class="line-number">166</span><br><span class="line-number">167</span><br><span class="line-number">168</span><br><span class="line-number">169</span><br><span class="line-number">170</span><br><span class="line-number">171</span><br><span class="line-number">172</span><br><span class="line-number">173</span><br><span class="line-number">174</span><br><span class="line-number">175</span><br><span class="line-number">176</span><br><span class="line-number">177</span><br><span class="line-number">178</span><br><span class="line-number">179</span><br><span class="line-number">180</span><br><span class="line-number">181</span><br><span class="line-number">182</span><br><span class="line-number">183</span><br><span class="line-number">184</span><br><span class="line-number">185</span><br><span class="line-number">186</span><br><span class="line-number">187</span><br><span class="line-number">188</span><br><span class="line-number">189</span><br><span class="line-number">190</span><br><span class="line-number">191</span><br><span class="line-number">192</span><br><span class="line-number">193</span><br><span class="line-number">194</span><br><span class="line-number">195</span><br><span class="line-number">196</span><br><span class="line-number">197</span><br><span class="line-number">198</span><br><span class="line-number">199</span><br><span class="line-number">200</span><br><span class="line-number">201</span><br><span class="line-number">202</span><br><span class="line-number">203</span><br><span class="line-number">204</span><br><span class="line-number">205</span><br><span class="line-number">206</span><br><span class="line-number">207</span><br><span class="line-number">208</span><br><span class="line-number">209</span><br><span class="line-number">210</span><br><span class="line-number">211</span><br><span class="line-number">212</span><br><span class="line-number">213</span><br><span class="line-number">214</span><br><span class="line-number">215</span><br><span class="line-number">216</span><br><span class="line-number">217</span><br><span class="line-number">218</span><br><span class="line-number">219</span><br><span class="line-number">220</span><br><span class="line-number">221</span><br><span class="line-number">222</span><br><span class="line-number">223</span><br><span class="line-number">224</span><br><span class="line-number">225</span><br><span class="line-number">226</span><br><span class="line-number">227</span><br><span class="line-number">228</span><br><span class="line-number">229</span><br><span class="line-number">230</span><br><span class="line-number">231</span><br><span class="line-number">232</span><br><span class="line-number">233</span><br><span class="line-number">234</span><br><span class="line-number">235</span><br><span class="line-number">236</span><br><span class="line-number">237</span><br><span class="line-number">238</span><br><span class="line-number">239</span><br><span class="line-number">240</span><br><span class="line-number">241</span><br><span class="line-number">242</span><br><span class="line-number">243</span><br><span class="line-number">244</span><br><span class="line-number">245</span><br><span class="line-number">246</span><br><span class="line-number">247</span><br><span class="line-number">248</span><br><span class="line-number">249</span><br><span class="line-number">250</span><br><span class="line-number">251</span><br><span class="line-number">252</span><br><span class="line-number">253</span><br></div></div><h2 id="exit释放锁"><a href="#exit释放锁" class="header-anchor">#</a> exit释放锁</h2> <h3 id="objectmonitor的exit"><a href="#objectmonitor的exit" class="header-anchor">#</a> ObjectMonitor的exit</h3> <p>为了提高性能，ObjectMonitor的exit实现会做很多优化，比如如果锁冲突比较激烈，
+exit会倾向于只设置owner为NULL然后返回，因为在spin过程中的线程会通过cas获取到锁，不需要由释放锁的线程去唤醒。
+节省了unpark的唤醒开销。如果出现罕见的等待线程没被唤醒的情况，通过前面EnterI中的_Responsible机制保证等待线程能够获取到锁。</p> <p>_succ字段（successor的意思），是用于减少多余的warkup调用量。</p> <ul><li>release_clear_owner(current)：设置owner为NULL</li> <li>OrderAccess::storeload()：storeload保证之后的其他线程能够读取到owner的新值（即NULL）</li> <li><code>(intptr_t(_EntryList)|intptr_t(_cxq)) == 0 || _succ != NULL)</code> <ul><li>说明要么两个队列都是空的，不需要唤醒，如果有并发情况（其他线程cas失败再入队，这里没有读取到），可以通过_Responsible机制保证等待线程不会无限等待。</li> <li>如果队列不为空，并且_succ不为空，_succ不为空说明有其他线程是spin，不需要主动唤醒，可以直接返回。</li></ul></li> <li><code>try_set_owner_from(NULL, current) != NULL</code>：说明修改_owner为NULL之后有其他线程获取了锁，可以退出。</li> <li>判断_EntryList不为空，则<code>ExitEpilog(current, w)</code>设置_succ为EntryList头结点，并调用unpark唤醒。</li> <li>如果_EntryList为空，但是_cxq不为空，则将_cxq队列元素转移到_EntryList，在通过<code>ExitEpilog(current, w)</code>唤醒EntryList等待的头结点。</li></ul> <div class="language-text line-numbers-mode"><pre class="language-text"><code>  for (;;) {
+    assert(current == owner_raw(), &quot;invariant&quot;);
+
+    // Drop the lock.
+    // release semantics: prior loads and stores from within the critical section
+    // must not float (reorder) past the following store that drops the lock.
+    // Uses a storeload to separate release_store(owner) from the
+    // successor check. The try_set_owner() below uses cmpxchg() so
+    // we get the fence down there.
+    release_clear_owner(current);
+    OrderAccess::storeload();
+
+    if ((intptr_t(_EntryList)|intptr_t(_cxq)) == 0 || _succ != NULL) {
+      return;
+    }
+    // Other threads are blocked trying to acquire the lock.
+
+    // Normally the exiting thread is responsible for ensuring succession,
+    // but if other successors are ready or other entering threads are spinning
+    // then this thread can simply store NULL into _owner and exit without
+    // waking a successor.  The existence of spinners or ready successors
+    // guarantees proper succession (liveness).  Responsibility passes to the
+    // ready or running successors.  The exiting thread delegates the duty.
+    // More precisely, if a successor already exists this thread is absolved
+    // of the responsibility of waking (unparking) one.
+    //
+    // The _succ variable is critical to reducing futile wakeup frequency.
+    // _succ identifies the &quot;heir presumptive&quot; thread that has been made
+    // ready (unparked) but that has not yet run.  We need only one such
+    // successor thread to guarantee progress.
+    // See http://www.usenix.org/events/jvm01/full_papers/dice/dice.pdf
+    // section 3.3 &quot;Futile Wakeup Throttling&quot; for details.
+    //
+    // Note that spinners in Enter() also set _succ non-null.
+    // In the current implementation spinners opportunistically set
+    // _succ so that exiting threads might avoid waking a successor.
+    // Another less appealing alternative would be for the exiting thread
+    // to drop the lock and then spin briefly to see if a spinner managed
+    // to acquire the lock.  If so, the exiting thread could exit
+    // immediately without waking a successor, otherwise the exiting
+    // thread would need to dequeue and wake a successor.
+    // (Note that we'd need to make the post-drop spin short, but no
+    // shorter than the worst-case round-trip cache-line migration time.
+    // The dropped lock needs to become visible to the spinner, and then
+    // the acquisition of the lock by the spinner must become visible to
+    // the exiting thread).
+
+    // It appears that an heir-presumptive (successor) must be made ready.
+    // Only the current lock owner can manipulate the EntryList or
+    // drain _cxq, so we need to reacquire the lock.  If we fail
+    // to reacquire the lock the responsibility for ensuring succession
+    // falls to the new owner.
+    //
+    if (try_set_owner_from(NULL, current) != NULL) {
+      return;
+    }
+
+    guarantee(owner_raw() == current, &quot;invariant&quot;);
+
+    ObjectWaiter* w = NULL;
+
+    w = _EntryList;
+    if (w != NULL) {
+      // I'd like to write: guarantee (w-&gt;_thread != current).
+      // But in practice an exiting thread may find itself on the EntryList.
+      // Let's say thread T1 calls O.wait().  Wait() enqueues T1 on O's waitset and
+      // then calls exit().  Exit release the lock by setting O._owner to NULL.
+      // Let's say T1 then stalls.  T2 acquires O and calls O.notify().  The
+      // notify() operation moves T1 from O's waitset to O's EntryList. T2 then
+      // release the lock &quot;O&quot;.  T2 resumes immediately after the ST of null into
+      // _owner, above.  T2 notices that the EntryList is populated, so it
+      // reacquires the lock and then finds itself on the EntryList.
+      // Given all that, we have to tolerate the circumstance where &quot;w&quot; is
+      // associated with current.
+      assert(w-&gt;TState == ObjectWaiter::TS_ENTER, &quot;invariant&quot;);
+      ExitEpilog(current, w);
+      return;
+    }
+
+    // If we find that both _cxq and EntryList are null then just
+    // re-run the exit protocol from the top.
+    w = _cxq;
+    if (w == NULL) continue;
+
+    // Drain _cxq into EntryList - bulk transfer.
+    // First, detach _cxq.
+    // The following loop is tantamount to: w = swap(&amp;amp;cxq, NULL)
+    for (;;) {
+      assert(w != NULL, &quot;Invariant&quot;);
+      ObjectWaiter* u = Atomic::cmpxchg(&amp;amp;_cxq, w, (ObjectWaiter*)NULL);
+      if (u == w) break;
+      w = u;
+    }
+
+    assert(w != NULL, &quot;invariant&quot;);
+    assert(_EntryList == NULL, &quot;invariant&quot;);
+
+    // Convert the LIFO SLL anchored by _cxq into a DLL.
+    // The list reorganization step operates in O(LENGTH(w)) time.
+    // It's critical that this step operate quickly as
+    // &quot;current&quot; still holds the outer-lock, restricting parallelism
+    // and effectively lengthening the critical section.
+    // Invariant: s chases t chases u.
+    // TODO-FIXME: consider changing EntryList from a DLL to a CDLL so
+    // we have faster access to the tail.
+
+    _EntryList = w;
+    ObjectWaiter* q = NULL;
+    ObjectWaiter* p;
+    for (p = w; p != NULL; p = p-&gt;_next) {
+      guarantee(p-&gt;TState == ObjectWaiter::TS_CXQ, &quot;Invariant&quot;);
+      p-&gt;TState = ObjectWaiter::TS_ENTER;
+      p-&gt;_prev = q;
+      q = p;
+    }
+
+    // In 1-0 mode we need: ST EntryList; MEMBAR #storestore; ST _owner = NULL
+    // The MEMBAR is satisfied by the release_store() operation in ExitEpilog().
+
+    // See if we can abdicate to a spinner instead of waking a thread.
+    // A primary goal of the implementation is to reduce the
+    // context-switch rate.
+    if (_succ != NULL) continue;
+
+    w = _EntryList;
+    if (w != NULL) {
+      guarantee(w-&gt;TState == ObjectWaiter::TS_ENTER, &quot;invariant&quot;);
+      ExitEpilog(current, w);
+      return;
+    }
+  }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br><span class="line-number">89</span><br><span class="line-number">90</span><br><span class="line-number">91</span><br><span class="line-number">92</span><br><span class="line-number">93</span><br><span class="line-number">94</span><br><span class="line-number">95</span><br><span class="line-number">96</span><br><span class="line-number">97</span><br><span class="line-number">98</span><br><span class="line-number">99</span><br><span class="line-number">100</span><br><span class="line-number">101</span><br><span class="line-number">102</span><br><span class="line-number">103</span><br><span class="line-number">104</span><br><span class="line-number">105</span><br><span class="line-number">106</span><br><span class="line-number">107</span><br><span class="line-number">108</span><br><span class="line-number">109</span><br><span class="line-number">110</span><br><span class="line-number">111</span><br><span class="line-number">112</span><br><span class="line-number">113</span><br><span class="line-number">114</span><br><span class="line-number">115</span><br><span class="line-number">116</span><br><span class="line-number">117</span><br><span class="line-number">118</span><br><span class="line-number">119</span><br><span class="line-number">120</span><br><span class="line-number">121</span><br><span class="line-number">122</span><br><span class="line-number">123</span><br><span class="line-number">124</span><br><span class="line-number">125</span><br><span class="line-number">126</span><br><span class="line-number">127</span><br><span class="line-number">128</span><br><span class="line-number">129</span><br><span class="line-number">130</span><br><span class="line-number">131</span><br></div></div></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/jvm/jvm/monitor.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+        ←
+        <a href="/md/jvm/jvm/synchronizer.html" class="prev">
+          synchronzier
+        </a></span> <span class="next"><a href="/md/jvm/jvm/virtualthread/virtual-thread.html">
+          JDK Virtual Thread的实现
+        </a>
+        →
+      </span></p></div> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><div class="option-box-toc-fixed"><div class="toc-container-sidebar"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:650px"><div style="font-weight:bold;text-align:center;">synchronized、monitor lock加锁流程</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/jvm/jvm/monitor.html#实现" class="toc-sidebar-link">实现</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/monitor.html#monitorenter的实现" class="toc-sidebar-link">monitorenter的实现</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/monitor.html#lock-object" class="toc-sidebar-link">lock_object</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/monitor.html#interpreter-runtime中的monitor-enter" class="toc-sidebar-link">interpreter runtime中的monitor enter</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/monitor.html#锁膨胀inflation" class="toc-sidebar-link">锁膨胀inflation</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/monitor.html#重量级锁的enter加锁" class="toc-sidebar-link">重量级锁的enter加锁</a></li></ul></li><li><a href="/md/jvm/jvm/monitor.html#exit释放锁" class="toc-sidebar-link">exit释放锁</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/monitor.html#objectmonitor的exit" class="toc-sidebar-link">ObjectMonitor的exit</a></li></ul></li></ul></div></div></div></div></div> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">synchronized、monitor lock加锁流程</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/jvm/jvm/monitor.html#实现" class="toc-sidebar-link">实现</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/monitor.html#monitorenter的实现" class="toc-sidebar-link">monitorenter的实现</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/monitor.html#lock-object" class="toc-sidebar-link">lock_object</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/monitor.html#interpreter-runtime中的monitor-enter" class="toc-sidebar-link">interpreter runtime中的monitor enter</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/monitor.html#锁膨胀inflation" class="toc-sidebar-link">锁膨胀inflation</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/monitor.html#重量级锁的enter加锁" class="toc-sidebar-link">重量级锁的enter加锁</a></li></ul></li><li><a href="/md/jvm/jvm/monitor.html#exit释放锁" class="toc-sidebar-link">exit释放锁</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/monitor.html#objectmonitor的exit" class="toc-sidebar-link">ObjectMonitor的exit</a></li></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/jvm/jvm/monitor.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <div title="synchronzier" class="option-box" style="padding-left:2px;text-align:center;"><a href="/md/jvm/jvm/synchronizer.html"><img src="/images/system/pre2.png" width="30px" class="nozoom"> <span class="show-txt">上一篇</span></a></div> <div title="JDK Virtual Thread的实现" class="option-box" style="padding-left:2px;text-align:center;"><a href="/md/jvm/jvm/virtualthread/virtual-thread.html"><img src="/images/system/next2.png" width="30px" class="nozoom"> <span class="show-txt">下一篇</span></a></div></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-209.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

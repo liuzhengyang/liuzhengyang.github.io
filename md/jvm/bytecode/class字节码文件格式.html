@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>class字节码文件格式 | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="class字节码文件格式">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html">
+    <meta name="twitter:title" content="class字节码文件格式">
+    <meta name="twitter:url" content="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-152.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>JVM字节码</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/md/jvm/bytecode/class字节码文件格式.html" class="active sidebar-link">class字节码文件格式</a></li><li><a href="/md/jvm/bytecode/字节码指令.html" class="sidebar-link">字节码指令</a></li><li><a href="/md/jvm/bytecode/lambda.html" class="sidebar-link">lambda表达式实现原理分析</a></li></ul></section></li></ul> </aside> <div><main class="page"> <div class="theme-default-content content__default"><h1 id="class字节码文件格式"><a href="#class字节码文件格式" class="header-anchor">#</a> class字节码文件格式</h1> <p>掌握jvm 字节码，最关键的是学习class文件格式以及字节码指令集等细节，今天我们来学习class字节码文件格式(jdk8版本)。</p> <p>Java代码经过javac编译器编译成class文件，JVM虚拟机读取class文件执行其中的代码。</p> <p>通过JVM虚拟机规范，实现了jvm跨平台、跨语言的能力，JVM规范中非常重要的一部分就是class字节码文件格式。</p> <h2 id="class文件结构"><a href="#class文件结构" class="header-anchor">#</a> class文件结构</h2> <p>class文件的整体结构如下图所示，其中u1,u2,u4分别表示1个、2个、4个字节长度的无符号数据，无符号byte数据按照具体的场景可以用来表示数字、字符等。
+结构中还可以使用复合结构，比如cp_info, cp_info结构也会在规范中进行定义。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>ClassFile {
+       u4             magic;
+       u2             minor_version;
+       u2             major_version;
+       u2             constant_pool_count;
+       cp_info        constant_pool[constant_pool_count-1];
+       u2             access_flags;
+       u2             this_class;
+       u2             super_class;
+       u2             interfaces_count;
+       u2             interfaces[interfaces_count];
+       u2             fields_count;
+       field_info     fields[fields_count];
+       u2             methods_count;
+       method_info    methods[methods_count];
+       u2             attributes_count;
+       attribute_info attributes[attributes_count];
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br></div></div><h3 id="magic"><a href="#magic" class="header-anchor">#</a> magic</h3> <p>魔法字符串，固定为0xCAFEBABE</p> <h3 id="minor-version-major-version"><a href="#minor-version-major-version" class="header-anchor">#</a> minor_version, major_version</h3> <p>分别是class文件的小版本号和大版本号，jvm规范要求运行的jvm版本必须大于等于（更严格说是能支持，不过目前大于等于即可）class文件的major_version才能运行，否则抛出异常。</p> <h3 id="constant-pool-count"><a href="#constant-pool-count" class="header-anchor">#</a> constant_pool_count</h3> <p>常量池数量，是下面的常量池表的长度加一，因为index=0的常量引用没有使用。</p> <h3 id="constant-pool"><a href="#constant-pool" class="header-anchor">#</a> constant_pool[]</h3> <p>常量池表，每个常量池的结构cp_info如下，常量池可以表示字符串常量、类名、接口名、方法等信息，这些常量池会在class文件中其他地方进行引用（比如字段中字段类型、字段名等）。
+常量通过index进行引用，常量之间也可以通过index进行引用。</p> <p>cp_info中的tag字段用来标识当前的常量类型，不同的常量类型有不同的子结构，然后就可以用具体的结构来解析info[]这个byte数组。
+常量的结构有，</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>cp_info {
+    u1 tag;
+    u1 info[];
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br></div></div><table><thead><tr><th>Constant type</th> <th>tag value</th></tr></thead> <tbody><tr><td>CONSTANT_Class</td> <td>7</td></tr> <tr><td>CONSTANT_Fieldref</td> <td>9</td></tr> <tr><td>CONSTANT_Methodref</td> <td>10</td></tr> <tr><td>CONSTANT_InterfaceMethodref</td> <td>11</td></tr> <tr><td>CONSTANT_Integer</td> <td>3</td></tr> <tr><td>CONSTANT_Float</td> <td>4</td></tr> <tr><td>CONSTANT_Long</td> <td>5</td></tr> <tr><td>CONSTANT_Double</td> <td>6</td></tr> <tr><td>CONSTANT_NameAndType</td> <td>12</td></tr> <tr><td>CONSTANT_Utf8</td> <td>1</td></tr> <tr><td>CONSTANT_MethodHandle</td> <td>15</td></tr> <tr><td>CONSTANT_MethodType</td> <td>16</td></tr> <tr><td>CONSTANT_InvokeDynamic</td> <td>18</td></tr></tbody></table> <p>我们提前查看一下各个常量类型的结构，给后面介绍Field, Method做铺垫。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>CONSTANT_Class_info {
+    u1 tag;
+    u2 name_index;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br></div></div><h4 id="constant-class-info"><a href="#constant-class-info" class="header-anchor">#</a> CONSTANT_Class_info</h4> <p>CONSTANT_Class_info表示类或接口</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>CONSTANT_Class_info {
+    u1 tag;
+    u2 name_index;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br></div></div><p>tag: 是CONSTANT_Class对应的值(7)
+name_index: name_index是这个类或接口的类名的字符串常量的index</p> <h4 id="constant-fieldref-info-constant-methodref-info-constant-interfacemethodref-info"><a href="#constant-fieldref-info-constant-methodref-info-constant-interfacemethodref-info" class="header-anchor">#</a> CONSTANT_Fieldref_info, CONSTANT_Methodref_info, CONSTANT_InterfaceMethodref_info</h4> <div class="language-text line-numbers-mode"><pre class="language-text"><code>CONSTANT_Fieldref_info {
+    u1 tag;
+    u2 class_index;
+    u2 name_and_type_index;
+}
+
+CONSTANT_Methodref_info {
+    u1 tag;
+    u2 class_index;
+    u2 name_and_type_index;
+}
+
+CONSTANT_InterfaceMethodref_info {
+    u1 tag;
+    u2 class_index;
+    u2 name_and_type_index;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br></div></div><p>字段引用、方法引用、接口方法引用这三个结构比较类似，都是各自的tag以及class_index和name_and_type_index</p> <p>class_index: 这个字段、方法所在类的class的常量的index</p> <p>name_and_type_index: 这个字段的名称和类型结构常量CONSTANT_NameAndType_info的index。name分别是字段名和方法名，类型是字段、方法的descriptor描述符。</p> <h4 id="constant-string-info"><a href="#constant-string-info" class="header-anchor">#</a> CONSTANT_String_info</h4> <p>字符串常量结构</p> <p>string_index: 指向CONSTANT_Utf8_info的index</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>CONSTANT_String_info {
+    u1 tag;
+    u2 string_index;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br></div></div><h4 id="constant-integer-info-constant-float-info"><a href="#constant-integer-info-constant-float-info" class="header-anchor">#</a> CONSTANT_Integer_info, CONSTANT_Float_info</h4> <p>整数和浮点数常量结构，对应的数值占用4个字节。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>CONSTANT_Integer_info {
+    u1 tag;
+    u4 bytes;
+}
+
+CONSTANT_Float_info {
+    u1 tag;
+    u4 bytes;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br></div></div><h4 id="constant-long-info-constant-double-info"><a href="#constant-long-info-constant-double-info" class="header-anchor">#</a> CONSTANT_Long_info, CONSTANT_Double_info</h4> <p>这两个常量结构分别存储long和double类型的数值，大小占用8个字节
+high_bytes和low_bytes分别表示高位和低位的数据，以long为例，对应值为<code>((long) high_bytes &lt;&lt; 32) + low_bytes</code></p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>CONSTANT_Long_info {
+    u1 tag;
+    u4 high_bytes;
+    u4 low_bytes;
+}
+
+CONSTANT_Double_info {
+    u1 tag;
+    u4 high_bytes;
+    u4 low_bytes;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br></div></div><h4 id="constant-nameandtype-info"><a href="#constant-nameandtype-info" class="header-anchor">#</a> CONSTANT_NameAndType_info</h4> <p>CONSTANT_NameAndType_info常量用来表示名称和类型，在前面的CONSTANT_Fieldref_info, CONSTANT_Methodref_info, CONSTANT_InterfaceMethodref_info
+常量中有使用，结构如下</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>CONSTANT_NameAndType_info {
+    u1 tag;
+    u2 name_index;
+    u2 descriptor_index;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><p>name_index: 指向对应名称的utf8常量的CONSTANT_Utf8_info的index
+descriptor_index: 指向类型描述符的CONSTANT_Utf8_info的index。</p> <h4 id="field-descriptor和method-descriptor"><a href="#field-descriptor和method-descriptor" class="header-anchor">#</a> Field Descriptor和Method Descriptor</h4> <p>在jvm中，数据分为primitive type(基本类型，比如int, long)和reference type（引用类型），类型的描述符规则如下</p> <table><thead><tr><th>类型</th> <th>描述符</th></tr></thead> <tbody><tr><td>byte</td> <td>B</td></tr> <tr><td>char</td> <td>C</td></tr> <tr><td>double</td> <td>D</td></tr> <tr><td>float</td> <td>F</td></tr> <tr><td>int</td> <td>I</td></tr> <tr><td>long</td> <td>J</td></tr> <tr><td>short</td> <td>S</td></tr> <tr><td>boolean</td> <td>Z</td></tr> <tr><td>reference,引用类型</td> <td>LClassName;</td></tr> <tr><td>数组</td> <td>[</td></tr></tbody></table> <p>引用类型的ClassName是/间隔的字符串，比如<code>java.lang.String</code>的描述符为<code>Ljava/lang/String;</code>
+数组是在对应的类型前加[，比如<code>int[]</code>描述符为<code>[I</code>, <code>String[]</code>描述符为<code>[Ljava/lang/String;</code>, 多维数组距离 <code>int[][]</code>描述符为<code>[[I</code></p> <p>Field Descriptor是对应字段的类型的描述符
+Method Descriptor为( {ParameterDescriptor} ) ReturnDescriptor，比如<code>public String test(int a, Long b)</code>的方法描述符为<code>(ILjava/lang/Long)Ljava/lang/String;</code>，如果返回值是void，则使用V</p> <h4 id="constant-utf8-info"><a href="#constant-utf8-info" class="header-anchor">#</a> CONSTANT_Utf8_info</h4> <p>CONSTANT_Utf8_info常量存储utf8编码的字符串内容，包含一个字符串长度字段和对应长度的byte数组。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>CONSTANT_Utf8_info {
+    u1 tag;
+    u2 length;
+    u1 bytes[length];
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><h3 id="class-access-flags"><a href="#class-access-flags" class="header-anchor">#</a> class access_flags</h3> <p>access_flags用来表示当前类的一些bit信息（类似bitmap），这样用2个字节的空间就可以表示16个标记信息。</p> <table><thead><tr><th>Flag Name</th> <th>Value</th> <th>表头</th></tr></thead> <tbody><tr><td>ACC_PUBLIC</td> <td>0x0001</td> <td>表示当前类/接口是否是public</td></tr> <tr><td>ACC_FINAL</td> <td>0x0010</td> <td>是否声明了final</td></tr> <tr><td>ACC_SUPER</td> <td>0x0020</td> <td>都是true, 为了兼容旧版本的字节码的标记</td></tr> <tr><td>ACC_INTERFACE</td> <td>0x0200</td> <td>是否是接口</td></tr> <tr><td>ACC_ABSTRACT</td> <td>0x0400</td> <td>是否是抽象类，接口也是抽象类</td></tr> <tr><td>ACC_SYNTHETIC</td> <td>0x1000</td> <td>表示不是代码中生成的类，比如jdk为实现lambda表达式在运行时生成的一些类</td></tr> <tr><td>ACC_ANNOTATION</td> <td>0x2000</td> <td>是否是@interface这样的注解类</td></tr> <tr><td>ACC_ENUM</td> <td>0x4000</td> <td>是否枚举类</td></tr></tbody></table> <h3 id="fields"><a href="#fields" class="header-anchor">#</a> Fields</h3> <p>Fields是field_info的数组，每个field_info结构如下。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>field_info {
+    u2             access_flags;
+    u2             name_index;
+    u2             descriptor_index;
+    u2             attributes_count;
+    attribute_info attributes[attributes_count];
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br></div></div><p>access_flags: 字段的access_flags，和class的access_flags类似，用来描述字段的public,private,volatile等等标识信息。</p> <table><thead><tr><th>Flag Name</th> <th>Value</th> <th>描述</th></tr></thead> <tbody><tr><td>ACC_PUBLIC</td> <td>0x0001</td> <td>是否是public字段</td></tr> <tr><td>ACC_PRIVATE</td> <td>0x0002</td> <td>是否是private字段</td></tr> <tr><td>ACC_PROTECTED</td> <td>0x0004</td> <td>是否是static字段</td></tr> <tr><td>ACC_STATIC</td> <td>0x0008</td> <td>是否是static字段</td></tr> <tr><td>ACC_FINAL</td> <td>0x0010</td> <td>是否是final字段</td></tr> <tr><td>ACC_VOLATILE</td> <td>0x0040</td> <td>是否是volatile字段</td></tr> <tr><td>ACC_TRANSIENT</td> <td>0x0080</td> <td>是否是transient字段</td></tr> <tr><td>ACC_SYNTHETIC</td> <td>0x1000</td> <td>单元格</td></tr> <tr><td>ACC_ENUM</td> <td>0x4000</td> <td>单元格</td></tr></tbody></table> <p>name_index: 字段名称的CONSTANT_Utf8_info常量index
+descriptor_index: 字段类型描述符的CONSTANT_Utf8_info常量index
+attributes_count: 字段的属性数量
+attributes: 字段的属性，结构为attribute_info，比如ConstantValue，描述常量字段的常量值，属性的结构稍后介绍。</p> <h3 id="methods"><a href="#methods" class="header-anchor">#</a> Methods</h3> <p>类中所有的方法包括构造函数(<code>&lt;init&gt;</code>)、静态初始化方法(<code>&lt;clinit&gt;</code>)，都使用method_info结构，在一个类中，方法名称和方法签名联合起来必须唯一</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>method_info {
+    u2             access_flags;
+    u2             name_index;
+    u2             descriptor_index;
+    u2             attributes_count;
+    attribute_info attributes[attributes_count];
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br></div></div><p>access_flags: 方法的标识数据，包括public, private, synchronized等等信息</p> <table><thead><tr><th>Flag Name</th> <th>Value</th> <th>描述</th></tr></thead> <tbody><tr><td>ACC_PUBLIC</td> <td>0x0001</td> <td>public方法</td></tr> <tr><td>ACC_PRIVATE</td> <td>0x0002</td> <td>private方法</td></tr> <tr><td>ACC_PROTECTED</td> <td>0x0004</td> <td>protected方法</td></tr> <tr><td>ACC_STATIC</td> <td>0x0008</td> <td>static方法</td></tr> <tr><td>ACC_FINAL</td> <td>0x0010</td> <td>final方法</td></tr> <tr><td>ACC_SYNCHRONIZED</td> <td>0x0020</td> <td>synchronized方法（方法维度的synchronized声明，不同于synchronized代码块的monitor_enter和monitor_exit)</td></tr> <tr><td>ACC_BRIDGE</td> <td>0x0040</td> <td>是否是transient字段</td></tr> <tr><td>ACC_VARARGS</td> <td>0x0080</td> <td>有可变参数的方法</td></tr> <tr><td>ACC_NATIVE</td> <td>0x0100</td> <td>native方法</td></tr> <tr><td>ACC_ABSTRACT</td> <td>0x0400</td> <td>抽象方法</td></tr> <tr><td>ACC_STRICT</td> <td>0x0800</td> <td>浮点数模式是FT-strict的，这个很少见</td></tr> <tr><td>ACC_SYNTHETIC</td> <td>0x1000</td> <td>是否是合成方法，即不再源代码中的方法</td></tr></tbody></table> <p>name_index: 指向方法名的CONSTANT_Utf8_info常量
+descriptor_index: 指向方法描述符的CONSTANT_Utf8_info常量
+attributes_count: 方法的属性数量
+attributes[]: 方法的各个属性，其中比较关键的是名字为Code的属性，包含的是方法体的字节码指令。</p> <h3 id="attributes属性"><a href="#attributes属性" class="header-anchor">#</a> Attributes属性</h3> <p>Attributes属性在classfile, field_info, method_info中都有使用，结构如下</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>attribute_info {
+    u2 attribute_name_index;
+    u4 attribute_length;
+    u1 info[attribute_length];
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><p>attribute_name_index: 指向属性的名称的CONSTANT_Utf8_info常量
+attribute_length: 属性信息的字节长度，即info的长度
+info[]: 属性的具体信息，每种属性有自己的结构</p> <p>属性有ConstantValue,Code,StackMapTable,Exceptions,BootstrapMethods等等很多种属性，我们这里重点介绍一下ConstantValue和Code。</p> <h4 id="constantvalue属性"><a href="#constantvalue属性" class="header-anchor">#</a> ConstantValue属性</h4> <p>常量值属性用来表示常量字段的常量值，数值（int,long,float等）和字符串字段能够声明成常量。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>ConstantValue_attribute {
+    u2 attribute_name_index;
+    u4 attribute_length;
+    u2 constantvalue_index;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><p>attribute_name_index: 指向&quot;ConstantValue&quot;的CONSTANT_Utf8_info
+attribute_length: 2，因为constantvalue_index是两个byte长度的index
+constantvalue_index: 指向具体的常量池中的常量，按照类型不同分为CONSTANT_Long,CONSTANT_Float,CONSTANT_Double,CONSTANT_Integer(int, short, char, byte, boolean都用CONSTANT_Integer),CONSTANT_String,</p> <h4 id="code属性"><a href="#code属性" class="header-anchor">#</a> Code属性</h4> <p>Code属性用来表示方法体中的代码字节码。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>Code_attribute {
+    u2 attribute_name_index;
+    u4 attribute_length;
+    u2 max_stack;
+    u2 max_locals;
+    u4 code_length;
+    u1 code[code_length];
+    u2 exception_table_length;
+    {   u2 start_pc;
+        u2 end_pc;
+        u2 handler_pc;
+        u2 catch_type;
+    } exception_table[exception_table_length];
+    u2 attributes_count;
+    attribute_info attributes[attributes_count];
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br></div></div><p>attribute_name_index: 指向&quot;Code&quot;的CONSTANT_Utf8_info常量
+attribute_length: 后面所有的字段信息的字节数
+max_stack: 方法的字节码指令执行过程中需要的操作数栈的最大栈层数，关于方法字节码指令的执行，在字节码指令文章中进行介绍。
+max_locals: 方法的字节码指令执行过程中需要的本地变量表的最大长度（注意局部变量表的元素长度是4字节，long和double变量在局部变量表中占两个位置）
+code_length: 方法体的字节码的长度
+code[]: 方法体的字节码
+exception_table_length: 异常表的长度
+exception_table[]: 异常表数组，每个异常表包含start_pc,end_pc,handler_pc,catch_type。pc是指code[]数组中的索引，也就是从code[]字节码数组start_pc(包含)到end_pc(不包含)中的字节码执行时出现catch_type(指向异常类的CONSTANT_Class_info常量)异常，则转到code[]的handler_pc位置来处理异常。
+attributes_count: Code属性的数量
+attributes[]: Code属性数组，比如LineNumberTable，LocalVariableTable, LocalVariableTypeTable, StackMapTable</p> <p>其他的属性可以参考<a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7" target="_blank" rel="noopener noreferrer">jvm规范<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></p> <h2 id="如何解析class文件"><a href="#如何解析class文件" class="header-anchor">#</a> 如何解析class文件</h2> <p>假如我们现在有一个class文件，想去查看其中的Java源代码，该如何实现呢？有如下几种方法。</p> <h3 id="通过javap"><a href="#通过javap" class="header-anchor">#</a> 通过javap</h3> <p>javap是jdk里自带的反编译工具，可以打印出更加可读的class字节码信息。</p> <div class="language-shell line-numbers-mode"><pre class="language-shell"><code>javap -c -cp /Users/liuzhengyang/Code/work/code-test/target/classes/ test.Test
+
+Compiled from <span class="token string">&quot;Test.java&quot;</span>
+public class test.Test <span class="token punctuation">{</span>
+  public test.Test<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    Code:
+       <span class="token number">0</span>: aload_0
+       <span class="token number">1</span>: invokespecial <span class="token comment">#1                  // Method java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span>
+       <span class="token number">4</span>: <span class="token builtin class-name">return</span>
+
+  public java.lang.String hello<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    Code:
+       <span class="token number">0</span>: ldc           <span class="token comment">#2                  // String hello world</span>
+       <span class="token number">2</span>: areturn
+<span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br></div></div><p>javap参数说明</p> <table><thead><tr><th>参数</th> <th>说明</th></tr></thead> <tbody><tr><td>-cp</td> <td>指定classpath, javap需要到classpath中寻找class文件</td></tr> <tr><td>-p</td> <td>默认情况下javap不打印出private的方法、字段，通过-p可以打印全部信息</td></tr> <tr><td>-c</td> <td>默认情况下javap不打印出方法的body字节码，通过-c可以打印</td></tr> <tr><td>-v</td> <td>打印最全的信息，包括常量池、方法stack size、方法本地变量表等等</td></tr></tbody></table> <h3 id="通过idea反编译"><a href="#通过idea反编译" class="header-anchor">#</a> 通过IDEA反编译</h3> <p>把class文件拖动到IDEA中即可查看到反编译的java代码结果，相比javap更加易读。</p> <h3 id="通过arthas-jad命令"><a href="#通过arthas-jad命令" class="header-anchor">#</a> 通过arthas jad命令</h3> <p>如果要查看运行中的程序中使用到的代码，可以使用arthas的<a href="https://arthas.aliyun.com/doc/jad.html" target="_blank" rel="noopener noreferrer">jad<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a>命令。</p> <h2 id="更多资料"><a href="#更多资料" class="header-anchor">#</a> 更多资料</h2> <p>更详细的资料包括java语言规范、java虚拟机规范可以在<a href="https://docs.oracle.com/javase/specs/index.html" target="_blank" rel="noopener noreferrer">Java Language and Virtual Machine Specifications<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a>中找到</p> <h2 id="总结"><a href="#总结" class="header-anchor">#</a> 总结</h2> <p>本篇文章介绍了class文件的结构，包括常量池、字段、方法、属性等，详细了解了每个数据的结构，最后了解查看class文件的几种方式。</p></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/jvm/bytecode/class字节码文件格式.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <div class="page-nav"><p class="inner"><!----> <span class="next"><a href="/md/jvm/bytecode/字节码指令.html">
+          字节码指令
+        </a>
+        →
+      </span></p></div> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><div class="option-box-toc-fixed"><div class="toc-container-sidebar"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:650px"><div style="font-weight:bold;text-align:center;">class字节码文件格式</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#class文件结构" class="toc-sidebar-link">class文件结构</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#magic" class="toc-sidebar-link">magic</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#minor-version-major-version" class="toc-sidebar-link">minorversion, majorversion</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#constant-pool-count" class="toc-sidebar-link">constantpoolcount</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#constant-pool" class="toc-sidebar-link">constant_pool[]</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#class-access-flags" class="toc-sidebar-link">class access_flags</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#fields" class="toc-sidebar-link">Fields</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#methods" class="toc-sidebar-link">Methods</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#attributes属性" class="toc-sidebar-link">Attributes属性</a></li></ul></li><li><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#如何解析class文件" class="toc-sidebar-link">如何解析class文件</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#通过javap" class="toc-sidebar-link">通过javap</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#通过idea反编译" class="toc-sidebar-link">通过IDEA反编译</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#通过arthas-jad命令" class="toc-sidebar-link">通过arthas jad命令</a></li></ul></li><li><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#更多资料" class="toc-sidebar-link">更多资料</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#总结" class="toc-sidebar-link">总结</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">class字节码文件格式</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#class文件结构" class="toc-sidebar-link">class文件结构</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#magic" class="toc-sidebar-link">magic</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#minor-version-major-version" class="toc-sidebar-link">minorversion, majorversion</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#constant-pool-count" class="toc-sidebar-link">constantpoolcount</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#constant-pool" class="toc-sidebar-link">constant_pool[]</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#class-access-flags" class="toc-sidebar-link">class access_flags</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#fields" class="toc-sidebar-link">Fields</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#methods" class="toc-sidebar-link">Methods</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#attributes属性" class="toc-sidebar-link">Attributes属性</a></li></ul></li><li><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#如何解析class文件" class="toc-sidebar-link">如何解析class文件</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#通过javap" class="toc-sidebar-link">通过javap</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#通过idea反编译" class="toc-sidebar-link">通过IDEA反编译</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#通过arthas-jad命令" class="toc-sidebar-link">通过arthas jad命令</a></li></ul></li><li><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#更多资料" class="toc-sidebar-link">更多资料</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html#总结" class="toc-sidebar-link">总结</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/jvm/bytecode/class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <!----> <div title="字节码指令" class="option-box" style="padding-left:2px;text-align:center;"><a href="/md/jvm/bytecode/字节码指令.html"><img src="/images/system/next2.png" width="30px" class="nozoom"> <span class="show-txt">下一篇</span></a></div></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-152.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

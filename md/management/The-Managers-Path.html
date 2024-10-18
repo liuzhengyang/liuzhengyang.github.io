@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>The Manager&#39;s Path 管理者之路 | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="The Manager&#39;s Path 管理者之路">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/management/The-Managers-Path.html">
+    <meta name="twitter:title" content="The Manager&#39;s Path 管理者之路">
+    <meta name="twitter:url" content="/md/management/The-Managers-Path.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-280.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>管理</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/md/management/技术管理.html" class="sidebar-link">技术管理</a></li><li><a href="/md/management/The-Managers-Path.html" aria-current="page" class="active sidebar-link">The Manager's Path 管理者之路</a></li><li><a href="/md/management/one-on-one-meetings.html" class="sidebar-link">one-on-one meetings</a></li></ul></section></li></ul> </aside> <div><main class="page"> <div class="theme-default-content content__default"><h1 id="the-manager-s-path-管理者之路"><a href="#the-manager-s-path-管理者之路" class="header-anchor">#</a> The Manager's Path 管理者之路</h1> <h2 id="前言"><a href="#前言" class="header-anchor">#</a> 前言</h2> <p>在互联网公司中，一般按照树状结构进行部门组织划分，树的叶子节点上最基层
+的普通员工，其他的非叶子节点则承担管理职责，负责管理下面的员工、组织。</p> <p>我待过两家比较大的互联网公司，目前工作8年左右，期间更换过10多个管理者，
+中间也虚线带过一段时间其他人。
+所以我有比较丰富的被管理的经历，每个管理者都有自己的特点、管理风格，我也对行业的现状比较感叹，确实很少能有优秀或者说合格的管理者。
+作者也提到很多人可能在整个职业生涯过程中，一个好的管理者也遇不到。
+好的管理者为团队成员的成长着想、带领团队完成任务、成就他人、团队环境气氛好，不好的管理者有的放任不管、有的人品性格有缺陷打压别人以个人利益为中心。
+同时回首我带人的经历，很多地方也做的不好。
+我们还是要积极面对这个环境，这本书对于个人的意义在于，识别什么是好的管理者什么是不好的管理者，我们无力改变环境改变别人，那就在有选择能力时跟随对的人，
+同时本书也指明了管理者的成长路径，清晰地指出该做什么该怎么做，有了这些知识准备，相信在有承担管理职责的机会来临时，我们能够更好地把握住机会。</p> <p>所以希望自己能够掌握本书内容，在未来有机会时，更好地通过管理帮助别人帮助团队，同时也成就自己。</p> <h2 id="管理101"><a href="#管理101" class="header-anchor">#</a> 管理101</h2> <h3 id="我们应该期望管理者做什么"><a href="#我们应该期望管理者做什么" class="header-anchor">#</a> 我们应该期望管理者做什么</h3> <h4 id="one-on-one-meetings"><a href="#one-on-one-meetings" class="header-anchor">#</a> One-on-one meetings</h4> <p>One-on-one meetings是指定期的一对一会议。然而很多管理者忽视这些会议，或者让他们感觉是在浪费你的时间。</p> <p>(ps: one-on-one目前看上非常重要的管理方法，不过互联网环境下能够定期和团队成员进行一对一会议的管理者可能很少，就我个人而言，从业8年10多个领导，还没有进行任何一次一对一会议，
+观察来看，进行过一对一的团队也是很少的)</p> <p>one-on-one有两个目的，首选，一对一会议创建你和管理者之间的人类之间的连接，能让彼此更加了解，了解除了
+工作之外的比如生活的事情，让我们能意识到大家都是活生生的人，而不是没有情感的工作机器。强大的团队的基石上人与人之间的连接，
+人和人的连接带来信任，信任上非常重要的事情。
+第二个目的是，给你一个固定的可以和管理者讨论需要私下谈论的内容的机会。</p> <p>尽量不好把这个会议做成工作汇报，工作汇报通过其他形式，比如日会周会进行，one-on-one更加进行工作内容之外的讨论，
+比如职业规划、人生计划、生活困扰、兴趣爱好等都是比较好的话题。作为被管理者，我们要提前准备好时间、准备好像讨论的内容。</p> <h4 id="反馈和工作指导"><a href="#反馈和工作指导" class="header-anchor">#</a> 反馈和工作指导</h4> <p>第二个我们期望从管理者获得的是反馈，不仅仅是绩效review。因为每个人都不可避免的会做错一些事情，如果
+你的管理者合格的话，他就应该及时让你知道你哪里做的不好。收到这样的反馈难免会让人感到不舒服，尤其是
+刚刚加入职场的新人，因为之前只有父母会给自己行为上的反馈。
+但是我们都是需要这样的反馈的，就像在海上航行能及时知道有没有走偏。不好的管理者会不给你反馈或只有在绩效review的时候
+才告诉你哪里不好，越早知道自己的不好的习惯，就越容易改正。
+反馈不仅仅指错误纠正，鼓励也是非常重要的，好的管理者能够注意到你做的好的地方并鼓励你保持。</p> <p>理想情况下，管理者应该公开表扬、私下批评。</p> <p>还有其他的可以从管理者得到的反馈，比如你在准备ppt，可以让管理者帮忙review给出建议，因为他们有更多经验和不同的视角。</p> <p>同时，向别人寻求建议，也是一种表达尊重的很好的方式。人们都喜欢感觉自己对别人有用有帮助，
+管理者对这种讨好，也是不会拒绝的。</p> <p>如果公司有职级，要和你的管理者询问如果你想晋升该关注提升哪些方面的能力。
+如果你和同事或其他团队合作遇到困难，你的管理者应该帮助你寻找解决方案，必要时能出面帮你协调解决。</p> <p>好的管理者能够给你合适的项目帮助你成长进步，好的管理者能够帮助你理解你在做的工作的价值，给你展示你在
+团队的目标的角色，让你每天的工作有目标感，当你明白你做的工作对于公司的整体成功有贡献时，你会更加自豪。</p> <h3 id="培训、职业成长"><a href="#培训、职业成长" class="header-anchor">#</a> 培训、职业成长</h3> <p>在公司这样的层级体系下，你的管理者上有责任帮助你提升的，通过帮助你找到培训或其他成长的资源。
+比如可能是告诉你需要的书籍，指出需要学习的领域等。
+如果有晋升体系，管理者应该辅导你晋升。</p> <h3 id="如何被管理"><a href="#如何被管理" class="header-anchor">#</a> 如何被管理</h3> <h2 id="mentoring-导师、带人"><a href="#mentoring-导师、带人" class="header-anchor">#</a> Mentoring 导师、带人</h2></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/management/The-Managers-Path.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+        ←
+        <a href="/md/management/技术管理.html" class="prev">
+          技术管理
+        </a></span> <span class="next"><a href="/md/management/one-on-one-meetings.html">
+          one-on-one meetings
+        </a>
+        →
+      </span></p></div> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><div class="option-box-toc-fixed"><div class="toc-container-sidebar"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:650px"><div style="font-weight:bold;text-align:center;">The Manager's Path 管理者之路</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/management/The-Managers-Path.html#前言" class="toc-sidebar-link">前言</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/management/The-Managers-Path.html#管理101" class="toc-sidebar-link">管理101</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/management/The-Managers-Path.html#我们应该期望管理者做什么" class="toc-sidebar-link">我们应该期望管理者做什么</a></li><li class="toc-sidebar-sub-header"><a href="/md/management/The-Managers-Path.html#培训、职业成长" class="toc-sidebar-link">培训、职业成长</a></li><li class="toc-sidebar-sub-header"><a href="/md/management/The-Managers-Path.html#如何被管理" class="toc-sidebar-link">如何被管理</a></li></ul></li><li><a href="/md/management/The-Managers-Path.html#mentoring-导师、带人" class="toc-sidebar-link">Mentoring 导师、带人</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">The Manager's Path 管理者之路</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/management/The-Managers-Path.html#前言" class="toc-sidebar-link">前言</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/management/The-Managers-Path.html#管理101" class="toc-sidebar-link">管理101</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/management/The-Managers-Path.html#我们应该期望管理者做什么" class="toc-sidebar-link">我们应该期望管理者做什么</a></li><li class="toc-sidebar-sub-header"><a href="/md/management/The-Managers-Path.html#培训、职业成长" class="toc-sidebar-link">培训、职业成长</a></li><li class="toc-sidebar-sub-header"><a href="/md/management/The-Managers-Path.html#如何被管理" class="toc-sidebar-link">如何被管理</a></li></ul></li><li><a href="/md/management/The-Managers-Path.html#mentoring-导师、带人" class="toc-sidebar-link">Mentoring 导师、带人</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/management/The-Managers-Path.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <div title="技术管理" class="option-box" style="padding-left:2px;text-align:center;"><a href="/md/management/技术管理.html"><img src="/images/system/pre2.png" width="30px" class="nozoom"> <span class="show-txt">上一篇</span></a></div> <div title="one-on-one meetings" class="option-box" style="padding-left:2px;text-align:center;"><a href="/md/management/one-on-one-meetings.html"><img src="/images/system/next2.png" width="30px" class="nozoom"> <span class="show-txt">下一篇</span></a></div></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-280.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

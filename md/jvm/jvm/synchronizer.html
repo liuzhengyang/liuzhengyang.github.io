@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>synchronzier | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="synchronzier">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/jvm/jvm/synchronizer.html">
+    <meta name="twitter:title" content="synchronzier">
+    <meta name="twitter:url" content="/md/jvm/jvm/synchronizer.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-219.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>JVM</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/md/jvm/jvm/build-jdk.html" class="sidebar-link">在2024年使用Clion编译、debug、开发Java虚拟机(Mac版本)</a></li><li><a href="/md/jvm/jvm/javaagent.html" class="sidebar-link">javaagent</a></li><li><a href="/md/jvm/jvm/jstack.html" class="sidebar-link">jstack实现原理分析</a></li><li><a href="/md/jvm/jvm/string-deduplication.html" class="sidebar-link">String Deduplication</a></li><li><a href="/md/jvm/jvm/tlab.html" class="sidebar-link">TLAB</a></li><li><a href="/md/jvm/jvm/synchronizer.html" aria-current="page" class="active sidebar-link">synchronzier</a></li><li><a href="/md/jvm/jvm/monitor.html" class="sidebar-link">synchronized、monitor lock加锁流程</a></li><li><a href="/md/jvm/jvm/virtualthread/virtual-thread.html" class="sidebar-link">JDK Virtual Thread的实现</a></li></ul></section></li></ul> </aside> <div><main class="page"> <div class="theme-default-content content__default"><h1 id="synchronzier"><a href="#synchronzier" class="header-anchor">#</a> synchronzier</h1> <h2 id="术语"><a href="#术语" class="header-anchor">#</a> 术语</h2> <ul><li>fast path: 通过cas等方式避免使用内核的重量级等待唤醒的操作(pthread_cond_wait)</li> <li>slow path: cas自旋不成功，入队等待。</li> <li>inflate/deflate: 膨胀、反膨胀</li> <li>轻量级锁: 通过cas目标对象的对象头为当前线程中的锁对象实现</li> <li>重量级锁: 当轻量级锁出现锁冲突时，会进入到重量级锁，即通过一个ObjectMonitor对象来维护锁数据，加锁过程可能涉及到系统调用挂起线程。</li></ul> <h2 id="核心数据结构"><a href="#核心数据结构" class="header-anchor">#</a> 核心数据结构</h2> <h3 id="java对象"><a href="#java对象" class="header-anchor">#</a> Java对象</h3> <p>每个Java对象，都是有对象头、内存数据、内存对齐（padding）构成的。（如果是数组会多一个4byte的数组长度）。
+对象头中包含MarkWord和metadata。
+MarkWord是标记字段，metadata指向class数据。</p> <p>MarkWord作为Java对象的辅助字段，用于加锁、保存对象identity hashCode、在gc时标记存活对象。</p> <p>MarkWord大小为一个Word，当内存大小不够时，会在其他内存位置保存MarkWord。比如MarkWord指向重量级锁时，JVM会先将MarkWord的内容copy到重量级锁ObjectMonitor中，
+然后在将ObjectMonitor的地址设置到MarkWord，使用完再复制回来。</p> <p>既然MarkWord有几种可能的用途，如何判断当前是哪一种呢？
+是通过最后的两个bit来判断的。</p> <ul><li><code>[ptr | 00]</code>：locked状态, ptr为指向线程栈中的LockRecord，原有的mark保存到了线程栈中的LockRecord中。</li> <li><code>[header | 0 | 01]</code>: unlocked状态，这是通常情况下的对象头未加锁状态</li> <li><code>[ptr | 10]</code>: monitored，ptr指向膨胀锁地址, 原有的mark被保存到了膨胀锁中。</li> <li><code>[ptr | 11]</code>: marked, GC过程中对象被标记为活跃对象、ptr为forward的地址</li> <li><code>[0.....0| 00]</code>: inflating, 正在膨胀过程中</li></ul> <p>这里ptr能够存储下是因为JVM内存分配使用8字节对齐。所以指针的最后3个bit为0</p> <h3 id="objectmonitor"><a href="#objectmonitor" class="header-anchor">#</a> ObjectMonitor</h3> <p>锁对象数据，其中核心的数据有</p> <ul><li>_owner: 当前锁的持有者、线程</li> <li>_EntryList：等待队列</li> <li>_cxq：最近到达的线程的等待队列，新的等待线程会加入到_cxq队列中，在monitor exit时，如果EntryList为空并且_cxq不为空则会批量的将_cxq中的线程转移到EntryList</li> <li>_succ：下一个要唤醒的ObjectWaiter</li> <li>_Responsible：为了解决极端情况下可能出现线程不能被唤醒的race condition，会有一个_Responsible负责轮训锁状态。</li></ul> <h2 id="入口"><a href="#入口" class="header-anchor">#</a> 入口</h2> <p>在C1编译器编译后的入口为</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token function">JRT_BLOCK_ENTRY</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">,</span> <span class="token class-name">Runtime1</span><span class="token operator">::</span><span class="token function">monitorenter</span><span class="token punctuation">(</span><span class="token class-name">JavaThread</span><span class="token operator">*</span> current<span class="token punctuation">,</span> oopDesc<span class="token operator">*</span> obj<span class="token punctuation">,</span> <span class="token class-name">BasicObjectLock</span><span class="token operator">*</span> lock<span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token function">NOT_PRODUCT</span><span class="token punctuation">(</span>_monitorenter_slowcase_cnt<span class="token operator">++</span><span class="token punctuation">;</span><span class="token punctuation">)</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token class-name">UseFastLocking</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    lock<span class="token operator">-&gt;</span><span class="token function">set_obj</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">assert</span><span class="token punctuation">(</span>obj <span class="token operator">==</span> lock<span class="token operator">-&gt;</span><span class="token function">obj</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&quot;must match&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token class-name">SharedRuntime</span><span class="token operator">::</span><span class="token function">monitor_enter_helper</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> lock<span class="token operator">-&gt;</span><span class="token function">lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> current<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">JRT_END</span>
+
+
+<span class="token function">JRT_LEAF</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">,</span> <span class="token class-name">Runtime1</span><span class="token operator">::</span><span class="token function">monitorexit</span><span class="token punctuation">(</span><span class="token class-name">JavaThread</span><span class="token operator">*</span> current<span class="token punctuation">,</span> <span class="token class-name">BasicObjectLock</span><span class="token operator">*</span> lock<span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token function">NOT_PRODUCT</span><span class="token punctuation">(</span>_monitorexit_slowcase_cnt<span class="token operator">++</span><span class="token punctuation">;</span><span class="token punctuation">)</span>
+  <span class="token keyword">assert</span><span class="token punctuation">(</span>current<span class="token operator">-&gt;</span><span class="token function">last_Java_sp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&quot;last_Java_sp must be set&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  oop obj <span class="token operator">=</span> lock<span class="token operator">-&gt;</span><span class="token function">obj</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">assert</span><span class="token punctuation">(</span>oopDesc<span class="token operator">::</span><span class="token function">is_oop</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&quot;must be NULL or an object&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token class-name">SharedRuntime</span><span class="token operator">::</span><span class="token function">monitor_exit_helper</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> lock<span class="token operator">-&gt;</span><span class="token function">lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> current<span class="token punctuation">)</span><span class="token punctuation">;</span>
+JRT_END
+
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br></div></div><p>如果当前没有在进入safepoint过程中，则会先调用<code>ObjectSynchronizer::quick_enter</code>尝试快速加锁。
+因为quick_enter过程中不会检查safepoint状态，这样能让进入safepoint更快。</p> <p>quick_enter会obj是否处于膨胀锁状态，如果是则会判断重入、尝试cas，成功返回，失败则会再调用<code>ObjectSynchronizer::enter</code>进行锁膨胀(inflation)加锁。</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token keyword">void</span> <span class="token class-name">SharedRuntime</span><span class="token operator">::</span><span class="token function">monitor_enter_helper</span><span class="token punctuation">(</span>oopDesc<span class="token operator">*</span> obj<span class="token punctuation">,</span> <span class="token class-name">BasicLock</span><span class="token operator">*</span> lock<span class="token punctuation">,</span> <span class="token class-name">JavaThread</span><span class="token operator">*</span> current<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token class-name">SafepointSynchronize</span><span class="token operator">::</span><span class="token function">is_synchronizing</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// Only try quick_enter() if we're not trying to reach a safepoint</span>
+    <span class="token comment">// so that the calling thread reaches the safepoint more quickly.</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">ObjectSynchronizer</span><span class="token operator">::</span><span class="token function">quick_enter</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> current<span class="token punctuation">,</span> lock<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment">// NO_ASYNC required because an async exception on the state transition destructor</span>
+  <span class="token comment">// would leave you with the lock held and it would never be released.</span>
+  <span class="token comment">// The normal monitorenter NullPointerException is thrown without acquiring a lock</span>
+  <span class="token comment">// and the model is that an exception implies the method failed.</span>
+  <span class="token class-name">JRT_BLOCK_NO_ASYNC</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">PrintBiasedLockingStatistics</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">Atomic</span><span class="token operator">::</span><span class="token function">inc</span><span class="token punctuation">(</span><span class="token class-name">BiasedLocking</span><span class="token operator">::</span><span class="token function">slow_path_entry_count_addr</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token class-name">Handle</span> <span class="token function">h_obj</span><span class="token punctuation">(</span>THREAD<span class="token punctuation">,</span> obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token class-name">ObjectSynchronizer</span><span class="token operator">::</span><span class="token function">enter</span><span class="token punctuation">(</span>h_obj<span class="token punctuation">,</span> lock<span class="token punctuation">,</span> current<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">assert</span><span class="token punctuation">(</span><span class="token operator">!</span>HAS_PENDING_EXCEPTION<span class="token punctuation">,</span> <span class="token string">&quot;Should have no exception here&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  JRT_BLOCK_END
+<span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br></div></div><p>quick_enter会判断重入、尝试cas修改object monitor的owner，如果成功说明加锁完成直接返回。</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code>bool <span class="token class-name">ObjectSynchronizer</span><span class="token operator">::</span><span class="token function">quick_enter</span><span class="token punctuation">(</span>oop obj<span class="token punctuation">,</span> <span class="token class-name">JavaThread</span><span class="token operator">*</span> current<span class="token punctuation">,</span>
+                                     <span class="token class-name">BasicLock</span> <span class="token operator">*</span> lock<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">assert</span><span class="token punctuation">(</span>current<span class="token operator">-&gt;</span><span class="token function">thread_state</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> _thread_in_Java<span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token class-name">NoSafepointVerifier</span> nsv<span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>obj <span class="token operator">==</span> NULL<span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>       <span class="token comment">// Need to throw NPE</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>obj<span class="token operator">-&gt;</span><span class="token function">klass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-&gt;</span><span class="token function">is_value_based</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">const</span> markWord mark <span class="token operator">=</span> obj<span class="token operator">-&gt;</span><span class="token function">mark</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>mark<span class="token punctuation">.</span><span class="token function">has_monitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">ObjectMonitor</span><span class="token operator">*</span> <span class="token keyword">const</span> m <span class="token operator">=</span> mark<span class="token punctuation">.</span><span class="token function">monitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// An async deflation or GC can race us before we manage to make</span>
+    <span class="token comment">// the ObjectMonitor busy by setting the owner below. If we detect</span>
+    <span class="token comment">// that race we just bail out to the slow-path here.</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>m<span class="token operator">-&gt;</span><span class="token function">object_peek</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token class-name">JavaThread</span><span class="token operator">*</span> <span class="token keyword">const</span> owner <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">JavaThread</span><span class="token operator">*</span><span class="token punctuation">)</span> m<span class="token operator">-&gt;</span><span class="token function">owner_raw</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// Lock contention and Transactional Lock Elision (TLE) diagnostics</span>
+    <span class="token comment">// and observability</span>
+    <span class="token comment">// Case: light contention possibly amenable to TLE</span>
+    <span class="token comment">// Case: TLE inimical operations such as nested/recursive synchronization</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>owner <span class="token operator">==</span> current<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      m<span class="token operator">-&gt;</span>_recursions<span class="token operator">++</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// This Java Monitor is inflated so obj's header will never be</span>
+    <span class="token comment">// displaced to this thread's BasicLock. Make the displaced header</span>
+    <span class="token comment">// non-NULL so this BasicLock is not seen as recursive nor as</span>
+    <span class="token comment">// being locked. We do this unconditionally so that this thread's</span>
+    <span class="token comment">// BasicLock cannot be mis-interpreted by any stack walkers. For</span>
+    <span class="token comment">// performance reasons, stack walkers generally first check for</span>
+    <span class="token comment">// Biased Locking in the object's header, the second check is for</span>
+    <span class="token comment">// stack-locking in the object's header, the third check is for</span>
+    <span class="token comment">// recursive stack-locking in the displaced header in the BasicLock,</span>
+    <span class="token comment">// and last are the inflated Java Monitor (ObjectMonitor) checks.</span>
+    lock<span class="token operator">-&gt;</span><span class="token function">set_displaced_header</span><span class="token punctuation">(</span>markWord<span class="token operator">::</span><span class="token function">unused_mark</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>owner <span class="token operator">==</span> NULL <span class="token operator">&amp;&amp;</span> m<span class="token operator">-&gt;</span><span class="token function">try_set_owner_from</span><span class="token punctuation">(</span>NULL<span class="token punctuation">,</span> current<span class="token punctuation">)</span> <span class="token operator">==</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">assert</span><span class="token punctuation">(</span>m<span class="token operator">-&gt;</span>_recursions <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment">// Note that we could inflate in quick_enter.</span>
+  <span class="token comment">// This is likely a useful optimization</span>
+  <span class="token comment">// Critically, in quick_enter() we must not:</span>
+  <span class="token comment">// -- perform bias revocation, or</span>
+  <span class="token comment">// -- block indefinitely, or</span>
+  <span class="token comment">// -- reach a safepoint</span>
+
+  <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>        <span class="token comment">// revert to slow-path</span>
+<span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br></div></div><h2 id="monitor-enter"><a href="#monitor-enter" class="header-anchor">#</a> monitor enter</h2> <p>加锁流程: ObjectSynchronizer::enter</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token keyword">void</span> <span class="token class-name">ObjectSynchronizer</span><span class="token operator">::</span><span class="token function">enter</span><span class="token punctuation">(</span><span class="token class-name">Handle</span> obj<span class="token punctuation">,</span> <span class="token class-name">BasicLock</span><span class="token operator">*</span> lock<span class="token punctuation">,</span> <span class="token class-name">JavaThread</span><span class="token operator">*</span> current<span class="token punctuation">)</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token comment">// 获取monitor对象的markWord对象头中的mark标记</span>
+markWord mark <span class="token operator">=</span> obj<span class="token operator">-&gt;</span><span class="token function">mark</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token comment">// is_neutral表示当前没有加锁，mark bit中是未加锁状态</span>
+<span class="token comment">// 则会尝试轻量级锁加锁，即cas设置对象头为当前线程的BasicLock</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>mark<span class="token punctuation">.</span><span class="token function">is_neutral</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// Anticipate successful CAS -- the ST of the displaced mark must</span>
+    <span class="token comment">// be visible &lt;= the ST performed by the CAS.</span>
+    <span class="token comment">// lock先保存monitor的对象头</span>
+    lock<span class="token operator">-&gt;</span><span class="token function">set_displaced_header</span><span class="token punctuation">(</span>mark<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 通过cas修改monitor对象的对象头为当前的lock，因为对象是8字节对齐，所以markWord最后两个bit肯定是00，是加锁状态。</span>
+    <span class="token comment">// mark == cas结果说明cas成功加锁完成直接返回。如果没cas成功，则会进入到inflate流程即锁膨胀流程</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>mark <span class="token operator">==</span> <span class="token function">obj</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-&gt;</span><span class="token function">cas_set_mark</span><span class="token punctuation">(</span>markWord<span class="token operator">::</span><span class="token function">from_pointer</span><span class="token punctuation">(</span>lock<span class="token punctuation">)</span><span class="token punctuation">,</span> mark<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// Fall through to inflate() ...</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>mark<span class="token punctuation">.</span><span class="token function">has_locker</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span>
+current<span class="token operator">-&gt;</span><span class="token function">is_lock_owned</span><span class="token punctuation">(</span><span class="token punctuation">(</span>address<span class="token punctuation">)</span>mark<span class="token punctuation">.</span><span class="token function">locker</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 如果已经加锁，并且是当前线程加锁，返回。</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>lock <span class="token operator">!=</span> mark<span class="token punctuation">.</span><span class="token function">locker</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&quot;must not re-lock the same lock&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>lock <span class="token operator">!=</span> <span class="token punctuation">(</span><span class="token class-name">BasicLock</span><span class="token operator">*</span><span class="token punctuation">)</span>obj<span class="token operator">-&gt;</span><span class="token function">mark</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&quot;don't relock with same BasicLock&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+lock<span class="token operator">-&gt;</span><span class="token function">set_displaced_header</span><span class="token punctuation">(</span>markWord<span class="token operator">::</span><span class="token function">from_pointer</span><span class="token punctuation">(</span>NULL<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br></div></div><p>cas和判断重入都失败的情况，进入到最后的inflate即锁膨胀。
+调用inflate创建ObjectMonitor对象，然后调用enter对象加锁。
+直到enter返回true返回说明加锁成功。</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token comment">// The object header will never be displaced to this lock,</span>
+<span class="token comment">// so it does not matter what the value is, except that it</span>
+<span class="token comment">// must be non-zero to avoid looking like a re-entrant lock,</span>
+<span class="token comment">// and must not look locked either.</span>
+lock<span class="token operator">-&gt;</span><span class="token function">set_displaced_header</span><span class="token punctuation">(</span>markWord<span class="token operator">::</span><span class="token function">unused_mark</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// An async deflation can race after the inflate() call and before</span>
+<span class="token comment">// enter() can make the ObjectMonitor busy. enter() returns false if</span>
+<span class="token comment">// we have lost the race to async deflation and we simply try again.</span>
+<span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">ObjectMonitor</span><span class="token operator">*</span> monitor <span class="token operator">=</span> <span class="token function">inflate</span><span class="token punctuation">(</span>current<span class="token punctuation">,</span> <span class="token function">obj</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> inflate_cause_monitor_enter<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>monitor<span class="token operator">-&gt;</span><span class="token function">enter</span><span class="token punctuation">(</span>current<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br></div></div><p>再看一下ObjectMonitor的enter实现</p> <p>先通过cas设置owner为当前线程对象，如果成功，返回true，表示加锁成功。</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token keyword">void</span><span class="token operator">*</span> cur <span class="token operator">=</span> <span class="token function">try_set_owner_from</span><span class="token punctuation">(</span>NULL<span class="token punctuation">,</span> current<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>cur <span class="token operator">==</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>_recursions <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><p>cas失败还可能是重入，增加_recursions重入计数</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token keyword">if</span> <span class="token punctuation">(</span>cur <span class="token operator">==</span> current<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// TODO-FIXME: check for integer overflow!  BUGID 6557169.</span>
+    _recursions<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token keyword">if</span> <span class="token punctuation">(</span>current<span class="token operator">-&gt;</span><span class="token function">is_lock_owned</span><span class="token punctuation">(</span><span class="token punctuation">(</span>address<span class="token punctuation">)</span>cur<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>_recursions <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">&quot;internal state error&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    _recursions <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token function">set_owner_from_BasicLock</span><span class="token punctuation">(</span>cur<span class="token punctuation">,</span> current<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// Convert from BasicLock* to Thread*.</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br></div></div><p>尝试一轮自适应spin自旋，如果成功，说明加锁成功返回true。自旋的操作也是cas修改ObjectMonitor的owner为当前线程。</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token comment">// Try one round of spinning *before* enqueueing current</span>
+  <span class="token comment">// and before going through the awkward and expensive state</span>
+  <span class="token comment">// transitions.  The following spin is strictly optional ...</span>
+  <span class="token comment">// Note that if we acquire the monitor from an initial spin</span>
+  <span class="token comment">// we forgo posting JVMTI events and firing DTRACE probes.</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">TrySpin</span><span class="token punctuation">(</span>current<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span><span class="token function">owner_raw</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> current<span class="token punctuation">,</span> <span class="token string">&quot;must be current: owner=&quot;</span> INTPTR_FORMAT<span class="token punctuation">,</span> <span class="token function">p2i</span><span class="token punctuation">(</span><span class="token function">owner_raw</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>_recursions <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">&quot;must be 0: recursions=&quot;</span> INTX_FORMAT<span class="token punctuation">,</span> _recursions<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span><span class="token function">object</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-&gt;</span><span class="token function">mark</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> markWord<span class="token operator">::</span><span class="token function">encode</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+           <span class="token string">&quot;object mark must match encoded this: mark=&quot;</span> INTPTR_FORMAT
+           <span class="token string">&quot;, encoded this=&quot;</span> INTPTR_FORMAT<span class="token punctuation">,</span> <span class="token function">object</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-&gt;</span><span class="token function">mark</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+           markWord<span class="token operator">::</span><span class="token function">encode</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    current<span class="token operator">-&gt;</span>_Stalled <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br></div></div><p>FIXME TrySpin实现</p> <p>接下来在循环中，进行线程阻塞等待。
+ThreadBlockInVMPreprocess对象在析构时会检查当前safepoint状态，如果在safepoint中，线程会等待
+safepoint结束再返回。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>for (;;) {
+  ExitOnSuspend eos(this);
+  {
+    ThreadBlockInVMPreprocess&amp;lt;ExitOnSuspend&gt; tbivs(current, eos);
+    EnterI(current);
+    current-&gt;set_current_pending_monitor(NULL);
+    // We can go to a safepoint at the end of this block. If we
+    // do a thread dump during that safepoint, then this thread will show
+    // as having &quot;-locked&quot; the monitor, but the OS and java.lang.Thread
+    // states will still report that the thread is blocked trying to
+    // acquire it.
+    // If there is a suspend request, ExitOnSuspend will exit the OM
+    // and set the OM as pending.
+  }
+  if (!eos.exited()) {
+    // ExitOnSuspend did not exit the OM
+    assert(owner_raw() == current, &quot;invariant&quot;);
+    break;
+  }
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br></div></div><p>下面进入到EnterI的实现。</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token keyword">void</span> <span class="token class-name">ObjectMonitor</span><span class="token operator">::</span><span class="token class-name">EnterI</span><span class="token punctuation">(</span><span class="token class-name">JavaThread</span><span class="token operator">*</span> current<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><p>执行一次TryLock，如果成功返回。</p> <div class="language-shell line-numbers-mode"><pre class="language-shell"><code><span class="token keyword">if</span> <span class="token punctuation">(</span>TryLock <span class="token punctuation">(</span>current<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    assert<span class="token punctuation">(</span>_succ <span class="token operator">!=</span> current, <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    assert<span class="token punctuation">(</span>owner_raw<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> current, <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    assert<span class="token punctuation">(</span>_Responsible <span class="token operator">!=</span> current, <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token builtin class-name">return</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br></div></div><p>再进行一轮TrySpin</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token comment">// We try one round of spinning *before* enqueueing current.</span>
+  <span class="token comment">//</span>
+  <span class="token comment">// If the _owner is ready but OFFPROC we could use a YieldTo()</span>
+  <span class="token comment">// operation to donate the remainder of this thread's quantum</span>
+  <span class="token comment">// to the owner.  This has subtle but beneficial affinity</span>
+  <span class="token comment">// effects.</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">TrySpin</span><span class="token punctuation">(</span>current<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span><span class="token function">owner_raw</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> current<span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>_succ <span class="token operator">!=</span> current<span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>_Responsible <span class="token operator">!=</span> current<span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br></div></div><p>接下来，创建ObjectWaiter节点，加入到等待队列中，并park线程。</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token comment">// Enqueue &quot;current&quot; on ObjectMonitor's _cxq.</span>
+  <span class="token comment">//</span>
+  <span class="token comment">// Node acts as a proxy for current.</span>
+  <span class="token comment">// As an aside, if were to ever rewrite the synchronization code mostly</span>
+  <span class="token comment">// in Java, WaitNodes, ObjectMonitors, and Events would become 1st-class</span>
+  <span class="token comment">// Java objects.  This would avoid awkward lifecycle and liveness issues,</span>
+  <span class="token comment">// as well as eliminate a subset of ABA issues.</span>
+  <span class="token comment">// TODO: eliminate ObjectWaiter and enqueue either Threads or Events.</span>
+  <span class="token comment">// 创建节点。</span>
+  <span class="token class-name">ObjectWaiter</span> <span class="token function">node</span><span class="token punctuation">(</span>current<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  current<span class="token operator">-&gt;</span>_ParkEvent<span class="token operator">-&gt;</span><span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  node<span class="token punctuation">.</span>_prev   <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">ObjectWaiter</span><span class="token operator">*</span><span class="token punctuation">)</span> <span class="token number">0xBAD</span><span class="token punctuation">;</span>
+  <span class="token class-name"><span class="token namespace">node<span class="token punctuation">.</span></span>TState</span>  <span class="token operator">=</span> <span class="token class-name">ObjectWaiter</span><span class="token operator">::</span>TS_CXQ<span class="token punctuation">;</span>
+
+  <span class="token comment">// Push &quot;current&quot; onto the front of the _cxq.</span>
+  <span class="token comment">// Once on cxq/EntryList, current stays on-queue until it acquires the lock.</span>
+  <span class="token comment">// Note that spinning tends to reduce the rate at which threads</span>
+  <span class="token comment">// enqueue and dequeue on EntryList|cxq.</span>
+  <span class="token comment">// 通过cas 头结点入队。</span>
+  <span class="token class-name">ObjectWaiter</span><span class="token operator">*</span> nxt<span class="token punctuation">;</span>
+  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span><span class="token punctuation">;</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    node<span class="token punctuation">.</span>_next <span class="token operator">=</span> nxt <span class="token operator">=</span> _cxq<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">Atomic</span><span class="token operator">::</span><span class="token function">cmpxchg</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>_cxq<span class="token punctuation">,</span> nxt<span class="token punctuation">,</span> <span class="token operator">&amp;</span>node<span class="token punctuation">)</span> <span class="token operator">==</span> nxt<span class="token punctuation">)</span> <span class="token keyword">break</span><span class="token punctuation">;</span>
+    
+          <span class="token comment">// cas失败再增加一次TryLock，目的是减少cas减少开销、提高加锁速度</span>
+    <span class="token comment">// Interference - the CAS failed because _cxq changed.  Just retry.</span>
+    <span class="token comment">// As an optional optimization we retry the lock.</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">TryLock</span> <span class="token punctuation">(</span>current<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">assert</span><span class="token punctuation">(</span>_succ <span class="token operator">!=</span> current<span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">assert</span><span class="token punctuation">(</span><span class="token function">owner_raw</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> current<span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">assert</span><span class="token punctuation">(</span>_Responsible <span class="token operator">!=</span> current<span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br></div></div><p>接下里一段注释，表示enter和exit可能出现非常罕见的race condition并发问题，可能导致等待的线程不被唤醒，
+这是因为有一些使用fast_unlock的地方，fast_unlock中的实现没有通过MEMBAR和CAS保证可见性，导致exit的线程可能看不到等待线程。
+所以等待队列中的一个_Responsible线程使用的是一个不断timed park，也就是定时的park，万一出现并发问题有一个兜底能够自己唤醒检查能否加锁。</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token comment">// Check for cxq|EntryList edge transition to non-null.  This indicates</span>
+  <span class="token comment">// the onset of contention.  While contention persists exiting threads</span>
+  <span class="token comment">// will use a ST:MEMBAR:LD 1-1 exit protocol.  When contention abates exit</span>
+  <span class="token comment">// operations revert to the faster 1-0 mode.  This enter operation may interleave</span>
+  <span class="token comment">// (race) a concurrent 1-0 exit operation, resulting in stranding, so we</span>
+  <span class="token comment">// arrange for one of the contending thread to use a timed park() operations</span>
+  <span class="token comment">// to detect and recover from the race.  (Stranding is form of progress failure</span>
+  <span class="token comment">// where the monitor is unlocked but all the contending threads remain parked).</span>
+  <span class="token comment">// That is, at least one of the contended threads will periodically poll _owner.</span>
+  <span class="token comment">// One of the contending threads will become the designated &quot;Responsible&quot; thread.</span>
+  <span class="token comment">// The Responsible thread uses a timed park instead of a normal indefinite park</span>
+  <span class="token comment">// operation -- it periodically wakes and checks for and recovers from potential</span>
+  <span class="token comment">// strandings admitted by 1-0 exit operations.   We need at most one Responsible</span>
+  <span class="token comment">// thread per-monitor at any given moment.  Only threads on cxq|EntryList may</span>
+  <span class="token comment">// be responsible for a monitor.</span>
+  <span class="token comment">//</span>
+  <span class="token comment">// Currently, one of the contended threads takes on the added role of &quot;Responsible&quot;.</span>
+  <span class="token comment">// A viable alternative would be to use a dedicated &quot;stranding checker&quot; thread</span>
+  <span class="token comment">// that periodically iterated over all the threads (or active monitors) and unparked</span>
+  <span class="token comment">// successors where there was risk of stranding.  This would help eliminate the</span>
+  <span class="token comment">// timer scalability issues we see on some platforms as we'd only have one thread</span>
+  <span class="token comment">// -- the checker -- parked on a timer.</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br></div></div><p>如果等待队列为空，则通过cas设置_Responsible为自己。</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token keyword">if</span> <span class="token punctuation">(</span>nxt <span class="token operator">==</span> NULL <span class="token operator">&amp;&amp;</span> _EntryList <span class="token operator">==</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// Try to assume the role of responsible thread for the monitor.</span>
+    <span class="token comment">// CONSIDER:  ST vs CAS vs { if (Responsible==null) Responsible=current }</span>
+    <span class="token class-name">Atomic</span><span class="token operator">::</span><span class="token function">replace_if_null</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>_Responsible<span class="token punctuation">,</span> current<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><div class="language-java line-numbers-mode"><pre class="language-java"><code> <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span><span class="token punctuation">;</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 再掺杂一次TryLock，成功则break跳出循环</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">TryLock</span><span class="token punctuation">(</span>current<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span><span class="token function">owner_raw</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> current<span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// park self</span>
+    <span class="token comment">// 如果当前线程是_Responsible，则需要进行定时的park，超时时间从1ms开始，如果再重试则乘以8，直到最大的1s。</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>_Responsible <span class="token operator">==</span> current<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      current<span class="token operator">-&gt;</span>_ParkEvent<span class="token operator">-&gt;</span><span class="token function">park</span><span class="token punctuation">(</span><span class="token punctuation">(</span>jlong<span class="token punctuation">)</span> recheckInterval<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token comment">// Increase the recheckInterval, but clamp the value.</span>
+      recheckInterval <span class="token operator">*=</span> <span class="token number">8</span><span class="token punctuation">;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>recheckInterval <span class="token operator">&gt;</span> MAX_RECHECK_INTERVAL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        recheckInterval <span class="token operator">=</span> MAX_RECHECK_INTERVAL<span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token comment">// 不是_Responsible节点是使用无超时时间的park</span>
+      current<span class="token operator">-&gt;</span>_ParkEvent<span class="token operator">-&gt;</span><span class="token function">park</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// 被唤醒后，再次调用TryLock尝试加锁。</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">TryLock</span><span class="token punctuation">(</span>current<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token keyword">break</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">try_set_owner_from</span><span class="token punctuation">(</span>DEFLATER_MARKER<span class="token punctuation">,</span> current<span class="token punctuation">)</span> <span class="token operator">==</span> DEFLATER_MARKER<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment">// Cancelled the in-progress async deflation by changing owner from</span>
+      <span class="token comment">// DEFLATER_MARKER to current. As part of the contended enter protocol,</span>
+      <span class="token comment">// contentions was incremented to a positive value before EnterI()</span>
+      <span class="token comment">// was called and that prevents the deflater thread from winning the</span>
+      <span class="token comment">// last part of the 2-part async deflation protocol. After EnterI()</span>
+      <span class="token comment">// returns to enter(), contentions is decremented because the caller</span>
+      <span class="token comment">// now owns the monitor. We bump contentions an extra time here to</span>
+      <span class="token comment">// prevent the deflater thread from winning the last part of the</span>
+      <span class="token comment">// 2-part async deflation protocol after the regular decrement</span>
+      <span class="token comment">// occurs in enter(). The deflater thread will decrement contentions</span>
+      <span class="token comment">// after it recognizes that the async deflation was cancelled.</span>
+      <span class="token function">add_to_contentions</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// The lock is still contested.</span>
+    <span class="token comment">// Keep a tally of the # of futile wakeups.</span>
+    <span class="token comment">// Note that the counter is not protected by a lock or updated by atomics.</span>
+    <span class="token comment">// That is by design - we trade &quot;lossy&quot; counters which are exposed to</span>
+    <span class="token comment">// races during updates for a lower probe effect.</span>
+
+    <span class="token comment">// This PerfData object can be used in parallel with a safepoint.</span>
+    <span class="token comment">// See the work around in PerfDataManager::destroy().</span>
+    <span class="token function">OM_PERFDATA_OP</span><span class="token punctuation">(</span><span class="token class-name">FutileWakeups</span><span class="token punctuation">,</span> <span class="token function">inc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token operator">++</span>nWakeups<span class="token punctuation">;</span>
+
+    <span class="token comment">// Assuming this is not a spurious wakeup we'll normally find _succ == current.</span>
+    <span class="token comment">// We can defer clearing _succ until after the spin completes</span>
+    <span class="token comment">// TrySpin() must tolerate being called with _succ == current.</span>
+    <span class="token comment">// Try yet another round of adaptive spinning.</span>
+    <span class="token comment">// 尝试一轮自使用Spin自旋</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">TrySpin</span><span class="token punctuation">(</span>current<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token keyword">break</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// We can find that we were unpark()ed and redesignated _succ while</span>
+    <span class="token comment">// we were spinning.  That's harmless.  If we iterate and call park(),</span>
+    <span class="token comment">// park() will consume the event and return immediately and we'll</span>
+    <span class="token comment">// just spin again.  This pattern can repeat, leaving _succ to simply</span>
+    <span class="token comment">// spin on a CPU.</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>_succ <span class="token operator">==</span> current<span class="token punctuation">)</span> _succ <span class="token operator">=</span> NULL<span class="token punctuation">;</span>
+
+    <span class="token comment">// Invariant: after clearing _succ a thread *must* retry _owner before parking.</span>
+    <span class="token class-name">OrderAccess</span><span class="token operator">::</span><span class="token function">fence</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br></div></div><p>执行到这里说明已经加锁成功，需要从等待队列中出队。</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token class-name">UnlinkAfterAcquire</span><span class="token punctuation">(</span>current<span class="token punctuation">,</span> <span class="token operator">&amp;</span>node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>_succ <span class="token operator">==</span> current<span class="token punctuation">)</span> _succ <span class="token operator">=</span> NULL<span class="token punctuation">;</span>
+
+  <span class="token keyword">assert</span><span class="token punctuation">(</span>_succ <span class="token operator">!=</span> current<span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>_Responsible <span class="token operator">==</span> current<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    _Responsible <span class="token operator">=</span> NULL<span class="token punctuation">;</span>
+    <span class="token class-name">OrderAccess</span><span class="token operator">::</span><span class="token function">fence</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Dekker pivot-point</span>
+
+    <span class="token comment">// We may leave threads on cxq|EntryList without a designated</span>
+    <span class="token comment">// &quot;Responsible&quot; thread.  This is benign.  When this thread subsequently</span>
+    <span class="token comment">// exits the monitor it can &quot;see&quot; such preexisting &quot;old&quot; threads --</span>
+    <span class="token comment">// threads that arrived on the cxq|EntryList before the fence, above --</span>
+    <span class="token comment">// by LDing cxq|EntryList.  Newly arrived threads -- that is, threads</span>
+    <span class="token comment">// that arrive on cxq after the ST:MEMBAR, above -- will set Responsible</span>
+    <span class="token comment">// non-null and elect a new &quot;Responsible&quot; timer thread.</span>
+    <span class="token comment">//</span>
+    <span class="token comment">// This thread executes:</span>
+    <span class="token comment">//    ST Responsible=null; MEMBAR    (in enter epilogue - here)</span>
+    <span class="token comment">//    LD cxq|EntryList               (in subsequent exit)</span>
+    <span class="token comment">//</span>
+    <span class="token comment">// Entering threads in the slow/contended path execute:</span>
+    <span class="token comment">//    ST cxq=nonnull; MEMBAR; LD Responsible (in enter prolog)</span>
+    <span class="token comment">//    The (ST cxq; MEMBAR) is accomplished with CAS().</span>
+    <span class="token comment">//</span>
+    <span class="token comment">// The MEMBAR, above, prevents the LD of cxq|EntryList in the subsequent</span>
+    <span class="token comment">// exit operation from floating above the ST Responsible=null.</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment">// We've acquired ownership with CAS().</span>
+  <span class="token comment">// CAS is serializing -- it has MEMBAR/FENCE-equivalent semantics.</span>
+  <span class="token comment">// But since the CAS() this thread may have also stored into _succ,</span>
+  <span class="token comment">// EntryList, cxq or Responsible.  These meta-data updates must be</span>
+  <span class="token comment">// visible __before this thread subsequently drops the lock.</span>
+  <span class="token comment">// Consider what could occur if we didn't enforce this constraint --</span>
+  <span class="token comment">// STs to monitor meta-data and user-data could reorder with (become</span>
+  <span class="token comment">// visible after) the ST in exit that drops ownership of the lock.</span>
+  <span class="token comment">// Some other thread could then acquire the lock, but observe inconsistent</span>
+  <span class="token comment">// or old monitor meta-data and heap data.  That violates the JMM.</span>
+  <span class="token comment">// To that end, the 1-0 exit() operation must have at least STST|LDST</span>
+  <span class="token comment">// &quot;release&quot; barrier semantics.  Specifically, there must be at least a</span>
+  <span class="token comment">// STST|LDST barrier in exit() before the ST of null into _owner that drops</span>
+  <span class="token comment">// the lock.   The barrier ensures that changes to monitor meta-data and data</span>
+  <span class="token comment">// protected by the lock will be visible before we release the lock, and</span>
+  <span class="token comment">// therefore before some other thread (CPU) has a chance to acquire the lock.</span>
+  <span class="token comment">// See also: http://gee.cs.oswego.edu/dl/jmm/cookbook.html.</span>
+  <span class="token comment">//</span>
+  <span class="token comment">// Critically, any prior STs to _succ or EntryList must be visible before</span>
+  <span class="token comment">// the ST of null into _owner in the *subsequent* (following) corresponding</span>
+  <span class="token comment">// monitorexit.  Recall too, that in 1-0 mode monitorexit does not necessarily</span>
+  <span class="token comment">// execute a serializing instruction.</span>
+
+  <span class="token keyword">return</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br></div></div><h2 id="monitor-exit"><a href="#monitor-exit" class="header-anchor">#</a> monitor exit</h2> <p>exit也就是释放锁这里采用了一定的优化，减少cas/membar的使用，但是代价是存在非常罕见(extreme rare)的并发问题可能导致等待线程不被唤醒，
+所以enter过程中使用了一个_Responsible机制定期检查。</p> <p>重入情况的返回，如果_recursions不是0说明还是当前线程持有锁。</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code> <span class="token keyword">if</span> <span class="token punctuation">(</span>_recursions <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    _recursions<span class="token operator">--</span><span class="token punctuation">;</span>        <span class="token comment">// this is simple recursive enter</span>
+    <span class="token keyword">return</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br></div></div><p>设置_Responsible为NULL</p> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token comment">// Invariant: after setting Responsible=null an thread must execute</span>
+  <span class="token comment">// a MEMBAR or other serializing instruction before fetching EntryList|cxq.</span>
+  _Responsible <span class="token operator">=</span> NULL<span class="token punctuation">;</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span><span class="token punctuation">;</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>current <span class="token operator">==</span> <span class="token function">owner_raw</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// Drop the lock.</span>
+    <span class="token comment">// release semantics: prior loads and stores from within the critical section</span>
+    <span class="token comment">// must not float (reorder) past the following store that drops the lock.</span>
+    <span class="token comment">// Uses a storeload to separate release_store(owner) from the</span>
+    <span class="token comment">// successor check. The try_set_owner() below uses cmpxchg() so</span>
+    <span class="token comment">// we get the fence down there.</span>
+    <span class="token comment">// 设置owner为NULL</span>
+    <span class="token function">release_clear_owner</span><span class="token punctuation">(</span>current<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    
+    <span class="token comment">// 防止重排序、保证可见性</span>
+    <span class="token class-name">OrderAccess</span><span class="token operator">::</span><span class="token function">storeload</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">intptr_t</span><span class="token punctuation">(</span>_EntryList<span class="token punctuation">)</span><span class="token operator">|</span><span class="token function">intptr_t</span><span class="token punctuation">(</span>_cxq<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">||</span> _succ <span class="token operator">!=</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// Other threads are blocked trying to acquire the lock.</span>
+
+    <span class="token comment">// Normally the exiting thread is responsible for ensuring succession,</span>
+    <span class="token comment">// but if other successors are ready or other entering threads are spinning</span>
+    <span class="token comment">// then this thread can simply store NULL into _owner and exit without</span>
+    <span class="token comment">// waking a successor.  The existence of spinners or ready successors</span>
+    <span class="token comment">// guarantees proper succession (liveness).  Responsibility passes to the</span>
+    <span class="token comment">// ready or running successors.  The exiting thread delegates the duty.</span>
+    <span class="token comment">// More precisely, if a successor already exists this thread is absolved</span>
+    <span class="token comment">// of the responsibility of waking (unparking) one.</span>
+    <span class="token comment">//</span>
+    <span class="token comment">// The _succ variable is critical to reducing futile wakeup frequency.</span>
+    <span class="token comment">// _succ identifies the &quot;heir presumptive&quot; thread that has been made</span>
+    <span class="token comment">// ready (unparked) but that has not yet run.  We need only one such</span>
+    <span class="token comment">// successor thread to guarantee progress.</span>
+    <span class="token comment">// See http://www.usenix.org/events/jvm01/full_papers/dice/dice.pdf</span>
+    <span class="token comment">// section 3.3 &quot;Futile Wakeup Throttling&quot; for details.</span>
+    <span class="token comment">//</span>
+    <span class="token comment">// Note that spinners in Enter() also set _succ non-null.</span>
+    <span class="token comment">// In the current implementation spinners opportunistically set</span>
+    <span class="token comment">// _succ so that exiting threads might avoid waking a successor.</span>
+    <span class="token comment">// Another less appealing alternative would be for the exiting thread</span>
+    <span class="token comment">// to drop the lock and then spin briefly to see if a spinner managed</span>
+    <span class="token comment">// to acquire the lock.  If so, the exiting thread could exit</span>
+    <span class="token comment">// immediately without waking a successor, otherwise the exiting</span>
+    <span class="token comment">// thread would need to dequeue and wake a successor.</span>
+    <span class="token comment">// (Note that we'd need to make the post-drop spin short, but no</span>
+    <span class="token comment">// shorter than the worst-case round-trip cache-line migration time.</span>
+    <span class="token comment">// The dropped lock needs to become visible to the spinner, and then</span>
+    <span class="token comment">// the acquisition of the lock by the spinner must become visible to</span>
+    <span class="token comment">// the exiting thread).</span>
+
+    <span class="token comment">// It appears that an heir-presumptive (successor) must be made ready.</span>
+    <span class="token comment">// Only the current lock owner can manipulate the EntryList or</span>
+    <span class="token comment">// drain _cxq, so we need to reacquire the lock.  If we fail</span>
+    <span class="token comment">// to reacquire the lock the responsibility for ensuring succession</span>
+    <span class="token comment">// falls to the new owner.</span>
+    <span class="token comment">//</span>
+    <span class="token comment">// 尝试进行一次cas，如果失败，说明其他线程获得了锁，当前线程可以返回，不用负责进行唤醒。</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">try_set_owner_from</span><span class="token punctuation">(</span>NULL<span class="token punctuation">,</span> current<span class="token punctuation">)</span> <span class="token operator">!=</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">guarantee</span><span class="token punctuation">(</span><span class="token function">owner_raw</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> current<span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token class-name">ObjectWaiter</span><span class="token operator">*</span> w <span class="token operator">=</span> NULL<span class="token punctuation">;</span>
+
+    <span class="token comment">// 先读取EntryList列表</span>
+    w <span class="token operator">=</span> _EntryList<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>w <span class="token operator">!=</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment">// I'd like to write: guarantee (w-&gt;_thread != current).</span>
+      <span class="token comment">// But in practice an exiting thread may find itself on the EntryList.</span>
+      <span class="token comment">// Let's say thread T1 calls O.wait().  Wait() enqueues T1 on O's waitset and</span>
+      <span class="token comment">// then calls exit().  Exit release the lock by setting O._owner to NULL.</span>
+      <span class="token comment">// Let's say T1 then stalls.  T2 acquires O and calls O.notify().  The</span>
+      <span class="token comment">// notify() operation moves T1 from O's waitset to O's EntryList. T2 then</span>
+      <span class="token comment">// release the lock &quot;O&quot;.  T2 resumes immediately after the ST of null into</span>
+      <span class="token comment">// _owner, above.  T2 notices that the EntryList is populated, so it</span>
+      <span class="token comment">// reacquires the lock and then finds itself on the EntryList.</span>
+      <span class="token comment">// Given all that, we have to tolerate the circumstance where &quot;w&quot; is</span>
+      <span class="token comment">// associated with current.</span>
+      <span class="token keyword">assert</span><span class="token punctuation">(</span>w<span class="token operator">-&gt;</span><span class="token class-name">TState</span> <span class="token operator">==</span> <span class="token class-name">ObjectWaiter</span><span class="token operator">::</span>TS_ENTER<span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token comment">// EntryList不为空，则在ExitEpilog中通过unpark唤醒头结点。</span>
+      <span class="token class-name">ExitEpilog</span><span class="token punctuation">(</span>current<span class="token punctuation">,</span> w<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// 如果EntryList为空，则尝试_cxq</span>
+    <span class="token comment">// If we find that both _cxq and EntryList are null then just</span>
+    <span class="token comment">// re-run the exit protocol from the top.</span>
+    w <span class="token operator">=</span> _cxq<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>w <span class="token operator">==</span> NULL<span class="token punctuation">)</span> <span class="token keyword">continue</span><span class="token punctuation">;</span>
+    
+    <span class="token comment">// 如果_cxq不为空，则将_cxq的节点drain到EntryList中。</span>
+    <span class="token comment">// Drain _cxq into EntryList - bulk transfer.</span>
+    <span class="token comment">// First, detach _cxq.</span>
+    <span class="token comment">// The following loop is tantamount to: w = swap(&amp;cxq, NULL)</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span><span class="token punctuation">;</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">assert</span><span class="token punctuation">(</span>w <span class="token operator">!=</span> NULL<span class="token punctuation">,</span> <span class="token string">&quot;Invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token class-name">ObjectWaiter</span><span class="token operator">*</span> u <span class="token operator">=</span> <span class="token class-name">Atomic</span><span class="token operator">::</span><span class="token function">cmpxchg</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>_cxq<span class="token punctuation">,</span> w<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token class-name">ObjectWaiter</span><span class="token operator">*</span><span class="token punctuation">)</span>NULL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>u <span class="token operator">==</span> w<span class="token punctuation">)</span> <span class="token keyword">break</span><span class="token punctuation">;</span>
+      w <span class="token operator">=</span> u<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>w <span class="token operator">!=</span> NULL<span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>_EntryList <span class="token operator">==</span> NULL<span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// Convert the LIFO SLL anchored by _cxq into a DLL.</span>
+    <span class="token comment">// The list reorganization step operates in O(LENGTH(w)) time.</span>
+    <span class="token comment">// It's critical that this step operate quickly as</span>
+    <span class="token comment">// &quot;current&quot; still holds the outer-lock, restricting parallelism</span>
+    <span class="token comment">// and effectively lengthening the critical section.</span>
+    <span class="token comment">// Invariant: s chases t chases u.</span>
+    <span class="token comment">// TODO-FIXME: consider changing EntryList from a DLL to a CDLL so</span>
+    <span class="token comment">// we have faster access to the tail.</span>
+
+    _EntryList <span class="token operator">=</span> w<span class="token punctuation">;</span>
+    <span class="token class-name">ObjectWaiter</span><span class="token operator">*</span> q <span class="token operator">=</span> NULL<span class="token punctuation">;</span>
+    <span class="token class-name">ObjectWaiter</span><span class="token operator">*</span> p<span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>p <span class="token operator">=</span> w<span class="token punctuation">;</span> p <span class="token operator">!=</span> NULL<span class="token punctuation">;</span> p <span class="token operator">=</span> p<span class="token operator">-&gt;</span>_next<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">guarantee</span><span class="token punctuation">(</span>p<span class="token operator">-&gt;</span><span class="token class-name">TState</span> <span class="token operator">==</span> <span class="token class-name">ObjectWaiter</span><span class="token operator">::</span>TS_CXQ<span class="token punctuation">,</span> <span class="token string">&quot;Invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      p<span class="token operator">-&gt;</span><span class="token class-name">TState</span> <span class="token operator">=</span> <span class="token class-name">ObjectWaiter</span><span class="token operator">::</span>TS_ENTER<span class="token punctuation">;</span>
+      p<span class="token operator">-&gt;</span>_prev <span class="token operator">=</span> q<span class="token punctuation">;</span>
+      q <span class="token operator">=</span> p<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// In 1-0 mode we need: ST EntryList; MEMBAR #storestore; ST _owner = NULL</span>
+    <span class="token comment">// The MEMBAR is satisfied by the release_store() operation in ExitEpilog().</span>
+
+    <span class="token comment">// See if we can abdicate to a spinner instead of waking a thread.</span>
+    <span class="token comment">// A primary goal of the implementation is to reduce the</span>
+    <span class="token comment">// context-switch rate.</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>_succ <span class="token operator">!=</span> NULL<span class="token punctuation">)</span> <span class="token keyword">continue</span><span class="token punctuation">;</span>
+
+    w <span class="token operator">=</span> _EntryList<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>w <span class="token operator">!=</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">guarantee</span><span class="token punctuation">(</span>w<span class="token operator">-&gt;</span><span class="token class-name">TState</span> <span class="token operator">==</span> <span class="token class-name">ObjectWaiter</span><span class="token operator">::</span>TS_ENTER<span class="token punctuation">,</span> <span class="token string">&quot;invariant&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token class-name">ExitEpilog</span><span class="token punctuation">(</span>current<span class="token punctuation">,</span> w<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br><span class="line-number">89</span><br><span class="line-number">90</span><br><span class="line-number">91</span><br><span class="line-number">92</span><br><span class="line-number">93</span><br><span class="line-number">94</span><br><span class="line-number">95</span><br><span class="line-number">96</span><br><span class="line-number">97</span><br><span class="line-number">98</span><br><span class="line-number">99</span><br><span class="line-number">100</span><br><span class="line-number">101</span><br><span class="line-number">102</span><br><span class="line-number">103</span><br><span class="line-number">104</span><br><span class="line-number">105</span><br><span class="line-number">106</span><br><span class="line-number">107</span><br><span class="line-number">108</span><br><span class="line-number">109</span><br><span class="line-number">110</span><br><span class="line-number">111</span><br><span class="line-number">112</span><br><span class="line-number">113</span><br><span class="line-number">114</span><br><span class="line-number">115</span><br><span class="line-number">116</span><br><span class="line-number">117</span><br><span class="line-number">118</span><br><span class="line-number">119</span><br><span class="line-number">120</span><br><span class="line-number">121</span><br><span class="line-number">122</span><br><span class="line-number">123</span><br><span class="line-number">124</span><br><span class="line-number">125</span><br><span class="line-number">126</span><br><span class="line-number">127</span><br><span class="line-number">128</span><br><span class="line-number">129</span><br><span class="line-number">130</span><br><span class="line-number">131</span><br><span class="line-number">132</span><br><span class="line-number">133</span><br><span class="line-number">134</span><br><span class="line-number">135</span><br><span class="line-number">136</span><br><span class="line-number">137</span><br><span class="line-number">138</span><br><span class="line-number">139</span><br></div></div><p>再看一下ExitEpilog的实现</p> <ul><li>设置_succ设置为被唤醒的线程，目的是减少大量无用的unpark</li> <li>设置owner为NULL，并通过OrderAccess::fence()防止重排序</li> <li>唤醒wakee</li></ul> <div class="language-java line-numbers-mode"><pre class="language-java"><code><span class="token keyword">void</span> <span class="token class-name">ObjectMonitor</span><span class="token operator">::</span><span class="token class-name">ExitEpilog</span><span class="token punctuation">(</span><span class="token class-name">JavaThread</span><span class="token operator">*</span> current<span class="token punctuation">,</span> <span class="token class-name">ObjectWaiter</span><span class="token operator">*</span> <span class="token class-name">Wakee</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+    <span class="token comment">// Exit protocol:</span>
+    <span class="token comment">// 1. ST _succ = wakee</span>
+    <span class="token comment">// 2. membar #loadstore|#storestore;</span>
+    <span class="token comment">// 2. ST _owner = NULL</span>
+    <span class="token comment">// 3. unpark(wakee)</span>
+
+    _succ <span class="token operator">=</span> <span class="token class-name">Wakee</span><span class="token operator">-&gt;</span>_thread<span class="token punctuation">;</span>
+    <span class="token class-name">ParkEvent</span> <span class="token operator">*</span> <span class="token class-name">Trigger</span> <span class="token operator">=</span> <span class="token class-name">Wakee</span><span class="token operator">-&gt;</span>_event<span class="token punctuation">;</span>
+
+    <span class="token comment">// Hygiene -- once we've set _owner = NULL we can't safely dereference Wakee again.</span>
+    <span class="token comment">// The thread associated with Wakee may have grabbed the lock and &quot;Wakee&quot; may be</span>
+    <span class="token comment">// out-of-scope (non-extant).</span>
+    <span class="token class-name">Wakee</span>  <span class="token operator">=</span> NULL<span class="token punctuation">;</span>
+
+    <span class="token comment">// Drop the lock.</span>
+    <span class="token comment">// Uses a fence to separate release_store(owner) from the LD in unpark().</span>
+    <span class="token function">release_clear_owner</span><span class="token punctuation">(</span>current<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">OrderAccess</span><span class="token operator">::</span><span class="token function">fence</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">DTRACE_MONITOR_PROBE</span><span class="token punctuation">(</span>contended__exit<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">,</span> <span class="token function">object</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> current<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">Trigger</span><span class="token operator">-&gt;</span><span class="token function">unpark</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// Maintain stats and report events to JVMTI</span>
+    <span class="token function">OM_PERFDATA_OP</span><span class="token punctuation">(</span><span class="token class-name">Parks</span><span class="token punctuation">,</span> <span class="token function">inc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br></div></div></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/jvm/jvm/synchronizer.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+        ←
+        <a href="/md/jvm/jvm/tlab.html" class="prev">
+          TLAB
+        </a></span> <span class="next"><a href="/md/jvm/jvm/monitor.html">
+          synchronized、monitor lock加锁流程
+        </a>
+        →
+      </span></p></div> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><div class="option-box-toc-fixed"><div class="toc-container-sidebar"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:650px"><div style="font-weight:bold;text-align:center;">synchronzier</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/jvm/jvm/synchronizer.html#术语" class="toc-sidebar-link">术语</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/jvm/jvm/synchronizer.html#核心数据结构" class="toc-sidebar-link">核心数据结构</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/synchronizer.html#java对象" class="toc-sidebar-link">Java对象</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/synchronizer.html#objectmonitor" class="toc-sidebar-link">ObjectMonitor</a></li></ul></li><li><a href="/md/jvm/jvm/synchronizer.html#入口" class="toc-sidebar-link">入口</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/jvm/jvm/synchronizer.html#monitor-enter" class="toc-sidebar-link">monitor enter</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/jvm/jvm/synchronizer.html#monitor-exit" class="toc-sidebar-link">monitor exit</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">synchronzier</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/jvm/jvm/synchronizer.html#术语" class="toc-sidebar-link">术语</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/jvm/jvm/synchronizer.html#核心数据结构" class="toc-sidebar-link">核心数据结构</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/synchronizer.html#java对象" class="toc-sidebar-link">Java对象</a></li><li class="toc-sidebar-sub-header"><a href="/md/jvm/jvm/synchronizer.html#objectmonitor" class="toc-sidebar-link">ObjectMonitor</a></li></ul></li><li><a href="/md/jvm/jvm/synchronizer.html#入口" class="toc-sidebar-link">入口</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/jvm/jvm/synchronizer.html#monitor-enter" class="toc-sidebar-link">monitor enter</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/jvm/jvm/synchronizer.html#monitor-exit" class="toc-sidebar-link">monitor exit</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/jvm/jvm/synchronizer.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <div title="TLAB" class="option-box" style="padding-left:2px;text-align:center;"><a href="/md/jvm/jvm/tlab.html"><img src="/images/system/pre2.png" width="30px" class="nozoom"> <span class="show-txt">上一篇</span></a></div> <div title="synchronized、monitor lock加锁流程" class="option-box" style="padding-left:2px;text-align:center;"><a href="/md/jvm/jvm/monitor.html"><img src="/images/system/next2.png" width="30px" class="nozoom"> <span class="show-txt">下一篇</span></a></div></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-219.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

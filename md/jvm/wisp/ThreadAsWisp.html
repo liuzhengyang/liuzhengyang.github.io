@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>ThreadAsWisp | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="ThreadAsWisp">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/jvm/wisp/ThreadAsWisp.html">
+    <meta name="twitter:title" content="ThreadAsWisp">
+    <meta name="twitter:url" content="/md/jvm/wisp/ThreadAsWisp.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-242.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <!----> </aside> <div><main class="withouttoc page"> <div class="theme-default-content content__default"><h1 id="threadaswisp"><a href="#threadaswisp" class="header-anchor">#</a> ThreadAsWisp</h1> <p>Java中的线程，通过<code>new Thread</code>创建，然后通过<code>Thread.start</code>启动。
+wisp在start方法中加入了wisp逻辑，如果开启了<code>+UseWisp2</code>并且没有给要启动的线程加到全转黑名单。
+则会把对应的线程对象转变成协程，并且不会调用start0也就不会创建操作系统的线程。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>public synchronized void start() {
+        /**
+         * This method is not invoked for the main method thread or &quot;system&quot;
+         * group threads created/set up by the VM. Any new functionality added
+         * to this method in the future may have to also be added to the VM.
+         *
+         * A zero status value corresponds to state &quot;NEW&quot;.
+         */
+        if (threadStatus != 0)
+            throw new IllegalThreadStateException();
+
+        /* Notify the group that this thread is about to be started
+         * so that it can be added to the group's list of threads
+         * and the group's unstarted count can be decremented. */
+        group.add(this);
+
+        boolean started = false;
+        try {
+            if (!(WEA != null &amp;amp;&amp;amp; WispEngine.enableThreadAsWisp() &amp;amp;&amp;amp;
+                    WEA.tryStartThreadAsWisp(this, target, this.stackSize))) {
+                start0();
+            }
+            started = true;
+        } finally {
+            try {
+                if (!started) {
+                    group.threadStartFailed(this);
+                }
+            } catch (Throwable ignore) {
+                /* do nothing. If start0 threw a Throwable then
+                  it will be passed up the call stack */
+            }
+        }
+    }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br></div></div><p>TODO: Thread.start0方法做了什么？</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>static boolean tryStart(Thread thread, Runnable target, long stackSize) {
+        // 判定当前线程是否是EngineThread(carrier thread)
+        if (WispEngine.isEngineThread(thread)) {
+            return false;
+        }
+        // 全转协程
+        if (WispConfiguration.ALL_THREAD_AS_WISP) {
+            // 过滤黑名单
+            if (matchList(thread, target, WispConfiguration.getThreadAsWispBlacklist())) {
+                return false;
+            }
+        }
+        // 不是全转的时候，判定白名单
+         else if (!matchList(thread, target, WispConfiguration.getThreadAsWispWhitelist())) {
+            return false;
+        }
+        // 不是daemon线程，因为Carrier线程是daemon线程，需要避免jvm进程退出，jvm在没有非daemon线程的时候会退出。
+        // preventShutdownThread会在协程退出的时候，进行判断，如果没有非daemon的协程，则会关闭preventShutdownThread
+        if (!thread.isDaemon()) {
+            synchronized (ThreadAsWisp.class) {
+                if (nonDaemonCount++ == 0) { // start a non-daemon thread to prevent jvm exit
+                    assert preventShutdownThread == null;
+                    preventShutdownThread = new PreventShutdownThread();
+                    preventShutdownThread.start();
+                }
+            }
+        }
+
+        // pthread_create always return before new thread started, so we should not wait here
+        WispEngine.JLA.setWispAlive(thread, true); // thread.isAlive() should be true
+        // startAsThread
+        WispEngine.current().startAsThread(thread, thread.getName(), thread, stackSize);
+        return true;
+    }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br></div></div><p>WispEngine.current调用的是WispCarrier.current().engine</p> <p>WispCarrier.current</p> <p>获取当前线程，获取线程的当前WispTask，如果WispTask是null，创建WispCarrier对象，并且初始化。
+engine默认用的是WispEngine.WISP_ROOT_ENGINE</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>/**
+     * The user can only get thread-specific carrier by calling this method.
+     * &amp;lt;p&gt;
+     * We can not use ThreadLocal any more, because if transparentAsync, it behaves as a coroutine local.
+     *
+     * @return thread-specific carrier
+     */
+    static WispCarrier current() {
+        Thread thread = WispEngine.JLA.currentThread0();
+        WispTask current = WispEngine.JLA.getWispTask(thread);
+        if (current == null) {
+            WispCarrier carrier = new WispCarrier(WispEngine.WISP_ROOT_ENGINE);
+            if (carrier.threadTask.ctx != null) {
+                WispEngine.JLA.setWispTask(thread, carrier.getCurrentTask());
+                carrier.init();
+            } // else: fake carrier used in jni attach
+            return carrier;
+        } else {
+            return current.carrier;
+        }
+    }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br></div></div><p>startAsThread向scheduler(WispScheduler)中增加执行一个TaskDispatcher对象。
+scheduler.execute会找到一个合适(idle)的Worker，调用Worker.pushAndSignal(command), command就是TaskDispatcher。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>    void startAsThread(Runnable target, String name, Thread thread, long stackSize) {
+        scheduler.execute(new TaskDispatcher(WispCarrier.current().current.ctxClassLoader,
+                target, name, thread, stackSize));
+    }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br></div></div><p>TaskDispatcher实现StealAwareRunnable接口，run方法获取当前的WispCarrier，调用WispCarrier的runTaskInternal方法。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>class TaskDispatcher implements StealAwareRunnable {
+    private final ClassLoader ctxClassLoader;
+    private final long enqueueTime;
+    private final Runnable target;
+    private final String name;
+    private final Thread thread;
+    private final long stackSize;
+
+    TaskDispatcher(ClassLoader ctxClassLoader, Runnable target, String name, Thread thread, long stackSize) {
+        this.ctxClassLoader = ctxClassLoader;
+        this.enqueueTime = WispEngine.getNanoTime();
+        this.target = target;
+        this.name = name;
+        this.thread = thread;
+        this.stackSize = stackSize;
+    }
+
+    @Override
+    public void run() {
+        WispCarrier current = WispCarrier.current();
+        current.countEnqueueTime(enqueueTime);
+        current.runTaskInternal(target, name, thread,
+                ctxClassLoader == null ? current.current.ctxClassLoader : ctxClassLoader,
+                this.stackSize);
+    }
+}
+
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br></div></div><p>runTaskInternal中，会从缓存获取或创建WispTask，通过WispTask的reset(target, name, thread, ctxLoader)设置
+要执行的Runnable的数据（减少WispTask对象的创建）
+然后调用yieldTo让底层的carrier去执行这个WispTask</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>final WispTask runTaskInternal(Runnable target, String name, Thread thread, ClassLoader ctxLoader, long stackSize) {
+        if (engine.hasBeenShutdown &amp;amp;&amp;amp; !WispTask.SHUTDOWN_TASK_NAME.equals(name)) {
+            throw new RejectedExecutionException(&quot;Wisp carrier has been shutdown&quot;);
+        }
+        assert current == threadTask;
+        boolean isInCritical0 = isInCritical;
+        isInCritical = true;
+        WispTask wispTask;
+        try {
+            counter.incrementCreateTaskCount();
+            if ((wispTask = getTaskFromCache(stackSize)) == null) {
+                wispTask = new WispTask(this, null, true, false, stackSize);
+                WispTask.trackTask(wispTask);
+            }
+            wispTask.reset(target, name, thread, ctxLoader);
+            TASK_COUNT_UPDATER.incrementAndGet(engine);
+        } finally {
+            isInCritical = isInCritical0;
+        }
+        yieldTo(wispTask, false);
+        runWispTaskEpilog();
+
+        return wispTask;
+    }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br></div></div><p>WispTask.reset</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>void reset(Runnable runnable, String name, Thread thread, ClassLoader ctxLoader) {
+        assert ctx != null;
+        this.status       = Status.ALIVE;
+        this.runnable     = runnable;
+        this.name         = name;
+        this.controlGroup = null;
+        interrupted       = 0;
+        ctxClassLoader    = ctxLoader;
+        ch                = null;
+        enqueueTime       = 0;
+        parkTime          = 0;
+        blockingTime      = 0;
+        registerEventTime = 0;
+
+        activeCount       = 0;
+        stealCount        = 0;
+        stealFailureCount = 0;
+        preemptCount      = 0;
+
+        // thread status
+        if (thread != null) { // calling from Thread.start()
+            NATIVE_INTERRUPTED_UPDATER.lazySet(this, 1);
+            isThreadAsWisp = true;
+            WispEngine.JLA.setWispTask(thread, this);
+            threadWrapper = thread;
+        } else {
+            // for WispThreadWrapper, skip native interrupt check
+            NATIVE_INTERRUPTED_UPDATER.lazySet(this, 0);
+            isThreadAsWisp = false;
+            if (threadWrapper == null) {
+                threadWrapper = new WispThreadWrapper(this);
+            }
+            WispEngine.JLA.setWispAlive(threadWrapper, true);
+        }
+        assert WispEngine.JLA.getWispTask(threadWrapper) == this;
+
+        if (!isThreadTask() &amp;amp;&amp;amp; name != null &amp;amp;&amp;amp; !threadWrapper.getName().equals(name)) {
+            threadWrapper.setName(name);
+        }
+    }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br></div></div><p>WispEngine.JLA.setWispTask会设置wispTask到Thread类的wispTask属性上。这是wisp jdk新增的字段。</p> <p>runTaskInternal完成wispTask创建/获取、wispTask.reset后，最后会执行yieldTo(wispTask, false)</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>final WispTask runTaskInternal(Runnable target, String name, Thread thread, ClassLoader ctxLoader, long stackSize) {
+    ...
+    yieldTo(wispTask, false);
+    runWispTaskEpilog();
+    return wispTask;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br></div></div><p>yieldTo调用WispTask.switchTo，最终调用到CoroutineSupport的unsafeSymmetricYieldTo(next.ctx)
+ctx是WispTask中的Coroutine字段，runTaskInternal时会创建WispTask对象（或从缓存中获取），创建时，isRealTask赋值true。
+isRealTask为trueWispTask会创建一个CacheableCoroutine对象赋值给ctx字段。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>    WispTask(WispCarrier carrier, Coroutine ctx, boolean isRealTask, boolean isThreadTask, long stackSize) {
+        this.isThreadTask = isThreadTask;
+        this.id = isRealTask ? idGenerator.addAndGet(1) : -1;
+        this.stackSize = stackSize;
+        setCarrier(carrier);
+        if (isRealTask) {
+            this.ctx = ctx != null ? ctx : new CacheableCoroutine(this.stackSize);
+            this.ctx.setWispTask(id, this, carrier);
+        } else {
+            this.ctx = null;
+        }
+        resumeEntry = isThreadTask ? null : carrier.createResumeEntry(this);
+    }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br></div></div><div class="language-text line-numbers-mode"><pre class="language-text"><code>private boolean yieldTo(WispTask task, boolean terminal) {
+    assert task != null;
+    assert WispCarrier.current() == this;
+    assert task.carrier == this;
+    assert task != current;
+
+    schedTick++;
+
+    if (task.status != WispTask.Status.ALIVE) {
+        unregisterEvent(task);
+        return false;
+    }
+
+    WispTask from = current;
+    current = task;
+    counter.incrementSwitchCount();
+    switchTimestamp = WispEngine.getNanoTime();
+    assert !isInCritical;
+    WispTask.switchTo(from, task, terminal);
+    // Since carrier is changed with stealing, we shouldn't directly access carrier's member any more.
+    assert WispCarrier.current().current == from;
+    assert !from.carrier.isInCritical;
+    return true;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br></div></div><p>CacheableCoroutine继承于Coroutine类，覆写了run方法。CacheableCoroutine类不是static类，所以
+它实际上也持有WispTask的引用, run方法中的runnable就是WispTask的runnable字段。
+run方法运行while(true)循环，每次循环都判断当前WispTask的runnable，如果不为null，则调用runCommand()去执行这个runnable。
+runCommand判断当前ResourceContainer如果是root，则直接调用runnable.run();</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>    class CacheableCoroutine extends Coroutine {
+        CacheableCoroutine(long stacksize) {
+            super(stacksize);
+        }
+
+        @Override
+        protected void run() {
+            while (true) {
+                assert !WispConfiguration.WISP_USE_STEAL_LOCK || stealLock != 0;
+                assert WispCarrier.current() == carrier;
+                assert carrier.current == WispTask.this;
+                if (runnable != null) {
+                    Throwable throwable = null;
+                    try {
+                        runCommand();
+                    } catch (Throwable t) {
+                        throwable = t;
+                    } finally {
+                        assert timeOut == null;
+                        assert controlGroup == null; // terminated
+                        runnable = null;
+                        WispEngine.JLA.setWispAlive(threadWrapper, false);
+                        if (isThreadAsWisp) {
+                            ThreadAsWisp.exit(threadWrapper);
+                        }
+                        if (throwable instanceof CoroutineExitException) {
+                            throw (CoroutineExitException) throwable;
+                        }
+                        carrier.taskExit();
+                    }
+                } else {
+                    carrier.schedule(false);
+                }
+            }
+        }
+    }
+    private void runCommand() {
+        ResourceContainer irc = WispEngine.JLA.getInheritedResourceContainer(threadWrapper);
+        if (irc != ResourceContainer.root()) {
+            irc.run(wrapRunOutsideWisp(runnable));
+        } else {
+            runOutsideWisp(runnable);
+        }
+    }
+
+    /**
+     * Mark if wisp is running internal scheduling code or user code, this would
+     * be used in preempt to identify if it's okay to preempt
+     * Modify Coroutine::is_usermark_frame accordingly if you need to change this
+     * method, because it's name and sig are used
+     */
+    static void runOutsideWisp(Runnable runnable) {
+        runnable.run();
+    }
+
+    static Runnable wrapRunOutsideWisp(Runnable runnable) {
+        return () -&gt; runOutsideWisp(runnable);
+    }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br></div></div><p>runnable.run如果执行过程中调用了阻塞方法比如Thread.sleep、LockSupport.park、synchronized等待加锁等，都会把当前协程让出，让底层的线程去执行其他的协程。</p> <p>LockSupport.park调用到Unsafe，然后调用到WispTask.parkInternal, WispTask.parkInternal中调用到carrier.schedule(false)。
+carrier.schedule(false)会把WispCarrier正在执行的WispTask从阻塞的WispTask切换到初始的threadTask。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>current = threadTask = new WispTask(this,
+                cs == null ? null : cs.threadCoroutine(),
+                cs != null, true, WispConfiguration.STACK_SIZE);
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><p>threadTask传入的第二个参数是cs.threadCoroutine()。cs是thread.getCoroutineSupport。
+threadCoroutine是创建CoroutineSupport的构造函数中创建，调用new Coroutine创建，第二个参数传入getNativeThreadCoroutine。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>public CoroutineSupport(Thread thread) {
+        if (thread.getCoroutineSupport() != null) {
+            throw new IllegalArgumentException(&quot;Cannot instantiate CoroutineThreadSupport for existing Thread&quot;);
+        }
+        id = idGen.incrementAndGet();
+        this.thread = thread;
+        threadCoroutine = new Coroutine(this, getNativeThreadCoroutine());
+        markThreadCoroutine(threadCoroutine.nativeCoroutine, threadCoroutine);
+        currentCoroutine = threadCoroutine;
+    }
+
+    /**
+     * return the threadCoroutine
+     *
+     * @return threadCoroutine
+     */
+    public Coroutine threadCoroutine() {
+        return threadCoroutine;
+    }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br></div></div><div class="language-text line-numbers-mode"><pre class="language-text"><code>    /**
+     * Creates the initial coroutine for a new thread
+     *
+     * @param threadSupport the CoroutineSupport
+     * @param data          the value
+     */
+    Coroutine(CoroutineSupport threadSupport, long nativeCoroutine) {
+        super(threadSupport, nativeCoroutine);
+        this.target = null;
+    }
+    
+    /**
+     * Creates the initial coroutine for a new thread
+     *
+     * @param threadSupport CoroutineSupport
+     * @param data          value
+     */
+    CoroutineBase(CoroutineSupport threadSupport, long nativeCoroutine) {
+        this.threadSupport = threadSupport;
+        this.nativeCoroutine = nativeCoroutine;
+    }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br></div></div><p>getNativeThreadCoroutine是native方法</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>    private static native long getNativeThreadCoroutine();
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><p>返回的是线程的coroutine_list引用地址</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>JVM_ENTRY(jlong, CoroutineSupport_getNativeThreadCoroutine(JNIEnv* env, jclass klass))
+  DEBUG_CORO_PRINT(&quot;CoroutineSupport_getNativeThreadCoroutine\n&quot;);
+  assert(EnableCoroutine, &quot;pre-condition&quot;);
+
+  Coroutine* list = thread-&gt;coroutine_list();
+  assert(list != NULL, &quot;thread isn't initialized for coroutines&quot;);
+
+  return (jlong)list;
+JVM_END
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br></div></div></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/jvm/wisp/ThreadAsWisp.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <!----> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><!----> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">ThreadAsWisp</div> <hr> <div class="toc-box"><!----></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/jvm/wisp/ThreadAsWisp.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <!----> <!----></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-242.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

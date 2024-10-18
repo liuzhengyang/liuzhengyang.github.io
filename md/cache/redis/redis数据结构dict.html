@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>redis数据结构dict | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="redis数据结构dict">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/cache/redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84dict.html">
+    <meta name="twitter:title" content="redis数据结构dict">
+    <meta name="twitter:url" content="/md/cache/redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84dict.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-58.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>redis数据结构</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/md/cache/redis/redis数据结构.html" class="sidebar-link">redis数据结构介绍</a></li><li><a href="/md/cache/redis/redis源码本地调试.html" class="sidebar-link">redis源码本地调试.md</a></li><li><a href="/md/cache/redis/redis数据结构dict.html" class="active sidebar-link">redis数据结构dict</a></li><li><a href="/md/cache/redis/字符串使用和内部原理.html" class="sidebar-link">字符串使用和内部原理</a></li><li><a href="/md/cache/redis/redis过期机制.html" class="sidebar-link">Redis过期策略</a></li><li><a href="/md/cache/redis/淘汰机制.html" class="sidebar-link">内存逐出淘汰机制</a></li><li><a href="/md/cache/redis/hyperloglog.html" class="sidebar-link">hyperloglog</a></li><li><a href="/md/cache/redis/redis可靠性.html" class="sidebar-link">Redis可靠性（持久化、主从同步、sentinel、集群）</a></li><li><a href="/md/cache/redis/redis.html" class="sidebar-link">redis概述</a></li></ul></section></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>高并发应用缓存设计与实现</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/md/cache/redis/高并发应用缓存设计与实现.html" class="sidebar-link">高并发应用缓存设计与实现</a></li></ul></section></li></ul> </aside> <div><main class="page"> <div class="theme-default-content content__default"><h1 id="redis数据结构dict"><a href="#redis数据结构dict" class="header-anchor">#</a> redis数据结构dict</h1> <h2 id="dict"><a href="#dict" class="header-anchor">#</a> dict</h2> <p>redis中所有的kv数据都保存在一个字典dict(相当于Java里的HashMap)里。这个dict字典在很多设计上也和Java的HashMap接近，
+dict通过数组加链表的方式存储数据，数据超过一定阈值会进行扩容(rehash)，扩容时会通过新旧两个表的方式渐进式rehash避免长时间停顿。
+dict在redis中作为一种Map，除了存储用户缓存数据，还有非常多的使用场景比如存储所有的redis命令的映射信息。</p> <p>下面是dict字典的定义(位于dict.h)。有两个dictEntry的table表（用于渐进式rehash，稍后讲解）
+ht_size_exp字段保存dict的数组长度的指数值，redis的dict也像Java的HashMap一样，数组长度是2的指数倍，每次扩容2倍，这样的好处包含通过hash计算数组中的index只需要做&amp;运算</p> <p><img alt="picture 10" data-src="/assets/images/redis/096debc63c42933683b84fbc7de96307ef6e2416e52b694967852ea7f3da9a9f.png" loading="lazy" class="lazy"></p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>struct dict {
+    // 类型
+    dictType *type;
+
+    // 两个hashtable，默认用0，rehash的时候会从0向1逐步转移数据
+    dictEntry **ht_table[2];
+    // 存储hashtable中写入了多少元素
+    unsigned long ht_used[2];
+
+    // rehashidx-1的时候说明没有在rehash
+    long rehashidx; /* rehashing not in progress if rehashidx == -1 */
+
+    // pauserehash用作暂停rehash的标识，在dictScan的时候会暂停rehash防止漏掉元素或者重复遍历元素
+    // 把int16_t的小的字段防止结构体最后来尽量优化结构体的padding，类似Java对象的8字节对齐
+    /* Keep small vars at end for optimal (minimal) struct padding */
+    int16_t pauserehash; /* If &gt;0 rehashing is paused (&lt;0 indicates coding error) */
+    // hashtable数组长度的2的指数值
+    signed char ht_size_exp[2]; /* exponent of size. (size = 1&lt;&lt;exp) */
+};
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br></div></div><p>数组链表中的链表元素定义为dictEntry，key指向entry的key，v中的val是value数据</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>/**
+ * dictEntry是dict字典中的链表元素
+ */
+typedef struct dictEntry {
+    // 字典key value的key
+    void *key;
+    union {
+        // value如果是复杂类型使用val指针指向真正的数据比如redisObject
+        void *val;
+	// value如果是简单数据类型uint64,int64，double 分别用下面三种字段存储
+        uint64_t u64;
+        int64_t s64;
+        double d; 
+    } v; // union结构
+    // 形成链表的next引用
+    struct dictEntry *next;     /* Next entry in the same hash bucket. */
+    void *metadata[];           /* An arbitrary number of bytes (starting at a
+                                 * pointer-aligned address) of size as returned
+                                 * by dictType's dictEntryMetadataBytes(). */
+} dictEntry;
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br></div></div><p>dictEntry-&gt;v-&gt;val指向的是一个redisObject对象，结构如下
+type用来区分具体的对象类型（有OBJ_STRING,OBJ_LIST,OBJ_SET,OBJ_ZSET,OBJ_HASH等）
+encoding用来区分具体的编码，redis为了提升性能或节省内存会根据不同的情况选择合适的对象编码方式
+lru用作内存淘汰，如果是LRU保存的是最近访问时间，如果是LFU保存8bit的访问次数和16bit的访问时间
+refcount引用计数
+ptr指向真正的value对象</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>typedef struct redisObject {
+    unsigned type:4;
+    unsigned encoding:4;
+    unsigned lru:LRU_BITS; /* LRU time (relative to global lru_clock) or
+                            * LFU data (least significant 8 bits frequency
+                            * and most significant 16 bits access time). */
+    int refcount;
+    void *ptr;
+} robj;
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br></div></div><p>dictType保存字典类型，不同的字段可以配置不同的hashFunction等函数。</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>typedef struct dictType {
+    uint64_t (*hashFunction)(const void *key);
+    void *(*keyDup)(dict *d, const void *key);
+    void *(*valDup)(dict *d, const void *obj);
+    int (*keyCompare)(dict *d, const void *key1, const void *key2);
+    void (*keyDestructor)(dict *d, void *key);
+    void (*valDestructor)(dict *d, void *obj);
+    int (*expandAllowed)(size_t moreMem, double usedRatio);
+    /* Allow a dictEntry to carry extra caller-defined metadata.  The
+     * extra memory is initialized to 0 when a dictEntry is allocated. */
+    size_t (*dictEntryMetadataBytes)(dict *d);
+} dictType;
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br></div></div><h2 id="dict添加元素的方法实现"><a href="#dict添加元素的方法实现" class="header-anchor">#</a> dict添加元素的方法实现</h2> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>/**
+ * 向dict中添加元素，如果对应的key已经存在，返回DICT_ERR。能够覆盖key对应的value的方法是dictReplace
+ */
+/* Add an element to the target hash table */
+int dictAdd(dict *d, void *key, void *val)
+{
+    // 先创建出对应的dictEntry
+    dictEntry *entry = dictAddRaw(d,key,NULL);
+
+    // 如果entry为NULL说明key已经存在返回DICT_ERR
+    if (!entry) return DICT_ERR;
+    // 调用dictSetVal把val设置到对应的entry中
+    dictSetVal(d, entry, val);
+    return DICT_OK;
+}
+/**
+ * 向dict中添加entry，如果对应的key已经存在了，返回NULL，如果不存在返回创建的entry
+ */
+/* Low level add or find:
+ * This function adds the entry but instead of setting a value returns the
+ * dictEntry structure to the user, that will make sure to fill the value
+ * field as they wish.
+ *
+ * This function is also directly exposed to the user API to be called
+ * mainly in order to store non-pointers inside the hash value, example:
+ *
+ * entry = dictAddRaw(dict,mykey,NULL);
+ * if (entry != NULL) dictSetSignedIntegerVal(entry,1000);
+ *
+ * Return values:
+ *
+ * If key already exists NULL is returned, and &quot;*existing&quot; is populated
+ * with the existing entry if existing is not NULL.
+ *
+ * If key was added, the hash entry is returned to be manipulated by the caller.
+ */
+dictEntry *dictAddRaw(dict *d, void *key, dictEntry **existing)
+{
+    long index;
+    dictEntry *entry;
+    int htidx;
+
+    // 如果dict在rehash过程中，执行一步rehash step
+    if (dictIsRehashing(d)) _dictRehashStep(d);
+
+    // 获取对应key在数组中的index，如果key已经存在返回NULL
+    /* Get the index of the new element, or -1 if
+     * the element already exists. */
+    if ((index = _dictKeyIndex(d, key, dictHashKey(d,key), existing)) == -1)
+        return NULL;
+
+    /* Allocate the memory and store the new entry.
+     * Insert the element in top, with the assumption that in a database
+     * system it is more likely that recently added entries are accessed
+     * more frequently. */
+    // 如果在rehash过程中，写入到新table即index=1的table
+    htidx = dictIsRehashing(d) ? 1 : 0;
+    size_t metasize = dictMetadataSize(d);
+    // 分配内存
+    entry = zmalloc(sizeof(*entry) + metasize);
+    if (metasize &gt; 0) {
+        memset(dictMetadata(entry), 0, metasize);
+    }
+    // 头插法，新创建的entry放到链表的表头，新创建的next指向原有的表头
+    entry-&gt;next = d-&gt;ht_table[htidx][index];
+    d-&gt;ht_table[htidx][index] = entry;
+    // hashtable used也就是元素数量加一
+    d-&gt;ht_used[htidx]++;
+
+    // 设置对应entry的key字段
+    /* Set the hash entry fields. */
+    dictSetKey(d, entry, key);
+    return entry;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br></div></div><h2 id="dict查找元素"><a href="#dict查找元素" class="header-anchor">#</a> dict查找元素</h2> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>/**
+ * 在dict中查找对应key的entry
+ */
+dictEntry *dictFind(dict *d, const void *key)
+{
+    dictEntry *he;
+    uint64_t h, idx, table;
+
+    // dict大小为0，说明dict中没有元素
+    if (dictSize(d) == 0) return NULL; /* dict is empty */
+    // 如果在rehash中，进行一次增量rehash
+    if (dictIsRehashing(d)) _dictRehashStep(d);
+    // 计算key的hash值
+    h = dictHashKey(d, key);
+    // 先查询旧table，如果旧table没有并且在rehash中则继续查新table
+    for (table = 0; table &lt;= 1; table++) {
+        // 计算数组index
+        idx = h &amp; DICTHT_SIZE_MASK(d-&gt;ht_size_exp[table]);
+        // 获取链表头节点
+        he = d-&gt;ht_table[table][idx];
+        // 遍历
+        while(he) {
+            // 判断是否是同一个key，类似java里的相同引用或equals
+            if (key==he-&gt;key || dictCompareKeys(d, key, he-&gt;key))
+                // 查找到则返回
+                return he;
+            // 继续遍历
+            he = he-&gt;next;
+        }
+        // 如果没有在rehash，则不需要查询index=1的table
+        if (!dictIsRehashing(d)) return NULL;
+    }
+    return NULL;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br></div></div><h2 id="rehash"><a href="#rehash" class="header-anchor">#</a> rehash</h2> <p>当dict中存入的元素比较多时，链表会变长，查找速度就会变慢，所以为了保证性能，dict需要增加数组长度来降低链表长度。</p> <p>rehash触发时机: 默认情况下dict元素数量大于等于数组长度（特殊情况可以关闭扩容）</p> <p>dictAdd方法会调用dictAddRaw，dictAddRaw中会调用_dictKeyIndex。
+_dictKeyIndex方法会调用_dictExpandIfNeeded来进行判断是否要扩容或初始化，如果需要进行扩容或初始化。</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>/**
+ * 按需进行初始化或扩容
+ */
+/* Expand the hash table if needed */
+static int _dictExpandIfNeeded(dict *d)
+{
+    // 如果已经在rehash中了，返回
+    /* Incremental rehashing already in progress. Return. */
+    if (dictIsRehashing(d)) return DICT_OK;
+
+    // 如果table还没有初始化，则进行初始化
+    /* If the hash table is empty expand it to the initial size. */
+    if (DICTHT_SIZE(d-&gt;ht_size_exp[0]) == 0) return dictExpand(d, DICT_HT_INITIAL_SIZE);
+
+    // 如果table里的元素数量除以table数组长度大于阈值（默认5），并且这个dict对应的类型允许扩容，则进行扩容。
+    /* If we reached the 1:1 ratio, and we are allowed to resize the hash
+     * table (global setting) or we should avoid it but the ratio between
+     * elements/buckets is over the &quot;safe&quot; threshold, we resize doubling
+     * the number of buckets. */
+    if (d-&gt;ht_used[0] &gt;= DICTHT_SIZE(d-&gt;ht_size_exp[0]) &amp;&amp;
+        (dict_can_resize ||
+         d-&gt;ht_used[0]/ DICTHT_SIZE(d-&gt;ht_size_exp[0]) &gt; dict_force_resize_ratio) &amp;&amp;
+        dictTypeExpandAllowed(d))
+    {
+        return dictExpand(d, d-&gt;ht_used[0] + 1);
+    }
+    return DICT_OK;
+}
+/**
+ * 扩容或创建hash table
+ * 参数的size是新的hash table要能容纳的元素的数量，
+ */
+/* Expand or create the hash table,
+ * when malloc_failed is non-NULL, it'll avoid panic if malloc fails (in which case it'll be set to 1).
+ * Returns DICT_OK if expand was performed, and DICT_ERR if skipped. */
+int _dictExpand(dict *d, unsigned long size, int* malloc_failed)
+{
+    if (malloc_failed) *malloc_failed = 0;
+
+    /* the size is invalid if it is smaller than the number of
+     * elements already inside the hash table */
+    if (dictIsRehashing(d) || d-&gt;ht_used[0] &gt; size)
+        return DICT_ERR;
+
+    /* the new hash table */
+    dictEntry **new_ht_table;
+    unsigned long new_ht_used;
+    // 计算新的hash table的数组大小，是第一个大于等于size的2的指数倍的值，比如size=5，则new_ht_size_exp是8
+    signed char new_ht_size_exp = _dictNextExp(size);
+
+    // 检测越界的情况，发生在数组长度太大的情况
+    /* Detect overflows */
+    size_t newsize = 1ul&lt;&lt;new_ht_size_exp;
+    if (newsize &lt; size || newsize * sizeof(dictEntry*) &lt; newsize)
+        return DICT_ERR;
+
+    /* Rehashing to the same table size is not useful. */
+    if (new_ht_size_exp == d-&gt;ht_size_exp[0]) return DICT_ERR;
+
+    // 创建新的hash table并且初始化所有的指针为NULL
+    /* Allocate the new hash table and initialize all pointers to NULL */
+    if (malloc_failed) {
+        new_ht_table = ztrycalloc(newsize*sizeof(dictEntry*));
+        *malloc_failed = new_ht_table == NULL;
+        if (*malloc_failed)
+            return DICT_ERR;
+    } else
+        new_ht_table = zcalloc(newsize*sizeof(dictEntry*));
+
+    new_ht_used = 0;
+
+    // 第一次初始化的情况和扩容的区别在于扩容需要设置rehashidx=0开启rehash，并且赋值的table index不同。
+    /* Is this the first initialization? If so it's not really a rehashing
+     * we just set the first hash table so that it can accept keys. */
+    if (d-&gt;ht_table[0] == NULL) {
+        d-&gt;ht_size_exp[0] = new_ht_size_exp;
+        d-&gt;ht_used[0] = new_ht_used;
+        d-&gt;ht_table[0] = new_ht_table;
+        return DICT_OK;
+    }
+
+    // 保存新的table到index=1的位置，并且设置rehashidx=0开启rehash
+    /* Prepare a second hash table for incremental rehashing */
+    d-&gt;ht_size_exp[1] = new_ht_size_exp;
+    d-&gt;ht_used[1] = new_ht_used;
+    d-&gt;ht_table[1] = new_ht_table;
+    d-&gt;rehashidx = 0;
+    return DICT_OK;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br><span class="line-number">89</span><br></div></div><p>rehash方法中包含了增量rehash的过程，在dict的增加查询等方法中都会判断如果当前是rehash中，进行一次增量rehash，同时也提供了dictRehashMilliseconds方法来实现一定时间的增量rehash。</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>/**
+ * 执行n此增量（渐进式）rehash。如果可能还有key要从旧table移动到新table则返回1，否则0
+ * n表示迁移n个bucket（数组元素），空的数组元素不算。为了避免太多空元素阻塞较长时间，限制最多访问n*10个空元素
+ *
+ */
+/* Performs N steps of incremental rehashing. Returns 1 if there are still
+ * keys to move from the old to the new hash table, otherwise 0 is returned.
+ *
+ * Note that a rehashing step consists in moving a bucket (that may have more
+ * than one key as we use chaining) from the old to the new hash table, however
+ * since part of the hash table may be composed of empty spaces, it is not
+ * guaranteed that this function will rehash even a single bucket, since it
+ * will visit at max N*10 empty buckets in total, otherwise the amount of
+ * work it does would be unbound and the function may block for a long time. */
+int dictRehash(dict *d, int n) {
+    // 最多访问到10个空的bucket
+    int empty_visits = n*10; /* Max number of empty buckets to visit. */
+    // 如果rehashing已经结束，返回
+    if (!dictIsRehashing(d)) return 0;
+
+    // 执行n次或者直到旧table里已经没有元素
+    while(n-- &amp;&amp; d-&gt;ht_used[0] != 0) {
+        // de是当前在移动的dictEntry,nextde是遍历链表用的next
+        dictEntry *de, *nextde;
+
+        /* Note that rehashidx can't overflow as we are sure there are more
+         * elements because ht[0].used != 0 */
+        assert(DICTHT_SIZE(d-&gt;ht_size_exp[0]) &gt; (unsigned long)d-&gt;rehashidx);
+        // 只要bucket是空的，就增加rehashidx移动到下一个bucket，如果总的遍历过的空bucket达到empty_visits，返回
+        while(d-&gt;ht_table[0][d-&gt;rehashidx] == NULL) {
+            d-&gt;rehashidx++;
+            if (--empty_visits == 0) return 1;
+        }
+        // 设置de为链表头
+        de = d-&gt;ht_table[0][d-&gt;rehashidx];
+        // 循环当前链表所有元素迁移到新table
+        /* Move all the keys in this bucket from the old to the new hash HT */
+        while(de) {
+            uint64_t h;
+            // 保存next
+            nextde = de-&gt;next;
+            // 计算当前entry的ke一种新table里的hash
+            /* Get the index in the new hash table */
+            h = dictHashKey(d, de-&gt;key) &amp; DICTHT_SIZE_MASK(d-&gt;ht_size_exp[1]);
+            // 头插法插入到新table
+            de-&gt;next = d-&gt;ht_table[1][h];
+            d-&gt;ht_table[1][h] = de;
+            // 旧表元素数量减一
+            d-&gt;ht_used[0]--;
+            // 新表元素数量加1
+            d-&gt;ht_used[1]++;
+            // 替换de为nextde继续遍历
+            de = nextde;
+        }
+        // 清空旧table这个index的引用
+        d-&gt;ht_table[0][d-&gt;rehashidx] = NULL;
+        // 移动rehashidx到下一个位置
+        d-&gt;rehashidx++;
+    }
+
+    // 检查下旧table是不是已经迁移完成
+    /* Check if we already rehashed the whole table... */
+    if (d-&gt;ht_used[0] == 0) {
+        // 如果迁移完成，清理旧table内存
+        zfree(d-&gt;ht_table[0]);
+        // index=1的table换到index=0上
+        /* Copy the new ht onto the old one */
+        d-&gt;ht_table[0] = d-&gt;ht_table[1];
+        d-&gt;ht_used[0] = d-&gt;ht_used[1];
+        d-&gt;ht_size_exp[0] = d-&gt;ht_size_exp[1];
+        // 重置index=1的table的ht_table、ht_used、ht_size_exp
+        _dictReset(d, 1);
+        // rehashidx=-1表示rehash结束
+        d-&gt;rehashidx = -1;
+        return 0;
+    }
+
+    /* More to rehash... */
+    return 1;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br></div></div></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/cache/redis/redis数据结构dict.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+        ←
+        <a href="/md/cache/redis/redis源码本地调试.html" class="prev">
+          redis源码本地调试.md
+        </a></span> <span class="next"><a href="/md/cache/redis/字符串使用和内部原理.html">
+          字符串使用和内部原理
+        </a>
+        →
+      </span></p></div> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><div class="option-box-toc-fixed"><div class="toc-container-sidebar"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:650px"><div style="font-weight:bold;text-align:center;">redis数据结构dict</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/cache/redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84dict.html#dict" class="toc-sidebar-link">dict</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/cache/redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84dict.html#dict添加元素的方法实现" class="toc-sidebar-link">dict添加元素的方法实现</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/cache/redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84dict.html#dict查找元素" class="toc-sidebar-link">dict查找元素</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/cache/redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84dict.html#rehash" class="toc-sidebar-link">rehash</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">redis数据结构dict</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/cache/redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84dict.html#dict" class="toc-sidebar-link">dict</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/cache/redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84dict.html#dict添加元素的方法实现" class="toc-sidebar-link">dict添加元素的方法实现</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/cache/redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84dict.html#dict查找元素" class="toc-sidebar-link">dict查找元素</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/cache/redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84dict.html#rehash" class="toc-sidebar-link">rehash</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/cache/redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84dict.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <div title="redis源码本地调试.md" class="option-box" style="padding-left:2px;text-align:center;"><a href="/md/cache/redis/redis源码本地调试.html"><img src="/images/system/pre2.png" width="30px" class="nozoom"> <span class="show-txt">上一篇</span></a></div> <div title="字符串使用和内部原理" class="option-box" style="padding-left:2px;text-align:center;"><a href="/md/cache/redis/字符串使用和内部原理.html"><img src="/images/system/next2.png" width="30px" class="nozoom"> <span class="show-txt">下一篇</span></a></div></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-58.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

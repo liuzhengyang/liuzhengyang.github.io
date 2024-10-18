@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>rate limiter关于限速器所需要了解的知识 | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="rate limiter关于限速器所需要了解的知识">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/java/basic/rate-limit.html">
+    <meta name="twitter:title" content="rate limiter关于限速器所需要了解的知识">
+    <meta name="twitter:url" content="/md/java/basic/rate-limit.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-130.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>Java并发</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/md/java/basic/java线程池.html" class="sidebar-link">ThreadPoolExecutor</a></li><li><a href="/md/java/basic/HashMap.html" class="sidebar-link">HashMap源码分析</a></li><li><a href="/md/java/basic/ConcurrentHashMap.html" class="sidebar-link">ConcurrentHashMap</a></li><li><a href="/md/java/basic/ThreadLocal.html" class="sidebar-link">ThreadLocal源码分析</a></li><li><a href="/md/java/basic/ArrayBlockingQueue阻塞队列.html" class="sidebar-link">ArrayBlockingQueue</a></li><li><a href="/md/java/basic/AbstractQueuedSynchronizer.html" class="sidebar-link">AQS详解</a></li><li><a href="/md/java/basic/ReentrantLock.html" class="sidebar-link">ReentrantLock</a></li><li><a href="/md/java/basic/ReentrantReadWriteLock.html" class="sidebar-link">ReentrantReadWriteLock</a></li><li><a href="/md/java/basic/CountDownLatch.html" class="sidebar-link">CountDownLatch</a></li><li><a href="/md/java/basic/LongAdder.html" class="sidebar-link">高并发计数类LongAdder</a></li><li><a href="/md/java/basic/AtomicInteger.html" class="sidebar-link">AtomicInteger</a></li><li><a href="/md/java/basic/动态代理.html" class="sidebar-link">Java动态代理</a></li><li><a href="/md/java/basic/lambda.html" class="sidebar-link">lambda表达式实现原理分析</a></li><li><a href="/md/java/basic/why-lambda-final.html" class="sidebar-link">lambda中的final修饰符</a></li><li><a href="/md/java/basic/ThreadLocalRandom.html" class="sidebar-link">ThreadLocalRandom</a></li><li><a href="/md/java/basic/rate-limit.html" aria-current="page" class="active sidebar-link">rate limiter关于限速器所需要了解的知识</a></li></ul></section></li></ul> </aside> <div><main class="page"> <div class="theme-default-content content__default"><h1 id="rate-limiter关于限速器所需要了解的知识"><a href="#rate-limiter关于限速器所需要了解的知识" class="header-anchor">#</a> rate limiter关于限速器所需要了解的知识</h1> <p>RateLimiter速率限流限速保护器是保证服务稳定性的一种重要手段，其他的稳定性保护手段还有熔断、并发限流等。
+比如我们的一个机器能够支持的最大的接口请求量为1000每秒，为了避免请求量过高导致服务请求积压，服务处理速度变慢最终无法对外响应。可以在服务的入口处增加
+一个限流保护器，当请求的QPS超过我们配置的值时，会直接抛出异常，避免增加请求压力超过自身处理能力。
+另外加入我们的服务要调用另外一个被调服务，该被调服务也有处理能力的速度上限，则我们也可以在调用这个被调服务时增加限流保护，避免超载。
+比如我们在开发一个数据迁移导入功能，把一批数据导入到新的数据库，导入程序通过增加限流，控制每秒导入的最大数据量，避免数据库超载。</p> <p>本文内容</p> <ul><li>限流的实现
+<ul><li>简单限流、guava限流。</li></ul></li> <li>限流的用途</li> <li>单机限流、分布式限流
+<ul><li>redis、批量</li></ul></li></ul> <h2 id="实现一个简单的rate-limiter"><a href="#实现一个简单的rate-limiter" class="header-anchor">#</a> 实现一个简单的rate limiter</h2> <p>现在假设限流器每秒允许执行N个操作，一种直观的实现是控制每次操作间的间隔超过1/N秒，因此一个RateLimiter
+只需要记录上次允许操作的时间即可。每次acquire时，判断距离上次允许操作的时间，是否超过了最小间隔，如果是
+则允许通过并且更新操作时间，否则等待到指定的时间再判断。</p> <p>如下代码使用kotlin实现了acquire和tryAcquire功能。tryAcquire类似Lock里的tryLock，会判断当前是否能acquire，如果不能直接返回不等待。
+否则会通过限流器。acquire方法在不能通过的情况下会等待重试。</p> <div class="language-kotlin line-numbers-mode"><pre class="language-kotlin"><code><span class="token keyword">class</span> <span class="token function">RateLimiter</span><span class="token punctuation">(</span>ratePerSecond<span class="token operator">:</span> Double<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> intervalMillis<span class="token operator">:</span> Long<span class="token punctuation">;</span>
+    <span class="token annotation builtin">@Volatile</span> <span class="token keyword">private</span> <span class="token keyword">var</span> lastTimeMillis<span class="token operator">:</span> Long <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">private</span> <span class="token keyword">val</span> lock <span class="token operator">=</span> <span class="token function">Object</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">init</span> <span class="token punctuation">{</span>
+        intervalMillis <span class="token operator">=</span> <span class="token punctuation">(</span>TimeUnit<span class="token punctuation">.</span>SECONDS<span class="token punctuation">.</span><span class="token function">toMillis</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">/</span> ratePerSecond<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toLong</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">fun</span> <span class="token function">acquire</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">synchronized</span><span class="token punctuation">(</span>lock<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">tryAcquire</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">val</span> sleepMillis <span class="token operator">=</span> lastTimeMillis <span class="token operator">+</span> intervalMillis <span class="token operator">-</span> System<span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>sleepMillis <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    lock<span class="token punctuation">.</span><span class="token function">wait</span><span class="token punctuation">(</span>sleepMillis<span class="token punctuation">)</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">fun</span> <span class="token function">tryAcquire</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> Boolean <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>System<span class="token punctuation">.</span><span class="token function">nanoTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> lastTimeMillis <span class="token operator">&gt;=</span> intervalMillis<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">synchronized</span><span class="token punctuation">(</span>lock<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>System<span class="token punctuation">.</span><span class="token function">nanoTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> lastTimeMillis <span class="token operator">&gt;=</span> intervalMillis<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    lastTimeMillis <span class="token operator">=</span> System<span class="token punctuation">.</span><span class="token function">nanoTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                    <span class="token keyword">return</span> <span class="token boolean">true</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br></div></div><h2 id="guava-rate-limiter"><a href="#guava-rate-limiter" class="header-anchor">#</a> guava rate limiter</h2> <p>我们上面实现的限速器的优点是实现简单，
+guava中的RateLimiter，增加了更多的设计考虑，针对RateLimiter一段时间没有请求的情况，
+RateLimiter会积累一个storedPermits的值，在有请求来了之后就直接允许storedPermits个请求通过，而不需要等待，
+这是针对类似空闲资源的更有限方式，比如带宽。
+另外常听说的限流实现还有令牌桶、漏桶等。</p> <h2 id="分布式限流"><a href="#分布式限流" class="header-anchor">#</a> 分布式限流</h2> <p>前面提到的限流都是一个Java进程内的限流，而有时我们的分布式微服务会有多个实例，那么如何实现分布式的限流呢？</p> <p>第一个方案，假如我们已知服务实例的数量，则可以按照整体限流值除以实例数量的方式为每个进程计算限流值</p> <p>第二个方案，通过redis的incr实现，比如为每一秒作为一个redis的key设置一定的过期时间，然后每次acquire时都去incr，判断返回的结果是否超过限流值。
+这种方式在请求量比较高时，会产生比较高的redis请求量，如果使用单个key，则单个key都请求到同一个redis实例，则会有热点问题，可以通过将key拆分成
+多个子key（比如通过机器名hash的方式），再拆分到多个子key上，降低单个redis的压力。还可以通过聚合的方式请求，比如每次incr的增量不是1，而是
+100，获取完100个permit后，可以在进程内acquire成功100次，从而能极大降低redis的请求量。在超过阈值后还能保存一个本地缓存避免同时间粒度内再次请求redis继续降低请求量。</p> <p>分布式限流还可以使用sentinel的<a href="https://sentinelguard.io/zh-cn/docs/cluster-flow-control.html" target="_blank" rel="noopener noreferrer">集群流控规则<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></p> <h2 id="限流的速率动态调整"><a href="#限流的速率动态调整" class="header-anchor">#</a> 限流的速率动态调整</h2> <p>有时候我们的限速器的配置希望能动态调整，比如服务下游出现问题，希望我们把调用量调小。
+有时候我们发现服务能够支持的调用量比预估的要高，希望调大限流值。
+这种需要调整限速值的情况，如果还需要修改代码重新部署，就非常不方便。那么如何实现一个能动态调整的限速器呢？</p> <p>对于前面的简单间隔限速器和分布式redis限速器，实现比较简单，只需要在配置值变化之后调整对应的最小间隔时间和redis incr结果的最大值即可。
+对于guava的RateLimiter，稍微麻烦点，需要我们把RateLimiter封装到一个封装类中，这个封装类中维护一个guava RateLimiter对象，当限流值变化时，
+创建一个新的RateLimiter对象并替换，调用acquire时从封装类获取最新的RateLimiter进行acquire。</p> <h2 id="分布式频次限制器"><a href="#分布式频次限制器" class="header-anchor">#</a> 分布式频次限制器</h2> <p>另外一种常见的需求是频次限制，类似限速器，但是要求更精准，比如为了防止接口被刷，业务上要求限制一个用户一天只能修改一次用户名，那么在修改用户名前
+就要判断今天修改了几次。类似这种需求可以通过频次限制实现。</p> <p>在redis中保存次数，每次获取频次时，incr并获取该key的ttl（即剩余过期时间），如果过期时间没有设置，则通过expire设置过期时间（频次限制的周期比如一天）。
+如果incr返回的值超过阈值，说明超过次数限制。</p></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/java/basic/rate-limit.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+        ←
+        <a href="/md/java/basic/ThreadLocalRandom.html" class="prev">
+          ThreadLocalRandom
+        </a></span> <!----></p></div> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><div class="option-box-toc-fixed"><div class="toc-container-sidebar"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:650px"><div style="font-weight:bold;text-align:center;">rate limiter关于限速器所需要了解的知识</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/java/basic/rate-limit.html#实现一个简单的rate-limiter" class="toc-sidebar-link">实现一个简单的rate limiter</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/rate-limit.html#guava-rate-limiter" class="toc-sidebar-link">guava rate limiter</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/rate-limit.html#分布式限流" class="toc-sidebar-link">分布式限流</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/rate-limit.html#限流的速率动态调整" class="toc-sidebar-link">限流的速率动态调整</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/rate-limit.html#分布式频次限制器" class="toc-sidebar-link">分布式频次限制器</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">rate limiter关于限速器所需要了解的知识</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/java/basic/rate-limit.html#实现一个简单的rate-limiter" class="toc-sidebar-link">实现一个简单的rate limiter</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/rate-limit.html#guava-rate-limiter" class="toc-sidebar-link">guava rate limiter</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/rate-limit.html#分布式限流" class="toc-sidebar-link">分布式限流</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/rate-limit.html#限流的速率动态调整" class="toc-sidebar-link">限流的速率动态调整</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/java/basic/rate-limit.html#分布式频次限制器" class="toc-sidebar-link">分布式频次限制器</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/java/basic/rate-limit.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <div title="ThreadLocalRandom" class="option-box" style="padding-left:2px;text-align:center;"><a href="/md/java/basic/ThreadLocalRandom.html"><img src="/images/system/pre2.png" width="30px" class="nozoom"> <span class="show-txt">上一篇</span></a></div> <!----></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-130.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

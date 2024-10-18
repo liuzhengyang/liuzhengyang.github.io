@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>goroutine调度 | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="goroutine调度">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/jvm/wisp/GMP.html">
+    <meta name="twitter:title" content="goroutine调度">
+    <meta name="twitter:url" content="/md/jvm/wisp/GMP.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-241.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <!----> </aside> <div><main class="withouttoc page"> <div class="theme-default-content content__default"><h1 id="goroutine调度"><a href="#goroutine调度" class="header-anchor">#</a> goroutine调度</h1> <p>mstart1</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>func mstart1() {
+    // ...
+	schedule()
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br></div></div><div class="language-text line-numbers-mode"><pre class="language-text"><code>// One round of scheduler: find a runnable goroutine and execute it.
+// Never returns.
+func schedule() {
+	mp := getg().m
+
+	if mp.locks != 0 {
+		throw(&quot;schedule: holding locks&quot;)
+	}
+
+	if mp.lockedg != 0 {
+		stoplockedm()
+		execute(mp.lockedg.ptr(), false) // Never returns.
+	}
+
+	// We should not schedule away from a g that is executing a cgo call,
+	// since the cgo call is using the m's g0 stack.
+	if mp.incgo {
+		throw(&quot;schedule: in cgo&quot;)
+	}
+
+top:
+	pp := mp.p.ptr()
+	pp.preempt = false
+
+	// Safety check: if we are spinning, the run queue should be empty.
+	// Check this before calling checkTimers, as that might call
+	// goready to put a ready goroutine on the local run queue.
+	if mp.spinning &amp;amp;&amp;amp; (pp.runnext != 0 || pp.runqhead != pp.runqtail) {
+		throw(&quot;schedule: spinning with local work&quot;)
+	}
+
+	gp, inheritTime, tryWakeP := findRunnable() // blocks until work is available
+
+	if debug.dontfreezetheworld &gt; 0 &amp;amp;&amp;amp; freezing.Load() {
+		// See comment in freezetheworld. We don't want to perturb
+		// scheduler state, so we didn't gcstopm in findRunnable, but
+		// also don't want to allow new goroutines to run.
+		//
+		// Deadlock here rather than in the findRunnable loop so if
+		// findRunnable is stuck in a loop we don't perturb that
+		// either.
+		lock(&amp;amp;deadlock)
+		lock(&amp;amp;deadlock)
+	}
+
+	// This thread is going to run a goroutine and is not spinning anymore,
+	// so if it was marked as spinning we need to reset it now and potentially
+	// start a new spinning M.
+	if mp.spinning {
+		resetspinning()
+	}
+
+	if sched.disable.user &amp;amp;&amp;amp; !schedEnabled(gp) {
+		// Scheduling of this goroutine is disabled. Put it on
+		// the list of pending runnable goroutines for when we
+		// re-enable user scheduling and look again.
+		lock(&amp;amp;sched.lock)
+		if schedEnabled(gp) {
+			// Something re-enabled scheduling while we
+			// were acquiring the lock.
+			unlock(&amp;amp;sched.lock)
+		} else {
+			sched.disable.runnable.pushBack(gp)
+			sched.disable.n++
+			unlock(&amp;amp;sched.lock)
+			goto top
+		}
+	}
+
+	// If about to schedule a not-normal goroutine (a GCworker or tracereader),
+	// wake a P if there is one.
+	if tryWakeP {
+		wakep()
+	}
+	if gp.lockedm != 0 {
+		// Hands off own p to the locked m,
+		// then blocks waiting for a new p.
+		startlockedm(gp)
+		goto top
+	}
+
+	execute(gp, inheritTime)
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br></div></div><p>findRunnable负责寻找可以运行的goroutine。</p> <ul><li>local queue</li> <li>global queue</li> <li>work steal</li> <li>timer</li> <li>network</li> <li>spin</li></ul> <p>如何解决signal丢失的问题，m在park之前，需要先设置spinning状态为false，然后再检查一遍队列。
+再sleep。</p> <ul><li>如果新任务是在设置spinning之前来的，那么再次检查能够发现新任务</li> <li>如果新任务是在设置spinning之后来的，那么新任务会发现这个标识，unpark能保证当前m不会park阻塞，会直接唤醒。</li></ul> <div class="language-text line-numbers-mode"><pre class="language-text"><code>// Finds a runnable goroutine to execute.
+// Tries to steal from other P's, get g from local or global queue, poll network.
+// tryWakeP indicates that the returned goroutine is not normal (GC worker, trace
+// reader) so the caller should try to wake a P.
+func findRunnable() (gp *g, inheritTime, tryWakeP bool) {
+	mp := getg().m
+
+	// The conditions here and in handoffp must agree: if
+	// findrunnable would return a G to run, handoffp must start
+	// an M.
+
+top:
+	pp := mp.p.ptr()
+	if sched.gcwaiting.Load() {
+		gcstopm()
+		goto top
+	}
+	if pp.runSafePointFn != 0 {
+		runSafePointFn()
+	}
+
+	// now and pollUntil are saved for work stealing later,
+	// which may steal timers. It's important that between now
+	// and then, nothing blocks, so these numbers remain mostly
+	// relevant.
+	now, pollUntil, _ := checkTimers(pp, 0)
+
+	// Try to schedule the trace reader.
+	if traceEnabled() || traceShuttingDown() {
+		gp := traceReader()
+		if gp != nil {
+			trace := traceAcquire()
+			casgstatus(gp, _Gwaiting, _Grunnable)
+			if trace.ok() {
+				trace.GoUnpark(gp, 0)
+				traceRelease(trace)
+			}
+			return gp, false, true
+		}
+	}
+
+	// Try to schedule a GC worker.
+	if gcBlackenEnabled != 0 {
+		gp, tnow := gcController.findRunnableGCWorker(pp, now)
+		if gp != nil {
+			return gp, false, true
+		}
+		now = tnow
+	}
+
+	// Check the global runnable queue once in a while to ensure fairness.
+	// Otherwise two goroutines can completely occupy the local runqueue
+	// by constantly respawning each other.
+	if pp.schedtick%61 == 0 &amp;amp;&amp;amp; sched.runqsize &gt; 0 {
+		lock(&amp;amp;sched.lock)
+		gp := globrunqget(pp, 1)
+		unlock(&amp;amp;sched.lock)
+		if gp != nil {
+			return gp, false, false
+		}
+	}
+
+	// Wake up the finalizer G.
+	if fingStatus.Load()&amp;amp;(fingWait|fingWake) == fingWait|fingWake {
+		if gp := wakefing(); gp != nil {
+			ready(gp, 0, true)
+		}
+	}
+	if *cgo_yield != nil {
+		asmcgocall(*cgo_yield, nil)
+	}
+
+	// local runq
+	if gp, inheritTime := runqget(pp); gp != nil {
+		return gp, inheritTime, false
+	}
+
+	// global runq
+	if sched.runqsize != 0 {
+		lock(&amp;amp;sched.lock)
+		gp := globrunqget(pp, 0)
+		unlock(&amp;amp;sched.lock)
+		if gp != nil {
+			return gp, false, false
+		}
+	}
+
+	// Poll network.
+	// This netpoll is only an optimization before we resort to stealing.
+	// We can safely skip it if there are no waiters or a thread is blocked
+	// in netpoll already. If there is any kind of logical race with that
+	// blocked thread (e.g. it has already returned from netpoll, but does
+	// not set lastpoll yet), this thread will do blocking netpoll below
+	// anyway.
+	if netpollinited() &amp;amp;&amp;amp; netpollAnyWaiters() &amp;amp;&amp;amp; sched.lastpoll.Load() != 0 {
+		if list, delta := netpoll(0); !list.empty() { // non-blocking
+			gp := list.pop()
+			injectglist(&amp;amp;list)
+			netpollAdjustWaiters(delta)
+			trace := traceAcquire()
+			casgstatus(gp, _Gwaiting, _Grunnable)
+			if trace.ok() {
+				trace.GoUnpark(gp, 0)
+				traceRelease(trace)
+			}
+			return gp, false, false
+		}
+	}
+
+	// Spinning Ms: steal work from other Ps.
+	//
+	// Limit the number of spinning Ms to half the number of busy Ps.
+	// This is necessary to prevent excessive CPU consumption when
+	// GOMAXPROCS&gt;&gt;1 but the program parallelism is low.
+	if mp.spinning || 2*sched.nmspinning.Load() &amp;lt; gomaxprocs-sched.npidle.Load() {
+		if !mp.spinning {
+			mp.becomeSpinning()
+		}
+
+		gp, inheritTime, tnow, w, newWork := stealWork(now)
+		if gp != nil {
+			// Successfully stole.
+			return gp, inheritTime, false
+		}
+		if newWork {
+			// There may be new timer or GC work; restart to
+			// discover.
+			goto top
+		}
+
+		now = tnow
+		if w != 0 &amp;amp;&amp;amp; (pollUntil == 0 || w &amp;lt; pollUntil) {
+			// Earlier timer to wait for.
+			pollUntil = w
+		}
+	}
+
+	// We have nothing to do.
+	//
+	// If we're in the GC mark phase, can safely scan and blacken objects,
+	// and have work to do, run idle-time marking rather than give up the P.
+	if gcBlackenEnabled != 0 &amp;amp;&amp;amp; gcMarkWorkAvailable(pp) &amp;amp;&amp;amp; gcController.addIdleMarkWorker() {
+		node := (*gcBgMarkWorkerNode)(gcBgMarkWorkerPool.pop())
+		if node != nil {
+			pp.gcMarkWorkerMode = gcMarkWorkerIdleMode
+			gp := node.gp.ptr()
+
+			trace := traceAcquire()
+			casgstatus(gp, _Gwaiting, _Grunnable)
+			if trace.ok() {
+				trace.GoUnpark(gp, 0)
+				traceRelease(trace)
+			}
+			return gp, false, false
+		}
+		gcController.removeIdleMarkWorker()
+	}
+
+	// wasm only:
+	// If a callback returned and no other goroutine is awake,
+	// then wake event handler goroutine which pauses execution
+	// until a callback was triggered.
+	gp, otherReady := beforeIdle(now, pollUntil)
+	if gp != nil {
+		trace := traceAcquire()
+		casgstatus(gp, _Gwaiting, _Grunnable)
+		if trace.ok() {
+			trace.GoUnpark(gp, 0)
+			traceRelease(trace)
+		}
+		return gp, false, false
+	}
+	if otherReady {
+		goto top
+	}
+
+	// Before we drop our P, make a snapshot of the allp slice,
+	// which can change underfoot once we no longer block
+	// safe-points. We don't need to snapshot the contents because
+	// everything up to cap(allp) is immutable.
+	allpSnapshot := allp
+	// Also snapshot masks. Value changes are OK, but we can't allow
+	// len to change out from under us.
+	idlepMaskSnapshot := idlepMask
+	timerpMaskSnapshot := timerpMask
+
+	// return P and block
+	lock(&amp;amp;sched.lock)
+	if sched.gcwaiting.Load() || pp.runSafePointFn != 0 {
+		unlock(&amp;amp;sched.lock)
+		goto top
+	}
+	if sched.runqsize != 0 {
+		gp := globrunqget(pp, 0)
+		unlock(&amp;amp;sched.lock)
+		return gp, false, false
+	}
+	if !mp.spinning &amp;amp;&amp;amp; sched.needspinning.Load() == 1 {
+		// See &quot;Delicate dance&quot; comment below.
+		mp.becomeSpinning()
+		unlock(&amp;amp;sched.lock)
+		goto top
+	}
+	if releasep() != pp {
+		throw(&quot;findrunnable: wrong p&quot;)
+	}
+	now = pidleput(pp, now)
+	unlock(&amp;amp;sched.lock)
+
+	// Delicate dance: thread transitions from spinning to non-spinning
+	// state, potentially concurrently with submission of new work. We must
+	// drop nmspinning first and then check all sources again (with
+	// #StoreLoad memory barrier in between). If we do it the other way
+	// around, another thread can submit work after we've checked all
+	// sources but before we drop nmspinning; as a result nobody will
+	// unpark a thread to run the work.
+	//
+	// This applies to the following sources of work:
+	//
+	// * Goroutines added to the global or a per-P run queue.
+	// * New/modified-earlier timers on a per-P timer heap.
+	// * Idle-priority GC work (barring golang.org/issue/19112).
+	//
+	// If we discover new work below, we need to restore m.spinning as a
+	// signal for resetspinning to unpark a new worker thread (because
+	// there can be more than one starving goroutine).
+	//
+	// However, if after discovering new work we also observe no idle Ps
+	// (either here or in resetspinning), we have a problem. We may be
+	// racing with a non-spinning M in the block above, having found no
+	// work and preparing to release its P and park. Allowing that P to go
+	// idle will result in loss of work conservation (idle P while there is
+	// runnable work). This could result in complete deadlock in the
+	// unlikely event that we discover new work (from netpoll) right as we
+	// are racing with _all_ other Ps going idle.
+	//
+	// We use sched.needspinning to synchronize with non-spinning Ms going
+	// idle. If needspinning is set when they are about to drop their P,
+	// they abort the drop and instead become a new spinning M on our
+	// behalf. If we are not racing and the system is truly fully loaded
+	// then no spinning threads are required, and the next thread to
+	// naturally become spinning will clear the flag.
+	//
+	// Also see &quot;Worker thread parking/unparking&quot; comment at the top of the
+	// file.
+	wasSpinning := mp.spinning
+	if mp.spinning {
+		mp.spinning = false
+		if sched.nmspinning.Add(-1) &amp;lt; 0 {
+			throw(&quot;findrunnable: negative nmspinning&quot;)
+		}
+
+		// Note the for correctness, only the last M transitioning from
+		// spinning to non-spinning must perform these rechecks to
+		// ensure no missed work. However, the runtime has some cases
+		// of transient increments of nmspinning that are decremented
+		// without going through this path, so we must be conservative
+		// and perform the check on all spinning Ms.
+		//
+		// See https://go.dev/issue/43997.
+
+		// Check global and P runqueues again.
+
+		lock(&amp;amp;sched.lock)
+		if sched.runqsize != 0 {
+			pp, _ := pidlegetSpinning(0)
+			if pp != nil {
+				gp := globrunqget(pp, 0)
+				if gp == nil {
+					throw(&quot;global runq empty with non-zero runqsize&quot;)
+				}
+				unlock(&amp;amp;sched.lock)
+				acquirep(pp)
+				mp.becomeSpinning()
+				return gp, false, false
+			}
+		}
+		unlock(&amp;amp;sched.lock)
+
+		pp := checkRunqsNoP(allpSnapshot, idlepMaskSnapshot)
+		if pp != nil {
+			acquirep(pp)
+			mp.becomeSpinning()
+			goto top
+		}
+
+		// Check for idle-priority GC work again.
+		pp, gp := checkIdleGCNoP()
+		if pp != nil {
+			acquirep(pp)
+			mp.becomeSpinning()
+
+			// Run the idle worker.
+			pp.gcMarkWorkerMode = gcMarkWorkerIdleMode
+			trace := traceAcquire()
+			casgstatus(gp, _Gwaiting, _Grunnable)
+			if trace.ok() {
+				trace.GoUnpark(gp, 0)
+				traceRelease(trace)
+			}
+			return gp, false, false
+		}
+
+		// Finally, check for timer creation or expiry concurrently with
+		// transitioning from spinning to non-spinning.
+		//
+		// Note that we cannot use checkTimers here because it calls
+		// adjusttimers which may need to allocate memory, and that isn't
+		// allowed when we don't have an active P.
+		pollUntil = checkTimersNoP(allpSnapshot, timerpMaskSnapshot, pollUntil)
+	}
+
+	// Poll network until next timer.
+	if netpollinited() &amp;amp;&amp;amp; (netpollAnyWaiters() || pollUntil != 0) &amp;amp;&amp;amp; sched.lastpoll.Swap(0) != 0 {
+		sched.pollUntil.Store(pollUntil)
+		if mp.p != 0 {
+			throw(&quot;findrunnable: netpoll with p&quot;)
+		}
+		if mp.spinning {
+			throw(&quot;findrunnable: netpoll with spinning&quot;)
+		}
+		delay := int64(-1)
+		if pollUntil != 0 {
+			if now == 0 {
+				now = nanotime()
+			}
+			delay = pollUntil - now
+			if delay &amp;lt; 0 {
+				delay = 0
+			}
+		}
+		if faketime != 0 {
+			// When using fake time, just poll.
+			delay = 0
+		}
+		list, delta := netpoll(delay) // block until new work is available
+		// Refresh now again, after potentially blocking.
+		now = nanotime()
+		sched.pollUntil.Store(0)
+		sched.lastpoll.Store(now)
+		if faketime != 0 &amp;amp;&amp;amp; list.empty() {
+			// Using fake time and nothing is ready; stop M.
+			// When all M's stop, checkdead will call timejump.
+			stopm()
+			goto top
+		}
+		lock(&amp;amp;sched.lock)
+		pp, _ := pidleget(now)
+		unlock(&amp;amp;sched.lock)
+		if pp == nil {
+			injectglist(&amp;amp;list)
+			netpollAdjustWaiters(delta)
+		} else {
+			acquirep(pp)
+			if !list.empty() {
+				gp := list.pop()
+				injectglist(&amp;amp;list)
+				netpollAdjustWaiters(delta)
+				trace := traceAcquire()
+				casgstatus(gp, _Gwaiting, _Grunnable)
+				if trace.ok() {
+					trace.GoUnpark(gp, 0)
+					traceRelease(trace)
+				}
+				return gp, false, false
+			}
+			if wasSpinning {
+				mp.becomeSpinning()
+			}
+			goto top
+		}
+	} else if pollUntil != 0 &amp;amp;&amp;amp; netpollinited() {
+		pollerPollUntil := sched.pollUntil.Load()
+		if pollerPollUntil == 0 || pollerPollUntil &gt; pollUntil {
+			netpollBreak()
+		}
+	}
+	stopm()
+	goto top
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br><span class="line-number">89</span><br><span class="line-number">90</span><br><span class="line-number">91</span><br><span class="line-number">92</span><br><span class="line-number">93</span><br><span class="line-number">94</span><br><span class="line-number">95</span><br><span class="line-number">96</span><br><span class="line-number">97</span><br><span class="line-number">98</span><br><span class="line-number">99</span><br><span class="line-number">100</span><br><span class="line-number">101</span><br><span class="line-number">102</span><br><span class="line-number">103</span><br><span class="line-number">104</span><br><span class="line-number">105</span><br><span class="line-number">106</span><br><span class="line-number">107</span><br><span class="line-number">108</span><br><span class="line-number">109</span><br><span class="line-number">110</span><br><span class="line-number">111</span><br><span class="line-number">112</span><br><span class="line-number">113</span><br><span class="line-number">114</span><br><span class="line-number">115</span><br><span class="line-number">116</span><br><span class="line-number">117</span><br><span class="line-number">118</span><br><span class="line-number">119</span><br><span class="line-number">120</span><br><span class="line-number">121</span><br><span class="line-number">122</span><br><span class="line-number">123</span><br><span class="line-number">124</span><br><span class="line-number">125</span><br><span class="line-number">126</span><br><span class="line-number">127</span><br><span class="line-number">128</span><br><span class="line-number">129</span><br><span class="line-number">130</span><br><span class="line-number">131</span><br><span class="line-number">132</span><br><span class="line-number">133</span><br><span class="line-number">134</span><br><span class="line-number">135</span><br><span class="line-number">136</span><br><span class="line-number">137</span><br><span class="line-number">138</span><br><span class="line-number">139</span><br><span class="line-number">140</span><br><span class="line-number">141</span><br><span class="line-number">142</span><br><span class="line-number">143</span><br><span class="line-number">144</span><br><span class="line-number">145</span><br><span class="line-number">146</span><br><span class="line-number">147</span><br><span class="line-number">148</span><br><span class="line-number">149</span><br><span class="line-number">150</span><br><span class="line-number">151</span><br><span class="line-number">152</span><br><span class="line-number">153</span><br><span class="line-number">154</span><br><span class="line-number">155</span><br><span class="line-number">156</span><br><span class="line-number">157</span><br><span class="line-number">158</span><br><span class="line-number">159</span><br><span class="line-number">160</span><br><span class="line-number">161</span><br><span class="line-number">162</span><br><span class="line-number">163</span><br><span class="line-number">164</span><br><span class="line-number">165</span><br><span class="line-number">166</span><br><span class="line-number">167</span><br><span class="line-number">168</span><br><span class="line-number">169</span><br><span class="line-number">170</span><br><span class="line-number">171</span><br><span class="line-number">172</span><br><span class="line-number">173</span><br><span class="line-number">174</span><br><span class="line-number">175</span><br><span class="line-number">176</span><br><span class="line-number">177</span><br><span class="line-number">178</span><br><span class="line-number">179</span><br><span class="line-number">180</span><br><span class="line-number">181</span><br><span class="line-number">182</span><br><span class="line-number">183</span><br><span class="line-number">184</span><br><span class="line-number">185</span><br><span class="line-number">186</span><br><span class="line-number">187</span><br><span class="line-number">188</span><br><span class="line-number">189</span><br><span class="line-number">190</span><br><span class="line-number">191</span><br><span class="line-number">192</span><br><span class="line-number">193</span><br><span class="line-number">194</span><br><span class="line-number">195</span><br><span class="line-number">196</span><br><span class="line-number">197</span><br><span class="line-number">198</span><br><span class="line-number">199</span><br><span class="line-number">200</span><br><span class="line-number">201</span><br><span class="line-number">202</span><br><span class="line-number">203</span><br><span class="line-number">204</span><br><span class="line-number">205</span><br><span class="line-number">206</span><br><span class="line-number">207</span><br><span class="line-number">208</span><br><span class="line-number">209</span><br><span class="line-number">210</span><br><span class="line-number">211</span><br><span class="line-number">212</span><br><span class="line-number">213</span><br><span class="line-number">214</span><br><span class="line-number">215</span><br><span class="line-number">216</span><br><span class="line-number">217</span><br><span class="line-number">218</span><br><span class="line-number">219</span><br><span class="line-number">220</span><br><span class="line-number">221</span><br><span class="line-number">222</span><br><span class="line-number">223</span><br><span class="line-number">224</span><br><span class="line-number">225</span><br><span class="line-number">226</span><br><span class="line-number">227</span><br><span class="line-number">228</span><br><span class="line-number">229</span><br><span class="line-number">230</span><br><span class="line-number">231</span><br><span class="line-number">232</span><br><span class="line-number">233</span><br><span class="line-number">234</span><br><span class="line-number">235</span><br><span class="line-number">236</span><br><span class="line-number">237</span><br><span class="line-number">238</span><br><span class="line-number">239</span><br><span class="line-number">240</span><br><span class="line-number">241</span><br><span class="line-number">242</span><br><span class="line-number">243</span><br><span class="line-number">244</span><br><span class="line-number">245</span><br><span class="line-number">246</span><br><span class="line-number">247</span><br><span class="line-number">248</span><br><span class="line-number">249</span><br><span class="line-number">250</span><br><span class="line-number">251</span><br><span class="line-number">252</span><br><span class="line-number">253</span><br><span class="line-number">254</span><br><span class="line-number">255</span><br><span class="line-number">256</span><br><span class="line-number">257</span><br><span class="line-number">258</span><br><span class="line-number">259</span><br><span class="line-number">260</span><br><span class="line-number">261</span><br><span class="line-number">262</span><br><span class="line-number">263</span><br><span class="line-number">264</span><br><span class="line-number">265</span><br><span class="line-number">266</span><br><span class="line-number">267</span><br><span class="line-number">268</span><br><span class="line-number">269</span><br><span class="line-number">270</span><br><span class="line-number">271</span><br><span class="line-number">272</span><br><span class="line-number">273</span><br><span class="line-number">274</span><br><span class="line-number">275</span><br><span class="line-number">276</span><br><span class="line-number">277</span><br><span class="line-number">278</span><br><span class="line-number">279</span><br><span class="line-number">280</span><br><span class="line-number">281</span><br><span class="line-number">282</span><br><span class="line-number">283</span><br><span class="line-number">284</span><br><span class="line-number">285</span><br><span class="line-number">286</span><br><span class="line-number">287</span><br><span class="line-number">288</span><br><span class="line-number">289</span><br><span class="line-number">290</span><br><span class="line-number">291</span><br><span class="line-number">292</span><br><span class="line-number">293</span><br><span class="line-number">294</span><br><span class="line-number">295</span><br><span class="line-number">296</span><br><span class="line-number">297</span><br><span class="line-number">298</span><br><span class="line-number">299</span><br><span class="line-number">300</span><br><span class="line-number">301</span><br><span class="line-number">302</span><br><span class="line-number">303</span><br><span class="line-number">304</span><br><span class="line-number">305</span><br><span class="line-number">306</span><br><span class="line-number">307</span><br><span class="line-number">308</span><br><span class="line-number">309</span><br><span class="line-number">310</span><br><span class="line-number">311</span><br><span class="line-number">312</span><br><span class="line-number">313</span><br><span class="line-number">314</span><br><span class="line-number">315</span><br><span class="line-number">316</span><br><span class="line-number">317</span><br><span class="line-number">318</span><br><span class="line-number">319</span><br><span class="line-number">320</span><br><span class="line-number">321</span><br><span class="line-number">322</span><br><span class="line-number">323</span><br><span class="line-number">324</span><br><span class="line-number">325</span><br><span class="line-number">326</span><br><span class="line-number">327</span><br><span class="line-number">328</span><br><span class="line-number">329</span><br><span class="line-number">330</span><br><span class="line-number">331</span><br><span class="line-number">332</span><br><span class="line-number">333</span><br><span class="line-number">334</span><br><span class="line-number">335</span><br><span class="line-number">336</span><br><span class="line-number">337</span><br><span class="line-number">338</span><br><span class="line-number">339</span><br><span class="line-number">340</span><br><span class="line-number">341</span><br><span class="line-number">342</span><br><span class="line-number">343</span><br><span class="line-number">344</span><br><span class="line-number">345</span><br><span class="line-number">346</span><br><span class="line-number">347</span><br><span class="line-number">348</span><br><span class="line-number">349</span><br><span class="line-number">350</span><br><span class="line-number">351</span><br><span class="line-number">352</span><br><span class="line-number">353</span><br><span class="line-number">354</span><br><span class="line-number">355</span><br><span class="line-number">356</span><br><span class="line-number">357</span><br><span class="line-number">358</span><br><span class="line-number">359</span><br><span class="line-number">360</span><br><span class="line-number">361</span><br><span class="line-number">362</span><br><span class="line-number">363</span><br><span class="line-number">364</span><br><span class="line-number">365</span><br><span class="line-number">366</span><br><span class="line-number">367</span><br><span class="line-number">368</span><br><span class="line-number">369</span><br><span class="line-number">370</span><br><span class="line-number">371</span><br><span class="line-number">372</span><br><span class="line-number">373</span><br><span class="line-number">374</span><br><span class="line-number">375</span><br><span class="line-number">376</span><br><span class="line-number">377</span><br><span class="line-number">378</span><br><span class="line-number">379</span><br><span class="line-number">380</span><br></div></div><p>唤醒流程</p> <ul><li>_Pidle：也是一个栈式结构，通过sched.pidle形成栈。wake时出栈、park时入栈。</li></ul> <div class="language-text line-numbers-mode"><pre class="language-text"><code>// Tries to add one more P to execute G's.
+// Called when a G is made runnable (newproc, ready).
+// Must be called with a P.
+func wakep() {
+	// Be conservative about spinning threads, only start one if none exist
+	// already.
+	if sched.nmspinning.Load() != 0 || !sched.nmspinning.CompareAndSwap(0, 1) {
+		return
+	}
+
+	// Disable preemption until ownership of pp transfers to the next M in
+	// startm. Otherwise preemption here would leave pp stuck waiting to
+	// enter _Pgcstop.
+	//
+	// See preemption comment on acquirem in startm for more details.
+	mp := acquirem()
+
+	var pp *p
+	lock(&amp;amp;sched.lock)
+	pp, _ = pidlegetSpinning(0)
+	if pp == nil {
+		if sched.nmspinning.Add(-1) &amp;lt; 0 {
+			throw(&quot;wakep: negative nmspinning&quot;)
+		}
+		unlock(&amp;amp;sched.lock)
+		releasem(mp)
+		return
+	}
+	// Since we always have a P, the race in the &quot;No M is available&quot;
+	// comment in startm doesn't apply during the small window between the
+	// unlock here and lock in startm. A checkdead in between will always
+	// see at least one running M (ours).
+	unlock(&amp;amp;sched.lock)
+
+	startm(pp, true, false)
+
+	releasem(mp)
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br></div></div></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/jvm/wisp/GMP.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <!----> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><!----> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">goroutine调度</div> <hr> <div class="toc-box"><!----></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/jvm/wisp/GMP.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <!----> <!----></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-241.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

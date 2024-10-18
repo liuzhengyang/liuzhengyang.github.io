@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>ID | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="ID">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/architecture/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/id.html">
+    <meta name="twitter:title" content="ID">
+    <meta name="twitter:url" content="/md/architecture/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/id.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-20.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <!----> </aside> <div><main class="withouttoc page"> <div class="theme-default-content content__default"><h1 id="id"><a href="#id" class="header-anchor">#</a> ID</h1> <h2 id="有存储生成类"><a href="#有存储生成类" class="header-anchor">#</a> 有存储生成类</h2> <h3 id="数据库表自增"><a href="#数据库表自增" class="header-anchor">#</a> 数据库表自增</h3> <p>业务表的primary key，配置auto increment</p> <p><img alt="single-db-increment.png" data-src="/assets/images/id/single-db-increment.png" loading="lazy" class="lazy"></p> <p>问题: 分库分表时，id会重复</p> <p>优化方案：单独创建一个表来生成id，从而解决分表各自自增的重复问题</p> <h3 id="单独表自增"><a href="#单独表自增" class="header-anchor">#</a> 单独表自增</h3> <p><img alt="independent_id_table.png" data-src="/assets/images/id/independent_id_table.png" loading="lazy" class="lazy"></p> <p>优点：解决了分表重复问题
+缺点：</p> <ol><li>性能：写入瓶颈，10w tps左右；多一次db io交互</li> <li>稳定性：数据库如果出现故障，则id完全不可用。如果出现网络抖动等原因，会引发超时、失败。</li> <li>正确性：主从切换数据重复风险（主从延迟时发生主从切换s，会导致数据重复，可配置半同步缓解）</li> <li>易用性：创建新id业务需要申请表、库</li></ol> <p><img alt="img.png" data-src="/assets/images/id/db-binlog-delay.png" loading="lazy" class="lazy"></p> <h3 id="表批量获取、独立server内存生成"><a href="#表批量获取、独立server内存生成" class="header-anchor">#</a> 表批量获取、独立server内存生成</h3> <p><img alt="img.png" data-src="/assets/images/id/id-server-batch.png" loading="lazy" class="lazy"></p> <ol><li>数据库设计改为每行表示一个业务的当前id水位，server从数据库获取一个范围放到内存消费堆外提供接口</li> <li>server内部缓存设计，即减少了数据库压力，提升整体性能，也提高了稳定性。</li> <li>主从延迟问题，可以通过一个强一致的存储来实现（比如zk、consul等），也可以开启半同步/全同步优化（因为数据库压力变小且有预取，耗时不敏感）。当前数据库切换为停写切换。</li> <li>易用性：创建新id业务不再需要创建表，只需要在表中增加一行记录，方便做平台化</li> <li>性能、稳定性：能够横向扩展Server，提高吞吐和稳定性。存储能够分片，进行业务隔离。</li></ol> <h3 id="多级buffer"><a href="#多级buffer" class="header-anchor">#</a> 多级buffer</h3> <p>id sdk内部再采取一层预取，从而能够降低id sdk到id server的访问量，提升性能，提高可靠性。</p> <p><img alt="img.png" data-src="/assets/images/id/id-sdk-buffer.png" loading="lazy" class="lazy"></p> <h3 id="严格-递增"><a href="#严格-递增" class="header-anchor">#</a> ”严格“递增</h3> <p>从id sdk到id server的路由选择，可以按照biz进行一致性hash路由选择，保证一个”递增“。（缺点：单个server的性能容器成为瓶颈）
+或者采用biz+业务key，保证业务key维度的递增。</p> <p><img alt="img.png" data-src="/assets/images/id/strict-increase.png" loading="lazy" class="lazy"></p> <p>这种方式能够实现正常情况下的严格递增，但是如果在server升级容器、网络异常等情况，可能出现短暂时间的id乱序。
+这是在可用性和完全严格递增下选择更高可用性的方案。
+如果要求绝对的严格递增，可以采用raft选主的方法确定一个biz业务由哪个server生成，避免同一时刻有多个server生成，
+并且处理好旧server的缓存清除机制。</p> <h3 id="机房容灾"><a href="#机房容灾" class="header-anchor">#</a> 机房容灾</h3> <p>如果需要机房级别的容灾，比如机房间网络故障等情形，可以通过在id后几位追加机房标识。这样两个机房之间可以完全不通信，并且不会重复。</p> <p><img alt="img.png" data-src="/assets/images/id/idc-id.png" loading="lazy" class="lazy"></p> <h3 id="其他可靠性"><a href="#其他可靠性" class="header-anchor">#</a> 其他可靠性</h3> <ul><li>对存储访问的限流熔断(按业务维度)</li> <li>自动调节batch</li> <li>监控报警演练</li></ul> <h2 id="时间戳生成类"><a href="#时间戳生成类" class="header-anchor">#</a> 时间戳生成类</h2> <p>使用snowflake算法</p> <h3 id="workerid防重"><a href="#workerid防重" class="header-anchor">#</a> workerId防重</h3> <p>一个重要问题是要解决workerId的防重。</p> <p>采用的是在zk上注册一个path（持久化类型），表示抢占workerId成功。
+并且用另一个zk数据存储该workerId的进程信息（包含进程最近活跃时间）。</p> <p>进程退出后删除该path和进程信息。</p> <p>如果出现异常退出比如jvm崩溃等情况，则该path需要在合适时机进行删除（检测进程最近活跃时间距离当前的安全时间，防止进程因为其他原因）</p> <h3 id="时间戳防回退"><a href="#时间戳防回退" class="header-anchor">#</a> 时间戳防回退</h3> <ol><li>进程内记录上一次毫秒值，如果下一次毫秒值比上一次小，则原地等待直到大于（并报警）</li> <li>启动时，需要查询上次使用这个workerId的进程信息，确认活跃时间距离当前有一定安全buffer再启动。</li></ol> <h3 id="可用性可靠性"><a href="#可用性可靠性" class="header-anchor">#</a> 可用性可靠性</h3> <ol><li>天然支持机房容灾</li> <li>id sdk也有批量预取设计</li> <li>支持横向扩容（在workerId范围内），且不同业务可以访问不同的集群。</li></ol></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/architecture/架构设计/id.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <!----> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><!----> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">ID</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/architecture/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/id.html#有存储生成类" class="toc-sidebar-link">有存储生成类</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/architecture/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/id.html#数据库表自增" class="toc-sidebar-link">数据库表自增</a></li><li class="toc-sidebar-sub-header"><a href="/md/architecture/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/id.html#单独表自增" class="toc-sidebar-link">单独表自增</a></li><li class="toc-sidebar-sub-header"><a href="/md/architecture/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/id.html#表批量获取、独立server内存生成" class="toc-sidebar-link">表批量获取、独立server内存生成</a></li><li class="toc-sidebar-sub-header"><a href="/md/architecture/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/id.html#多级buffer" class="toc-sidebar-link">多级buffer</a></li><li class="toc-sidebar-sub-header"><a href="/md/architecture/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/id.html#严格-递增" class="toc-sidebar-link">”严格“递增</a></li><li class="toc-sidebar-sub-header"><a href="/md/architecture/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/id.html#机房容灾" class="toc-sidebar-link">机房容灾</a></li><li class="toc-sidebar-sub-header"><a href="/md/architecture/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/id.html#其他可靠性" class="toc-sidebar-link">其他可靠性</a></li></ul></li><li><a href="/md/architecture/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/id.html#时间戳生成类" class="toc-sidebar-link">时间戳生成类</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/architecture/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/id.html#workerid防重" class="toc-sidebar-link">workerId防重</a></li><li class="toc-sidebar-sub-header"><a href="/md/architecture/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/id.html#时间戳防回退" class="toc-sidebar-link">时间戳防回退</a></li><li class="toc-sidebar-sub-header"><a href="/md/architecture/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/id.html#可用性可靠性" class="toc-sidebar-link">可用性可靠性</a></li></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/architecture/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/id.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <!----> <!----></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-20.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

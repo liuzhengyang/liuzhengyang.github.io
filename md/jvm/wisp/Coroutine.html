@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Coroutine | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="Coroutine">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/jvm/wisp/Coroutine.html">
+    <meta name="twitter:title" content="Coroutine">
+    <meta name="twitter:url" content="/md/jvm/wisp/Coroutine.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-237.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <!----> </aside> <div><main class="withouttoc page"> <div class="theme-default-content content__default"><h1 id="coroutine"><a href="#coroutine" class="header-anchor">#</a> Coroutine</h1> <div class="language-text line-numbers-mode"><pre class="language-text"><code>public class Coroutine extends CoroutineBase {
+private final Runnable target;
+
+    /**
+     * Allocates a new {@code Coroutine} object.
+     */
+    public Coroutine() {
+        this.target = null;
+        threadSupport.addCoroutine(this, -1);
+    }
+
+    /**
+     * Allocates a new {@code Coroutine} object.
+     *
+     * @param target the runnable
+     */
+    public Coroutine(Runnable target) {
+        this.target = target;
+        threadSupport.addCoroutine(this, -1);
+    }
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br></div></div><p>Coroutine提供了yieldTo和unsafeYieldTo方法。
+yieldTo是在当前协程阻塞时让出线程执行给另一个Coroutine协程。
+unsafeYieldTo也是让出协程的方法，不过有几个优化</p> <ol><li>不会同时从其他线程steal Coroutine</li> <li>不会switch到正在被steal的协程</li> <li>不会steal正在运行的coroutine</li></ol> <div class="language-text line-numbers-mode"><pre class="language-text"><code>/**
+     * Yields execution to the target coroutine.
+     * @param target Coroutine
+     */
+    public static void yieldTo(Coroutine target) {
+        SharedSecrets.getJavaLangAccess().currentThread0().getCoroutineSupport().symmetricYieldTo(target);
+    }
+    /**
+     * optimized version of yieldTo function for wisp based on the following assumptions:
+     * 1. we won't simultaneously steal a {@link Coroutine} from other threads
+     * 2. we won't switch to a {@link Coroutine} that's being stolen
+     * 3. we won't steal a running {@link Coroutine}
+     * @param target target coroutine
+     */
+    public static void unsafeYieldTo(Coroutine target) {
+        SharedSecrets.getJavaLangAccess().currentThread0().getCoroutineSupport().unsafeSymmetricYieldTo(target);
+    }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br></div></div><p>setWispTask会调用setWispTask这个同名的native方法。
+registerNatives方法会向jvm注册native方法，注册的是setWispTask</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>/**
+ * Relate Coroutine to wisp data structures
+ *
+ * @param id     wispTask id
+ * @param task   task oop
+ * @param engine wispEngine oop
+ */
+public void setWispTask(int id, Object task, Object engine) {
+    setWispTask(nativeCoroutine, id, task, engine);
+}
+static {
+    registerNatives();
+}
+
+private static native void registerNatives();
+
+private static native void setWispTask(long coroutine, int id, Object task, Object engine);
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br></div></div><p>Coroutine.c中的实现</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>#include &quot;jni.h&quot;
+#include &quot;jvm.h&quot;
+#include &quot;java_dyn_Coroutine.h&quot;
+
+#define ARRAY_LENGTH(a) (sizeof(a)/sizeof(a[0]))
+
+#define LANG &quot;Ljava/lang/&quot;
+#define OBJ LANG&quot;Object;&quot;
+
+static JNINativeMethod methods[] = {
+  {&quot;setWispTask&quot;,&quot;(JI&quot;OBJ OBJ&quot;)V&quot;, (void *)&amp;amp;JVM_SetWispTask},
+};
+
+JNIEXPORT void JNICALL
+Java_java_dyn_Coroutine_registerNatives(JNIEnv *env, jclass cls)
+{
+    (*env)-&gt;RegisterNatives(env, cls, methods, ARRAY_LENGTH(methods));
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br></div></div><p>setWispTask的实现在jvm.cpp中。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>JVM_ENTRY(void, JVM_SetWispTask(JNIEnv* env, jclass klass, jlong coroutinePtr, jint task_id, jobject task, jobject engine))
+  JVMWrapper(&quot;JVM_SetWispTask&quot;);
+  assert(EnableCoroutine, &quot;Coroutine is disabled&quot;);
+  Coroutine* coro = (Coroutine*)coroutinePtr;
+  coro-&gt;set_wisp_task_id(task_id);
+  coro-&gt;set_wisp_engine(JNIHandles::resolve_non_null(engine));
+  coro-&gt;set_wisp_task(JNIHandles::resolve_non_null(task));
+JVM_END
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br></div></div><h2 id="coroutine-hpp-native实现"><a href="#coroutine-hpp-native实现" class="header-anchor">#</a> Coroutine.hpp native实现</h2> <div class="language-text line-numbers-mode"><pre class="language-text"><code>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><h2 id="coroutinestack"><a href="#coroutinestack" class="header-anchor">#</a> CoroutineStack</h2> <p>CoroutineStack是协程的方法栈。</p> <h2 id="switchto切换协程的实现"><a href="#switchto切换协程的实现" class="header-anchor">#</a> switchTo切换协程的实现</h2> <p>在create_switchTo_contents</p> <p>把当前线程JavaThread的状态，保存到旧的协程(source)上，然后把新的协程(target)的数据，恢复到JavaThread上。</p> <ul><li>设置Coroutine::last_Java_pc_offset到JavaThread的last_Java_pc_offset</li> <li>设置线程栈，CoroutineStack::stack_base_offset、CoroutineStack::stack_size_offset</li> <li>设置stack pointer last_sp_offset到rsp堆栈指针寄存器上。</li></ul> <p>把当前线程的数据，保存到旧的(source)协程coroutine上</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>__ movl(Address(old_coroutine, Coroutine::state_offset()) , Coroutine::_onstack);
+
+    // rescue old handle and resource areas
+    __ movptr(temp, Address(thread, Thread::handle_area_offset()));
+    __ movptr(Address(old_coroutine, Coroutine::handle_area_offset()), temp);
+    __ movptr(temp, Address(thread, Thread::resource_area_offset()));
+    __ movptr(Address(old_coroutine, Coroutine::resource_area_offset()), temp);
+    __ movptr(temp, Address(thread, Thread::last_handle_mark_offset()));
+    __ movptr(Address(old_coroutine, Coroutine::last_handle_mark_offset()), temp);
+    __ movptr(temp, Address(thread, Thread::active_handles_offset()));
+    __ movptr(Address(old_coroutine, Coroutine::active_handles_offset()), temp);
+    __ movptr(temp, Address(thread, Thread::metadata_handles_offset()));
+    __ movptr(Address(old_coroutine, Coroutine::metadata_handles_offset()), temp);
+    __ movptr(temp, Address(thread, JavaThread::last_Java_pc_offset()));
+    __ movptr(Address(old_coroutine, Coroutine::last_Java_pc_offset()), temp);
+    __ movptr(temp, Address(thread, JavaThread::last_Java_sp_offset()));
+    __ movptr(Address(old_coroutine, Coroutine::last_Java_sp_offset()), temp);
+    __ movptr(temp, Address(thread, JavaThread::privileged_stack_top_offset()));
+    __ movptr(Address(old_coroutine, Coroutine::privileged_stack_top_offset()), temp);
+    __ movptr(temp, Address(thread, JavaThread::threadObj_offset()));
+    __ movl(temp, Address(temp, java_lang_Thread::thread_status_offset()));
+    __ movl(Address(old_coroutine, Coroutine::thread_status_offset()), temp);
+    __ movl(temp, Address(thread, JavaThread::java_call_counter_offset()));
+    __ movl(Address(old_coroutine, Coroutine::java_call_counter_offset()), temp);
+
+    __ movptr(Address(old_stack, CoroutineStack::last_sp_offset()), rsp);
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br></div></div><p>把新的(target) coroutine的数据恢复到线程上</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>    // perform the switch to the new stack
+    //
+    // valid registers: rdx = target Coroutine
+
+    __ movl(Address(target_coroutine, Coroutine::state_offset()), Coroutine::_current);
+
+    Register temp = r8;
+    Register temp2 = r9;
+    {
+      Register thread = r15;
+      __ movptr(Address(thread, JavaThread::current_coroutine_offset()), target_coroutine);
+      // set new handle and resource areas
+      __ movptr(temp, Address(target_coroutine, Coroutine::handle_area_offset()));
+      __ movptr(Address(thread, Thread::handle_area_offset()), temp);
+      __ movptr(temp, Address(target_coroutine, Coroutine::resource_area_offset()));
+      __ movptr(Address(thread, Thread::resource_area_offset()), temp);
+      __ movptr(temp, Address(target_coroutine, Coroutine::last_handle_mark_offset()));
+      __ movptr(Address(thread, Thread::last_handle_mark_offset()), temp);
+      __ movptr(temp, Address(target_coroutine, Coroutine::active_handles_offset()));
+      __ movptr(Address(thread, Thread::active_handles_offset()), temp);
+      __ movptr(temp, Address(target_coroutine, Coroutine::metadata_handles_offset()));
+      __ movptr(Address(thread, Thread::metadata_handles_offset()), temp);
+      __ movptr(temp, Address(target_coroutine, Coroutine::last_Java_pc_offset()));
+      __ movptr(Address(thread, JavaThread::last_Java_pc_offset()), temp);
+      __ movptr(temp, Address(target_coroutine, Coroutine::last_Java_sp_offset()));
+      __ movptr(Address(thread, JavaThread::last_Java_sp_offset()), temp);
+      __ movptr(temp, Address(target_coroutine, Coroutine::privileged_stack_top_offset()));
+      __ movptr(Address(thread, JavaThread::privileged_stack_top_offset()), temp);
+      __ movl(temp2, Address(target_coroutine, Coroutine::thread_status_offset()));
+      __ movptr(temp, Address(thread, JavaThread::threadObj_offset()));
+      __ movl(Address(temp, java_lang_Thread::thread_status_offset()), temp2);
+      __ movl(temp, Address(target_coroutine, Coroutine::java_call_counter_offset()));
+      __ movl(Address(thread, JavaThread::java_call_counter_offset()), temp);
+#ifdef ASSERT
+      __ movptr(Address(target_coroutine, Coroutine::handle_area_offset()), (intptr_t)NULL_WORD);
+      __ movptr(Address(target_coroutine, Coroutine::resource_area_offset()), (intptr_t)NULL_WORD);
+      __ movptr(Address(target_coroutine, Coroutine::last_handle_mark_offset()), (intptr_t)NULL_WORD);
+      __ movl(Address(target_coroutine, Coroutine::java_call_counter_offset()), 0);
+#endif
+
+      // update the thread's stack base and size
+      __ movptr(temp, Address(target_stack, CoroutineStack::stack_base_offset()));
+      __ movptr(Address(thread, JavaThread::stack_base_offset()), temp);
+      __ movl(temp2, Address(target_stack, CoroutineStack::stack_size_offset()));
+      __ movl(Address(thread, JavaThread::stack_size_offset()), temp2);
+
+      __ movptr(temp2, Address(target_stack, CoroutineStack::stack_overflow_limit_offset()));
+      __ movptr(Address(thread, JavaThread::stack_overflow_limit_offset()), temp2);
+
+      // update JavaThread::_reserved_stack_activation for @ReservedStackAccess support
+      __ movptr(Address(thread, JavaThread::reserved_stack_activation_offset()), temp);
+    }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br></div></div></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/jvm/wisp/Coroutine.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <!----> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><!----> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">Coroutine</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/jvm/wisp/Coroutine.html#coroutine-hpp-native实现" class="toc-sidebar-link">Coroutine.hpp native实现</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/jvm/wisp/Coroutine.html#coroutinestack" class="toc-sidebar-link">CoroutineStack</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/jvm/wisp/Coroutine.html#switchto切换协程的实现" class="toc-sidebar-link">switchTo切换协程的实现</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/jvm/wisp/Coroutine.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <!----> <!----></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-237.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

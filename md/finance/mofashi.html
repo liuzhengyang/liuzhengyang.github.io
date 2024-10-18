@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>股票魔法师 | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="股票魔法师">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/finance/mofashi.html">
+    <meta name="twitter:title" content="股票魔法师">
+    <meta name="twitter:url" content="/md/finance/mofashi.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-102.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <!----> </aside> <div><main class="withouttoc page"> <div class="theme-default-content content__default"><h1 id="股票魔法师"><a href="#股票魔法师" class="header-anchor">#</a> 股票魔法师</h1> <h1 id="时刻跟着计划走"><a href="#时刻跟着计划走" class="header-anchor">#</a> 时刻跟着计划走</h1> <h2 id="设定一个计划"><a href="#设定一个计划" class="header-anchor">#</a> 设定一个计划</h2> <ul><li>购买股票计划</li> <li>处理所以股票固有风险的计划</li> <li>是什么、为什么、何时、以及如何进行交易股票</li></ul> <p>投资交易计划的关键要素</p> <ul><li>建仓机制</li> <li>如何处理风险</li> <li>如何锁定利润</li> <li>如何控制头寸大小？何时决定重新进行资产配置？</li></ul> <p>应急计划：遇到预期外的情况，如何应对。</p> <ul><li>如果头寸表现与预期不符，你应该离场的点位</li> <li>如果止损离场后，重新买入股票的标准</li> <li>止盈离场的盈利目标</li> <li>保护利润的止盈目标</li> <li>应急预案</li></ul> <p>应急预案</p> <ul><li>初始止损位：一旦不跑上涨，就应该使用移动止损（也称追踪止损）或回撤止损策略，提高卖点以保护自己的利润。</li> <li>重新进场的标准：回撤止损清仓后。如果重新启动，是否进场的标准。</li> <li>止盈卖出的位置：强势卖出。弱势卖出。</li> <li>灾害预案：</li></ul> <p>根据重要性排列</p> <ul><li>限制你的损失</li> <li>保护你的本金</li> <li>保护你的利润</li></ul> <h2 id="交易规则"><a href="#交易规则" class="header-anchor">#</a> 交易规则</h2> <ul><li>设定止损规则</li> <li>选股买入时机规则</li> <li>卖出时机规则</li></ul> <h3 id="选股"><a href="#选股" class="header-anchor">#</a> 选股</h3> <ul><li>领头羊</li> <li>四阶段</li></ul> <p>不要过度分散投资: 集中在4-12只最好的股票上。</p> <h3 id="止损"><a href="#止损" class="header-anchor">#</a> 止损</h3> <h2 id="第三章-sepa策略"><a href="#第三章-sepa策略" class="header-anchor">#</a> 第三章 SEPA策略</h2> <h2 id="第六章-行业、类别和催化剂"><a href="#第六章-行业、类别和催化剂" class="header-anchor">#</a> 第六章 行业、类别和催化剂</h2> <h3 id="报告公布时刻"><a href="#报告公布时刻" class="header-anchor">#</a> 报告公布时刻</h3> <ul><li>即刻反应</li> <li>后续反应</li> <li>弹性</li></ul> <h2 id="价值百万的图表"><a href="#价值百万的图表" class="header-anchor">#</a> 价值百万的图表</h2> <p>将价格和成交量作为决定买卖时机的分析工具，管理风险，提高盈利的概率。</p> <h3 id="稳固期"><a href="#稳固期" class="header-anchor">#</a> 稳固期</h3> <p>价格均衡模式。好的股票会让纠正期的下跌维持在较小的服务端。之后，股票会继续休息并在之后结合着长期的
+上涨趋继续上升。</p> <h3 id="波动收缩"><a href="#波动收缩" class="header-anchor">#</a> 波动收缩</h3> <p>在稳固期其价格波动不断收窄，同时伴随着交易量明显的收缩。
+波动收缩规律（VCP）</p> <p>转入上涨模式、交易量开始放大的时候买入。</p> <h3 id="深度纠正模式-失败的前兆"><a href="#深度纠正模式-失败的前兆" class="header-anchor">#</a> 深度纠正模式 - 失败的前兆</h3> <p>当股票快速下跌时，很可能暗示着公司或者行业出了某些问题，甚至可能心的熊市就要到来。
+不能在此时因为股价从高点下跌50%甚至60%而认为股票价格便宜值得购买。</p> <h3 id="时间压缩"><a href="#时间压缩" class="header-anchor">#</a> 时间压缩</h3> <p>如果股票上涨速度过快，就会形成一个危险的时间压缩现象，而大多时候我们应该避免这种事情的发生。</p> <h3 id="震荡期"><a href="#震荡期" class="header-anchor">#</a> 震荡期</h3> <h3 id="关注需求的迹象"><a href="#关注需求的迹象" class="header-anchor">#</a> 关注需求的迹象</h3> <p>第二阶段是最佳的买入时机。
+股票会因为人们将获得的回报变现而出现纠正（下跌）。这时，有些人会因为时机
+选择的实物而错过卖出的最优时间。当股票再次上涨时，他们会抓住下次机会脱身离场。
+卖出的速度放缓后，股票还有吸引力么？只要仔细观察价格和交易量的走势，我们就能对上述
+问题给出自己粗略的答案。
+要将视线集中起来，寻找机构投资者出现的痕迹。痕迹质疑就是价格的骤然升高。
+价格拔地而起的情况一般发生在纠正期股价的地步或是纠正期后期。这类价格庆伟一般伴随着突然放大的交易量。
+价格和交易量的突然升高通常暗示机构的买入行为。</p> <p>20日移动平均线。
+交易量收缩是所有规律中最重要的现象。</p> <h3 id="_3c规律"><a href="#_3c规律" class="header-anchor">#</a> 3C规律</h3> <p>cpu completion cheat, 3C。</p> <h2 id="风险管理-风险的本质"><a href="#风险管理-风险的本质" class="header-anchor">#</a> 风险管理：风险的本质</h2> <h3 id="只要你学会保护它-钱将永远属于你"><a href="#只要你学会保护它-钱将永远属于你" class="header-anchor">#</a> 只要你学会保护它，钱将永远属于你</h3> <h3 id="合理的法则让你的视线更透彻"><a href="#合理的法则让你的视线更透彻" class="header-anchor">#</a> 合理的法则让你的视线更透彻</h3> <p>两次上涨一次下跌</p> <p>下跌的越多，需要上涨回本的上涨比例成倍增加。</p> <p>接受市场的判断
+知道何时自己是错的。
+避免巨大错误发生。
+不要成为无意识的投资者。
+因为投资者们决绝承认错误，他们会讲自己的错误合理化。
+当交易朝着不利于自己的方向移动，并出现亏损时，他们会突然决定长期持有这些股票。
+这时，他们就变成了利弗莫尔常说的&quot;无意识的投资者&quot;，一个只要有一点收益就收割，却把
+损失仍在那里放任其放大的投资者。
+利用止损规则限制了你的亏损后，你自己已经领先于
+其他投资者了，因为大多数投资者都不敢做到这一点。
+最好的交易以上那些能人事错误并用于止损，保护自己的资产，
+等待下一次机会的人。</p> <h2 id="风险管理-如何处理并掌控风险"><a href="#风险管理-如何处理并掌控风险" class="header-anchor">#</a> 风险管理：如何处理并掌控风险</h2> <p>风险是可能损失的概率。
+股票交易的模板上通过让潜在回报高于潜在风向来实现
+持续盈利。但是，大多数投资者面临的问题是他们过于专注
+于回报而忽视了风险。
+自律。</p> <h3 id="养成习惯"><a href="#养成习惯" class="header-anchor">#</a> 养成习惯</h3> <p>平庸与伟大的区别在于是否能自律。管理风险需要自律。坚持自己的策略需要自律。</p> <h3 id="应急计划"><a href="#应急计划" class="header-anchor">#</a> 应急计划</h3> <h4 id="初期止损"><a href="#初期止损" class="header-anchor">#</a> 初期止损</h4> <p>在买入股票钱，我会提前设定止损线：让我彻底退出该股票的价格水平。
+一旦股票上涨，止损线也应该随之调高，以保护自己的收益。</p> <h4 id="重新进入"><a href="#重新进入" class="header-anchor">#</a> 重新进入</h4> <h4 id="活力并卖出"><a href="#活力并卖出" class="header-anchor">#</a> 活力并卖出</h4> <ul><li>走强时卖出，也就是股价还在上升时卖出</li> <li>走弱时卖出，也就是股价下跌时卖掉。</li></ul> <h4 id="灾难计划"><a href="#灾难计划" class="header-anchor">#</a> 灾难计划</h4> <h4 id="何时应该斩仓止损"><a href="#何时应该斩仓止损" class="header-anchor">#</a> 何时应该斩仓止损</h4> <p>止损线应该与预期收益有关。</p> <h4 id="避开交易者的原罪"><a href="#避开交易者的原罪" class="header-anchor">#</a> 避开交易者的原罪</h4> <p>允许损失超过平均收益的行为我们称之为&quot;交易者原罪&quot;。
+你必须让你的平均收益超过损失。但在现实情况中，
+很多投资者设置不知道自己的平均收益是多少。
+当设置止损线时，我的第一法则上让损失不能超过该
+投资者历史成功投资中平均收益的一半。</p> <p>同样建议大多数投资者，不论平均收益是多少，不要让
+股票跌幅超过10%。</p> <p>你能做的最好的事情就是让你的损失小于收益。</p> <p>将亏损保持在较小额度上，并能成功避开投资者原罪。
+永远不要让损失增长得大于你的平均收益。</p> <h3 id="向你的止损线致敬"><a href="#向你的止损线致敬" class="header-anchor">#</a> 向你的止损线致敬</h3> <p>在股市中，股价下跌的越多，其上涨的困难也就越大。</p> <h3 id="一定会带来灾难的习惯"><a href="#一定会带来灾难的习惯" class="header-anchor">#</a> 一定会带来灾难的习惯</h3> <p>用赚来的钱来填补亏损的投资上让你走向贫穷最快的方法。这叫探底成功。经济商通常
+会劝其客户在股价下跌后继续买入加仓，以掩盖之前错误的投资建议。他们会告诉客户这样可以降低
+其平均成本。但是股价如果继续下跌的话，你的损失会被放大到原来的两倍。
+在股票交易中遭受损失没什么可羞耻的，但继续持有亏损的股票，放任损失放大，设置还在不断加仓
+才是业余的、自我毁灭的行为。</p> <p>对很多投资者来说，在价格回撤时买入股票上十分冒险的，尽管你会觉得与之前相比，
+现在的价格更有诱惑力。但是，摊低成本行为会让你失败、平庸。</p> <h4 id="逐步建仓与摊低成本"><a href="#逐步建仓与摊低成本" class="header-anchor">#</a> 逐步建仓与摊低成本</h4> <p>专业与业余最关键的区别之一就是专家们在逐步创建仓位的时候，业余投资者正在摊低成本。</p> <p>假设一个专家和业务选手都决定将5%的资本用于风险投资。专家可能会首选买2%，然后再买2%，最好再讲剩下的1%投资进去。
+之后他可能会讲止损线设置在平均买入价以下10%的位置，总风险控制在其总资本的0.5%。
+业余投资者会在同一价格一次性建仓完毕，如果市场走势与预期不同，他可能会讲仓位翻番，一次摊低平均成本。</p> <p>永远不要相信初始价格，除非你的仓位已经让你盈利。</p> <h1 id="股票魔法师2"><a href="#股票魔法师2" class="header-anchor">#</a> 股票魔法师2</h1> <p>风险优先的方式看待每一笔交易。</p> <h2 id="永远不要让风险超过预期收益"><a href="#永远不要让风险超过预期收益" class="header-anchor">#</a> 永远不要让风险超过预期收益</h2> <p>止损线控制在止盈线一半以下。
+平均成功率。
+在50%的平均成功率下，你正确的次数和错误的次数一样多，所以要保持2:1的收益/风险比，你需要让亏损只有收益的一半。
+然而，如果成功率是40%，为了保持相同的2:1的收益/风险比率，你的亏损必须保持在收益水平的1/3。</p> <h3 id="让-失败-成为一部分"><a href="#让-失败-成为一部分" class="header-anchor">#</a> 让&quot;失败&quot;成为一部分</h3> <h3 id="波动和预期的科学"><a href="#波动和预期的科学" class="header-anchor">#</a> 波动和预期的科学</h3> <p>严格控制亏损。</p> <p>随着亏损和你的收益同比例正价，回报实际上是在下降。</p></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/finance/mofashi.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <!----> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><!----> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">股票魔法师</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/finance/mofashi.html#设定一个计划" class="toc-sidebar-link">设定一个计划</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/finance/mofashi.html#交易规则" class="toc-sidebar-link">交易规则</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#选股" class="toc-sidebar-link">选股</a></li><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#止损" class="toc-sidebar-link">止损</a></li></ul></li><li><a href="/md/finance/mofashi.html#第三章-sepa策略" class="toc-sidebar-link">第三章 SEPA策略</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/finance/mofashi.html#第六章-行业、类别和催化剂" class="toc-sidebar-link">第六章 行业、类别和催化剂</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#报告公布时刻" class="toc-sidebar-link">报告公布时刻</a></li></ul></li><li><a href="/md/finance/mofashi.html#价值百万的图表" class="toc-sidebar-link">价值百万的图表</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#稳固期" class="toc-sidebar-link">稳固期</a></li><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#波动收缩" class="toc-sidebar-link">波动收缩</a></li><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#深度纠正模式-失败的前兆" class="toc-sidebar-link">深度纠正模式 - 失败的前兆</a></li><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#时间压缩" class="toc-sidebar-link">时间压缩</a></li><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#震荡期" class="toc-sidebar-link">震荡期</a></li><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#关注需求的迹象" class="toc-sidebar-link">关注需求的迹象</a></li><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#_3c规律" class="toc-sidebar-link">3C规律</a></li></ul></li><li><a href="/md/finance/mofashi.html#风险管理-风险的本质" class="toc-sidebar-link">风险管理：风险的本质</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#只要你学会保护它-钱将永远属于你" class="toc-sidebar-link">只要你学会保护它，钱将永远属于你</a></li><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#合理的法则让你的视线更透彻" class="toc-sidebar-link">合理的法则让你的视线更透彻</a></li></ul></li><li><a href="/md/finance/mofashi.html#风险管理-如何处理并掌控风险" class="toc-sidebar-link">风险管理：如何处理并掌控风险</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#养成习惯" class="toc-sidebar-link">养成习惯</a></li><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#应急计划" class="toc-sidebar-link">应急计划</a></li><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#向你的止损线致敬" class="toc-sidebar-link">向你的止损线致敬</a></li><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#一定会带来灾难的习惯" class="toc-sidebar-link">一定会带来灾难的习惯</a></li></ul></li><li><a href="/md/finance/mofashi.html#永远不要让风险超过预期收益" class="toc-sidebar-link">永远不要让风险超过预期收益</a><ul class="toc-sidebar-sub-headers"><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#让-失败-成为一部分" class="toc-sidebar-link">让&quot;失败&quot;成为一部分</a></li><li class="toc-sidebar-sub-header"><a href="/md/finance/mofashi.html#波动和预期的科学" class="toc-sidebar-link">波动和预期的科学</a></li></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/finance/mofashi.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <!----> <!----></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-102.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>

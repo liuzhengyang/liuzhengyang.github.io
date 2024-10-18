@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>WispScheduler | bytejava Java进阶手册</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <script charset="utf-8" async="async" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" async="async" src="/js/global.js"></script>
+    <script charset="utf-8" async="async" src="/js/fingerprint2.min.js"></script>
+    <script charset="utf-8" async="async" src="https://s9.cnzz.com/z_stat.php?id=12782949&amp;web_id=1272949"></script>
+    <script>
+              var _hmt = _hmt || [];
+              (function() {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?fa0fbf0fef3bba94118b912a64766cee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+              })();
+            </script>
+    <meta name="description" content="包含: Java 基础，高并发缓存，JVM，中间件，字节码编程...">
+    <meta property="og:title" content="WispScheduler">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="/md/jvm/wisp/WispScheduler.html">
+    <meta name="twitter:title" content="WispScheduler">
+    <meta name="twitter:url" content="/md/jvm/wisp/WispScheduler.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="all">
+    <meta name="author" content="bytejava">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="keywords" content="bytejava 高级Java，Java设计模式, 字节码编程, 中间件, Spring, Java基础, 面经手册">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="preload" href="/assets/css/0.styles.8fb5e8ac.css" as="style"><link rel="preload" href="/assets/css/styles.css?v=1729221831211" as="style"><link rel="preload" href="/assets/js/cg-styles.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-app.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-4.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-3.js?v=1729221831211" as="script"><link rel="preload" href="/assets/js/cg-245.js?v=1729221831211" as="script">
+    <link rel="stylesheet" href="/assets/css/0.styles.8fb5e8ac.css"><link rel="stylesheet" href="/assets/css/styles.css?v=1729221831211">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">bytejava Java进阶手册</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Java" class="dropdown-title"><span class="title">Java</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/java/basic/java线程池.html" class="nav-link">
+  Java基础
+</a></li><li class="dropdown-item"><!----> <a href="/md/java/compiler/javac.html" class="nav-link">
+  Java编译器
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="JVM" class="dropdown-title"><span class="title">JVM</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/jvm/bytecode/class字节码文件格式.html" class="nav-link">
+  字节码
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvm/javaagent.html" class="nav-link">
+  jvm
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/jvmti/jvmti介绍和开发.html" class="nav-link">
+  jvmti
+</a></li><li class="dropdown-item"><!----> <a href="/md/jvm/gc/g1/g1-all-intro.html" class="nav-link">
+  G1 GC
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="缓存" class="dropdown-title"><span class="title">缓存</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/cache/redis/redis.html" class="nav-link">
+  零基础到高并发应用专家，深入理解redis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Spring" class="dropdown-title"><span class="title">Spring</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/spring/springboot启动请求处理过程.html" class="nav-link">
+  Spring实现
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Kafka" class="dropdown-title"><span class="title">Kafka</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/kafka/kafka.html" class="nav-link">
+  kafka
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="MyBatis" class="dropdown-title"><span class="title">MyBatis</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/mybatis/mybatis-use-general.html" class="nav-link">
+  MyBatis
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="业务开发" class="dropdown-title"><span class="title">业务开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/develop/" class="nav-link">
+  业务开发
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="中间件" class="dropdown-title"><span class="title">中间件</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/distribute/raft.html" class="nav-link">
+  raft
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="算法" class="dropdown-title"><span class="title">算法</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/algorithm/leetcode.html" class="nav-link">
+  算法
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="软技能通用技能" class="dropdown-title"><span class="title">软技能通用技能</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/soft/晋升答辩.html" class="nav-link">
+  晋升答辩
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="专栏" class="dropdown-title"><span class="title">专栏</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/md/column/column.html" class="nav-link">
+  订阅我的专栏
+</a></li></ul></div></div><div class="nav-item"><a href="https://github.com/liuzhengyang" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <!----> </aside> <div><main class="withouttoc page"> <div class="theme-default-content content__default"><h1 id="wispscheduler"><a href="#wispscheduler" class="header-anchor">#</a> WispScheduler</h1> <p>WispScheduler负责管理所有的worker，worker能够work-stealing，即发现自己没有工作时，会主动查看其他worker有没有没做的工作，尝试抢过来运行。
+每个worker线程关联一个ConcurrentLinkedQueue来接收任务。</p> <div class="language-text line-numbers-mode"><pre class="language-text"><code>    WispScheduler(int parallelism, int stealRetry, int pushRetry, int helpStealRetry,
+                  ThreadFactory threadFactory, WispEngine engine, boolean isRootCarrier) {
+        assert parallelism &gt; 0;
+        PARALLEL = parallelism;
+        STEAL_RETRY = stealRetry;
+        PUSH_RETRY = pushRetry;
+        HELP_STEAL_RETRY = helpStealRetry;
+        IS_ROOT_CARRIER = isRootCarrier;
+        this.engine = engine;
+        this.threadFactory = threadFactory;
+        workers = new Worker[PARALLEL];
+        for (int i = parallelism - 1; i &gt;= 0; i--) {
+            workers[i] = new Worker(i);
+            workers[i].next = i == PARALLEL - 1 ? null : workers[i + 1];
+        }
+        workers[PARALLEL - 1].next = workers[0];
+        if (!isRootCarrier) {
+            // root worker threads are started in startWispDaemons()
+            startWorkerThreads();
+        }
+    }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br></div></div><h2 id="worker定义"><a href="#worker定义" class="header-anchor">#</a> Worker定义</h2> <ul><li>Worker包含一个taskQueue。taskQueue的类型是ConcurrentLinkedQueue，是juc提供的无锁的并发队列，这是因为队列没有长度上限，不需要阻塞等待，任务获取可以由worker自行决定是否阻塞挂起。</li> <li>每个Worker中还包含了一个WispEventPump的引用，pump与Worker是一对多的关系。这里有配置控制pump是否为null。
+<ul><li>默认情况下，wisp2采用的是全转线程为协程模式，pump不为null，会由Worker负责调用pump的pollAndDispatchEvents方法</li></ul></li> <li>每个Worker还包含一个next，形成一个链表结构。</li> <li>timerManager是时间管理器，用来实现定时阻塞功能，比如juc中同步器的有超时时间的条件等待。</li> <li>每个Worker对应一个线程，通过threadFactory创建，这个线程就是jvm的普通线程，会运行WispTask</li> <li>hasBeenHandoff: TODO FIXME 已经被转移，是什么作用？</li></ul> <div class="language-text line-numbers-mode"><pre class="language-text"><code>class Worker implements Runnable {
+    ConcurrentLinkedQueue&amp;lt;StealAwareRunnable&gt; taskQueue;
+    private final TimeOut.TimerManager timerManager;
+    private final Thread thread;
+    private final WispEventPump pump; // ONE pump verse N worker relationship
+    volatile boolean hasBeenHandoff = false;
+    private Worker next;
+
+    private final static int QL_PROCESSING_TIMER = -1; // idle than ql=0, but not really idle
+    private final static int QL_POLLING = -1000002;
+    private final static int QL_IDLE = -2000002;
+
+    volatile int queueLength;
+
+    Worker(int index) {
+        thread = threadFactory.newThread(this);
+        WispEngine.carrierThreads.add(thread);
+        taskQueue = new ConcurrentLinkedQueue&amp;lt;&gt;();
+        timerManager = new TimeOut.TimerManager();
+        queueLength = 0;
+        pump = WispConfiguration.CARRIER_AS_POLLER &amp;amp;&amp;amp; IS_ROOT_CARRIER ? WispEventPump.Pool.INSTANCE.getPump(index) : null;
+    }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br></div></div><p>run方法是Worker执行的代码逻辑。</p> <ul><li>WispCarrier.current() 获取当前的Worker对应的WispCarrier</li> <li>WispSysmon.INSTANCE.register(carrier)： 向WispSysmon中注册</li> <li>runCarrier: while(true)运行，不断从taskQueue中获取StealAwareRunnable任务执行任务，如果没有任务，会park或继续轮询polling</li> <li>doExec: 直接调用task.run(StealAwareRunnable)</li></ul> <div class="language-text line-numbers-mode"><pre class="language-text"><code>    void processTimer() {
+        timerManager.processTimeoutEventsAndGetWaitDeadline(System.nanoTime());
+    }
+
+    @Override
+    public void run() {
+        try {
+            WispCarrier carrier = WispCarrier.current();
+            carrier.engine = WispScheduler.this.engine;
+            carrier.worker = this;
+            WispScheduler.this.engine.carrierEngines.add(carrier);
+            WispEngine.registerPerfCounter(carrier);
+            WispSysmon.INSTANCE.register(carrier);
+            runCarrier(carrier);
+        } finally {
+            WispEngine.carrierThreads.remove(thread);
+            try {
+                engine.shutdownBarrier.await();
+            } catch (Exception e) {
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                System.out.println(&quot;[Wisp-ERROR] unexpected error &quot;
+                        + &quot;on current&quot; + Thread.currentThread() + &quot;has exception&quot;
+                        + sw.toString());
+            }
+        }
+    }
+
+    private void runCarrier(final WispCarrier carrier) {
+        int r = randomSeed();
+        Runnable task;
+        while (true) {
+            while ((task = pollTask(false)) != null) {
+                doExec(task);
+            }
+
+            if (carrier.engine.terminated) {
+                return;
+            } else if ((task = SCHEDULING_POLICY.steal(this, r = nextRandom(r))) != null) {
+                doExec(task);
+                continue; // process local queue
+            }
+            doParkOrPolling();
+        }
+    }
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br></div></div><p>每次while遍历，发现队列中没有可执行任务时，会调用doParkOrPolling。</p> <ul><li>st是state表示状态，QL_PROCESSING_TIMER为-1。</li> <li>timerManager.processTimeoutEventsAndGetWaitDeadline: 处理timeOutManager中的达到超时时间的任务，如果没有会返回最近要超时的时间点。</li> <li>返回这个时间点后，worker如果真的没有任务，就可以sleep到这个时间再醒过来</li> <li>判断当前的队列长度，如果不为零返回，说明有其他人向队列里添加了任务。</li> <li>如果为0，会调用LENGTH_UPDATE通过cas的方式，cas从0到-1。LENGTH_UPDATE是AtomicIntegerFieldUpdate，指向WispScheduler的queueLength字段。</li> <li>cas没成功，说明其他线程修改了队列长度，或者其他线程执行了cas。</li> <li>再判断一下queueLength==st也就是为-1，然后通过pump.tryAcquire，tryAcquire成功，update为QL_POLLING，否则为QL_IDLE；tryAcquire会把worker通过cas设置到WispEventPump的owner字段中。</li> <li>tryAcquire只是cas设置owner，但是pump中没有使用owner这个字段，有何意义？owner会负责执行doPolling，因为一个pump对应N个worker。</li> <li>通过LENGTH_UPDATE cas queueLength为update的值，cas成功，会再判断taskQueue是否为空，然后根据pump的tryAcquire结果，如果成功，则负责进行doPolling</li> <li>doPolling负责不断调用pump的pollAndDispatchEvents方法，直到达到deadline也就是有定时任务要处理了。</li> <li>doPolling结束后，会判断update是否等于QL_POLLING，如果等于说明是pump的owner，则会调用pump.release释放owner角色，说明当前的carrier暂时停止进行pollAndDispatch</li> <li>LENGTH_UPDATE.addAndGet(this, -st)，会给queueLength加1，以为length是-1,加完后变成0</li></ul> <div class="language-text line-numbers-mode"><pre class="language-text"><code>    private void doParkOrPolling() {
+        int st = QL_PROCESSING_TIMER;
+        if (queueLength != 0 || !LENGTH_UPDATER.compareAndSet(this, 0, st)) {
+            return;
+        }
+        final long now = System.nanoTime();
+        final long deadline = timerManager.processTimeoutEventsAndGetWaitDeadline(now);
+        assert deadline != 0;
+        if (queueLength == st) {
+            int update = pump != null &amp;amp;&amp;amp; pump.tryAcquire(this) ? QL_POLLING : QL_IDLE;
+            if (LENGTH_UPDATER.compareAndSet(this, st, update)) {
+                st = update;
+                if (taskQueue.peek() == null) {
+                    if (st == QL_IDLE) {
+                        UA.park0(false, deadline &amp;lt; 0 ? 0 : deadline - now);
+                    } else { // st == QL_POLLING
+                        doPolling(deadline, now);
+                    }
+                }
+            }
+            if (update == QL_POLLING) {
+                pump.release(this);
+            }
+        }
+        LENGTH_UPDATER.addAndGet(this, -st);
+    }
+
+    private void doPolling(final long deadline, long now) {
+        while ((deadline &amp;lt; 0 || deadline &gt; now) &amp;amp;&amp;amp;
+                !pump.pollAndDispatchEvents(
+                        deadline &amp;lt; 0 ? -1 : TimeOut.nanos2Millis(deadline - now)) &amp;amp;&amp;amp;
+                queueLength == QL_POLLING) { // if wakened by event, we can still waiting..
+            now = deadline &amp;lt; 0 ? now : System.nanoTime();
+        }
+    }
+
+    /**
+     * @return if it is idle
+     */
+    private boolean doSignalIfNecessary(int len) {
+        Thread current = JLA.currentThread0();
+        if (thread != current) {
+            if (len == QL_IDLE) {
+                UA.unpark0(this.thread);
+            } else if (len == QL_POLLING) {
+                pump.wakeup();
+            }
+        }
+        return len &amp;lt; 0;
+    }
+
+    boolean idleOrPolling() {
+        return queueLength == QL_IDLE || queueLength == QL_POLLING;
+    }
+
+    boolean isProcessingTimer() {
+        return queueLength == QL_PROCESSING_TIMER;
+    }
+
+    Runnable pollTask(boolean isSteal) {
+        StealAwareRunnable task = taskQueue.poll();
+        if (task != null) {
+            LENGTH_UPDATER.decrementAndGet(this);
+            if (isSteal &amp;amp;&amp;amp; !task.isStealEnable()) {
+                // disable steal is a very uncommon case,
+                // The overhead of re-enqueue is acceptable
+                // use pushAndSignal rather than offer,
+                // let the worker execute the task as soon as possible.
+                pushAndSignal(task);
+                return null;
+            }
+        }
+        return task;
+    }
+
+    /**
+     * @return if it is idle
+     */
+    boolean pushAndSignal(StealAwareRunnable task) {
+        taskQueue.offer(task);
+        return doSignalIfNecessary(LENGTH_UPDATER.getAndIncrement(this));
+    }
+
+    void signal() {
+        doSignalIfNecessary(queueLength);
+    }
+
+    void copyContextFromDetachedCarrier(Worker detachedWorker) {
+        // copy timers
+        timerManager.copyTimer(detachedWorker.timerManager.queue);
+        // drain wispTasks
+        StealAwareRunnable task;
+        while ((task = detachedWorker.taskQueue.poll()) != null) {
+            pushAndSignal(task);
+        }
+    }
+
+    WispScheduler theScheduler() {
+        return WispScheduler.this;
+    }
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br><span class="line-number">89</span><br><span class="line-number">90</span><br><span class="line-number">91</span><br><span class="line-number">92</span><br><span class="line-number">93</span><br><span class="line-number">94</span><br><span class="line-number">95</span><br><span class="line-number">96</span><br><span class="line-number">97</span><br><span class="line-number">98</span><br><span class="line-number">99</span><br><span class="line-number">100</span><br><span class="line-number">101</span><br></div></div><h2 id="问题"><a href="#问题" class="header-anchor">#</a> 问题</h2> <p>WispScheduler当前的问题在于，对于Worker的park和unpark没有谨慎调用，容易导致一个Worker频繁的进行park、unpark切换，
+导致大量CPU消耗在阻塞唤醒线程上下文切换上。</p> <p>WispScheduler的push调度策略是，如果WispTask的原始Worker当前繁忙（不是idle状态），则会随机找另一个最空闲Worker来入队（如果阻塞会先唤醒）
+并且在没有任务后（且steal不成功、没抢到event pump任务）会立刻park。</p> <h2 id="和forkjoinpool的差异"><a href="#和forkjoinpool的差异" class="header-anchor">#</a> 和ForkJoinPool的差异</h2> <p>ForkJoinPool的设计有如下特点</p> <ul><li>Worker生产了任务时，会放到自己的WorkQueue中，从而减少了唤醒次数</li> <li>唤醒Worker使用的最近（将要）park的Worker（通过栈结构），在一定程度上又能减少唤醒和park次数。</li> <li>Worker的steal使用的随机scan steal，Wisp在16核以上时使用的随机选择最空闲Worker唤醒。</li> <li>具有submission queue和local queue，能够减少冲突、减少唤醒。</li></ul></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/liuzhengyang/liuzhengyang.github.io/edit/master/docs/md/jvm/wisp/WispScheduler.md" target="_blank" rel="noopener noreferrer">Edit this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <!----> </main></div> <aside class="page-sidebar"> <div class="page-side-toolbar"><!----> <div class="option-box-toc-over"><img src="/images/system/toc.png" class="nozoom"> <span class="show-txt">目录</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="max-height:550px"><div style="font-weight:bold;text-align:center;">WispScheduler</div> <hr> <div class="toc-box"><ul class="toc-sidebar-links"><li><a href="/md/jvm/wisp/WispScheduler.html#worker定义" class="toc-sidebar-link">Worker定义</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/jvm/wisp/WispScheduler.html#问题" class="toc-sidebar-link">问题</a><ul class="toc-sidebar-sub-headers"></ul></li><li><a href="/md/jvm/wisp/WispScheduler.html#和forkjoinpool的差异" class="toc-sidebar-link">和ForkJoinPool的差异</a><ul class="toc-sidebar-sub-headers"></ul></li></ul></div></div></div></div></div> <div class="option-box"><img src="/images/system/wechat.png" class="nozoom"> <span class="show-txt">手机看</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">微信扫一扫</span> <img height="180px" src="https://api.qrserver.com/v1/create-qr-code/?data=https://bytejava.cn/md/jvm/wisp/WispScheduler.html" style="margin:10px;">
+                可以<b>手机看</b>或分享至<b>朋友圈</b></div></div></div></div> <div class="option-box"><img src="/images/personal/wechat-mp-logo.jpg" height="20" class="nozoom"> <span class="show-txt">公众号</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.9rem">关注公众号bytejava</span> <img src="/images/personal/wechat-mp.png" height="180" width></div></div></div></div> <div class="option-box"><img src="/images/system/toggle.png" width="30px" class="nozoom"> <span class="show-txt">左栏</span></div> <div class="option-box"><img src="/images/system/heart-1.png" width="25px" class="nozoom"> <span class="show-txt">赞赏我</span> <div class="toc-container"><div class="pos-box"><div class="icon-arrow"></div> <div class="scroll-box" style="text-align:center"><span style="font-size:0.8rem;font-weight:bold;">鼓励/支持/赞赏我</span> <img height="180px" src="/images/personal/encourage-head.jpg" style="margin:5px;"> <br>1. 不靠它生存但仍希望得到你的鼓励；
+                <br>2. 时刻警醒自己保持技术人的初心，沉淀，分享，成长；
+              </div></div></div></div> <!----> <!----></div>  <!----> </aside></div><div class="global-ui"></div></div>
+    <script src="/assets/js/cg-styles.js?v=1729221831211" defer></script><script src="/assets/js/cg-4.js?v=1729221831211" defer></script><script src="/assets/js/cg-3.js?v=1729221831211" defer></script><script src="/assets/js/cg-245.js?v=1729221831211" defer></script><script src="/assets/js/cg-app.js?v=1729221831211" defer></script>
+  </body>
+</html>
